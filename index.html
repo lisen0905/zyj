@@ -3379,32 +3379,6 @@ document.getElementById('api-settings-screen').innerHTML = `<header class="app-h
     <input type="checkbox" id="force-html-theater" style="width: auto; height: 20px;">
 </div>
 <!-- === 新增结束 === -->
-
-<!-- ===ai自动发布动态开关 === -->
-<div class="form-group" style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px;">
-    <label for="auto-post-moments" style="margin-bottom: 0;">AI自动发布动态</label>
-    <input type="checkbox" id="auto-post-moments" style="width: auto; height: 20px;">
-</div>
-
-<!-- === 新增结束 === -->
-
-<!-- === 新增ai主动发消息 === -->
-<div class="form-group" style="border-top: 1px solid #eee; padding-top: 20px; margin-top: 20px;">
-    <div style="display: flex; align-items: center; justify-content: space-between;">
-        <label for="proactive-messaging-enabled" style="margin-bottom: 0;">允许AI主动发消息</label>
-        <input type="checkbox" id="proactive-messaging-enabled" style="width: auto; height: 20px;">
-    </div>
-    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 15px;">
-        <label for="proactive-messaging-hours" style="margin-bottom: 0;">超时阈值 (小时)</label>
-        <div style="display: flex; align-items: center; gap: 8px;">
-         <input type="number" id="proactive-messaging-hours" style="width: 80px; text-align: center;" min="0.1" step="0.1" value="5">
-            <span>小时</span>
-        </div>
-    </div>
-</div>
-
-<!-- === 新增结束 === -->
-
 </form></main>`;
 
         document.getElementById('wallpaper-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="home-screen">‹</button><div class="title-container"><h1 class="title">更换壁纸</h1></div><div class="placeholder"></div></header><main class="content"><div class="wallpaper-preview" id="wallpaper-preview"><span>当前壁纸预览</span></div><input type="file" id="wallpaper-upload" accept="image/*" style="display: none;"><label for="wallpaper-upload" class="btn btn-primary">从相册选择新壁纸</label></main>`;
@@ -3800,11 +3774,6 @@ const locationBtn = document.getElementById('location-btn'),
 
             if (!db.apiSettings) db.apiSettings = {};
             if (db.apiSettings.forceHtmlTheater === undefined) db.apiSettings.forceHtmlTheater = false;
-if (db.apiSettings.autoPostMomentsEnabled === undefined) db.apiSettings.autoPostMomentsEnabled = false; // ▼▼▼【新增】
-// ▼▼▼ 1. 初始化主动消息设置 ▼▼▼
-            if (db.apiSettings.proactiveMessagingEnabled === undefined) db.apiSettings.proactiveMessagingEnabled = false;
-            if (db.apiSettings.proactiveMessagingHours === undefined) db.apiSettings.proactiveMessagingHours = 5; // 默认5小时
-            // ▲▲▲ 代码结束 ▲▲▲
             if (!db.wallpaper) db.wallpaper = 'https://i.postimg.cc/W4Z9R9x4/ins-1.jpg';
             if (!db.characters) db.characters = [];
             if (!db.groups) db.groups = [];
@@ -4445,49 +4414,48 @@ function formatFileSize(bytes) {
         }
 
         // --- App Setup Functions ---
-      // ▼▼▼【修复】用这个新版本替换旧的 setupHomeScreen 函数 ▼▼▼
-function setupHomeScreen() {
-    const getIcon = (id) => db.customIcons[id] || defaultIcons[id].url;
-    const homeScreenHTML = `
-    <div class="time-widget"><div class="time" id="time-display"></div><div class="date" id="date-display"></div></div>
-    
-    <div id="music-app-widget" class="music-widget">
-        <img src="https://i.postimg.cc/BQMG9TCB/retouch-2025080716560739.png" alt="音乐图标" class="music-widget-icon">
-        <div class="music-widget-info">
-            <p class="title">暂未播放</p>
-            <p class="artist">点击打开播放器</p>
-        </div>
+        function setupHomeScreen() {
+            const getIcon = (id) => db.customIcons[id] || defaultIcons[id].url;
+            const homeScreenHTML = `
+            <div class="time-widget"><div class="time" id="time-display"></div><div class="date" id="date-display"></div></div>
+            <!-- 在这里插入音乐小部件 -->
+<div id="music-app-widget" class="music-widget">
+    <img src="https://i.postimg.cc/BQMG9TCB/retouch-2025080716560739.png" alt="音乐图标" class="music-widget-icon">
+    <div class="music-widget-info">
+        <p class="title">暂未播放</p>
+        <p class="artist">点击打开播放器</p>
     </div>
-    <div class="app-grid">
-        <a href="#" class="app-icon" data-target="chat-list-screen"><img src="${getIcon('chat-list-screen')}" alt="404" class="icon-img"><span class="app-name">${defaultIcons['chat-list-screen'].name}</span></a>
-        <a href="#" class="app-icon" data-target="api-settings-screen"><img src="${getIcon('api-settings-screen')}" alt="API" class="icon-img"><span class="app-name">${defaultIcons['api-settings-screen'].name}</span></a>
-        <a href="#" class="app-icon" data-target="wallpaper-screen"><img src="${getIcon('wallpaper-screen')}" alt="Wallpaper" class="icon-img"><span class="app-name">${defaultIcons['wallpaper-screen'].name}</span></a>
-        <a href="#" class="app-icon" data-target="world-book-screen"><img src="${getIcon('world-book-screen')}" alt="World Book" class="icon-img"><span class="app-name">${defaultIcons['world-book-screen'].name}</span></a>
-        <a href="#" class="app-icon" data-target="customize-screen"><img src="${getIcon('customize-screen')}" alt="Customize" class="icon-img"><span class="app-name">${defaultIcons['customize-screen'].name}</span></a>
-        <a href="#" class="app-icon" data-target="tutorial-screen"><img src="${getIcon('tutorial-screen')}" alt="Tutorial" class="icon-img"><span class="app-name">${defaultIcons['tutorial-screen'].name}</span></a>
-    </div>
-    <div class="dock">
-        <a href="#" class="app-icon" id="day-mode-btn"><img src="${getIcon('day-mode-btn')}" alt="日间" class="icon-img"></a>
-        <a href="#" class="app-icon" id="night-mode-btn"><img src="${getIcon('night-mode-btn')}" alt="夜间" class="icon-img"></a>
-        <a href="#" class="app-icon" data-target="font-settings-screen"><img src="${getIcon('font-settings-screen')}" alt="字体" class="icon-img"></a>
-    </div>`;
-    homeScreen.innerHTML = homeScreenHTML;
-    updateClock();
-    applyWallpaper(db.wallpaper);
-    applyHomeScreenMode(db.homeScreenMode);
-    document.getElementById('day-mode-btn')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        applyHomeScreenMode('day');
-    });
-    document.getElementById('night-mode-btn')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        applyHomeScreenMode('night');
-    });
-    document.querySelector('[data-target="world-book-screen"]').addEventListener('click', renderWorldBookList);
-    document.querySelector('[data-target="customize-screen"]').addEventListener('click', renderCustomizeForm);
-    document.querySelector('[data-target="tutorial-screen"]').addEventListener('click', renderTutorialContent);
-}
-// ▲▲▲ 替换结束 ▲▲▲
+</div>
+<!-- 音乐小部件结束 -->
+            <div class="app-grid">
+                <a href="#" class="app-icon" data-target="chat-list-screen"><img src="${getIcon('chat-list-screen')}" alt="404" class="icon-img"><span class="app-name">${defaultIcons['chat-list-screen'].name}</span></a>
+                <a href="#" class="app-icon" data-target="api-settings-screen"><img src="${getIcon('api-settings-screen')}" alt="API" class="icon-img"><span class="app-name">${defaultIcons['api-settings-screen'].name}</span></a>
+                <a href="#" class="app-icon" data-target="wallpaper-screen"><img src="${getIcon('wallpaper-screen')}" alt="Wallpaper" class="icon-img"><span class="app-name">${defaultIcons['wallpaper-screen'].name}</span></a>
+                <a href="#" class="app-icon" data-target="world-book-screen"><img src="${getIcon('world-book-screen')}" alt="World Book" class="icon-img"><span class="app-name">${defaultIcons['world-book-screen'].name}</span></a>
+                <a href="#" class="app-icon" data-target="customize-screen"><img src="${getIcon('customize-screen')}" alt="Customize" class="icon-img"><span class="app-name">${defaultIcons['customize-screen'].name}</span></a>
+                <a href="#" class="app-icon" data-target="tutorial-screen"><img src="${getIcon('tutorial-screen')}" alt="Tutorial" class="icon-img"><span class="app-name">${defaultIcons['tutorial-screen'].name}</span></a>
+            </div>
+            <div class="dock">
+                <a href="#" class="app-icon" id="day-mode-btn"><img src="${getIcon('day-mode-btn')}" alt="日间" class="icon-img"></a>
+                <a href="#" class="app-icon" id="night-mode-btn"><img src="${getIcon('night-mode-btn')}" alt="夜间" class="icon-img"></a>
+                <a href="#" class="app-icon" data-target="font-settings-screen"><img src="${getIcon('font-settings-screen')}" alt="字体" class="icon-img"></a>
+            </div>`;
+            homeScreen.innerHTML = homeScreenHTML;
+            updateClock();
+            applyWallpaper(db.wallpaper);
+            applyHomeScreenMode(db.homeScreenMode);
+            document.getElementById('day-mode-btn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                applyHomeScreenMode('day');
+            });
+            document.getElementById('night-mode-btn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                applyHomeScreenMode('night');
+            });
+            document.querySelector('[data-target="world-book-screen"]').addEventListener('click', renderWorldBookList);
+            document.querySelector('[data-target="customize-screen"]').addEventListener('click', renderCustomizeForm);
+            document.querySelector('[data-target="tutorial-screen"]').addEventListener('click', renderTutorialContent);
+        }
 
         function applyWallpaper(url) {
             homeScreen.style.backgroundImage = `url(${url})`;
@@ -5100,77 +5068,44 @@ function cancelQuoteReply() {
             showToast(`已删除 ${deletedCount} 条消息`);
         }
 
-    // ▼▼▼ 从这里开始替换 ▼▼▼
-function openChatRoom(chatId, type) {
-    // 这部分代码是新增加的，用于提前检查是否需要主动回复
-    let shouldProactivelyReply = false;
-    if (db.apiSettings.proactiveMessagingEnabled && type === 'private' && !isGenerating) {
-        const character = db.characters.find(c => c.id === chatId);
-        if (character && character.history && character.history.length > 0) {
-            const lastMessage = character.history[character.history.length - 1];
-            if (lastMessage.role === 'assistant') {
-                const lastMessageTime = lastMessage.timestamp;
-                const currentTime = Date.now();
-                const thresholdMs = (db.apiSettings.proactiveMessagingHours || 5) * 60 * 60 * 1000;
-                if ((currentTime - lastMessageTime) > thresholdMs) {
-                    shouldProactivelyReply = true;
-                }
-            }
-        }
-    }
-
-    // --- 以下是您文件中原有的打开聊天室的逻辑，保持不变 ---
-    const chat = (type === 'private') ? db.characters.find(c => c.id === chatId) : db.groups.find(g => g.id === chatId);
-    if (!chat) return;
-
-    exitMultiSelectMode();
-    cancelMessageEdit();
-
-    voiceCallBtn.style.display = (type === 'private') ? 'flex' : 'none';
-    const diaryBtn = document.getElementById('diary-btn');
-    diaryBtn.style.display = (type === 'private') ? 'flex' : 'none';
-
-    chatRoomTitle.textContent = (type === 'private') ? chat.remarkName : chat.name;
-    const subtitle = document.getElementById('chat-room-subtitle');
-    if (type === 'private') {
-        subtitle.style.display = 'flex';
-        chatRoomStatusText.textContent = chat.status || '在线';
-    } else {
-        subtitle.style.display = 'none';
-    }
-
-    getReplyBtn.style.display = 'inline-flex';
-    chatRoomScreen.style.backgroundImage = chat.chatBg ? `url(${chat.chatBg})` : 'none';
-    chatRoomScreen.style.setProperty('--bubble-scale', type === 'group' ? (chat.bubbleScale || 1) : 1);
-
-    typingIndicator.style.display = 'none';
-    isGenerating = false;
-    getReplyBtn.disabled = false;
-
-    currentPage = 1;
-    chatRoomScreen.className = chatRoomScreen.className.replace(/\bchat-active-[^ ]+\b/g, '');
-    chatRoomScreen.classList.add(`chat-active-${chatId}`);
-    updateCustomBubbleStyle(chatId, chat.customBubbleCss, chat.useCustomBubbleCss);
-
-    renderMessages(false, true);
-    switchScreen('chat-room-screen');
-
-    // --- 核心修改：如果需要主动回复，就在这里执行 ---
-    if (shouldProactivelyReply) {
-        const character = db.characters.find(c => c.id === chatId);
-        // 1. 立即显示“正在输入中”
-        isGenerating = true;
-        getReplyBtn.disabled = true;
-        typingIndicator.textContent = `“${character.remarkName}”正在输入中...`;
-        typingIndicator.style.display = 'block';
-        messageArea.scrollTop = messageArea.scrollHeight;
-
-        // 2. 调用原有的 getProactiveAiMessage 函数去获取回复
-        // 这个函数内部会在完成后自动隐藏“正在输入”并解锁按钮
-        getProactiveAiMessage(character);
-    }
+        function openChatRoom(chatId, type) {
+            const chat = (type === 'private') ? db.characters.find(c => c.id === chatId) : db.groups.find(g => g.id === chatId);
+            if (!chat) return;
+            exitMultiSelectMode();
+if (type === 'private') {
+    voiceCallBtn.style.display = 'flex';
+} else {
+    voiceCallBtn.style.display = 'none';
 }
-// ▲▲▲ 替换到这里结束 (这个函数的最后一行就是一个 `}` ) ▲▲▲
+            cancelMessageEdit();
+            const diaryBtn = document.getElementById('diary-btn');
+    if (type === 'private') {
+        diaryBtn.style.display = 'flex';
+    } else {
+        diaryBtn.style.display = 'none';
+    }
+    // --- 添加结束 ---
+            chatRoomTitle.textContent = (type === 'private') ? chat.remarkName : chat.name;
+            const subtitle = document.getElementById('chat-room-subtitle');
+            if (type === 'private') {
+                subtitle.style.display = 'flex';
+                chatRoomStatusText.textContent = chat.status || '在线';
+            } else {
+                subtitle.style.display = 'none';
+            }
+            getReplyBtn.style.display = 'inline-flex';
+            chatRoomScreen.style.backgroundImage = chat.chatBg ? `url(${chat.chatBg})` : 'none';
+            chatRoomScreen.style.setProperty('--bubble-scale', type === 'group' ? (chat.bubbleScale || 1) : 1);
+            typingIndicator.style.display = 'none';
+            isGenerating = false;
+            getReplyBtn.disabled = false;
+            currentPage = 1;
+            chatRoomScreen.className = chatRoomScreen.className.replace(/\bchat-active-[^ ]+\b/g, '');
+            chatRoomScreen.classList.add(`chat-active-${chatId}`);
+            updateCustomBubbleStyle(chatId, chat.customBubbleCss, chat.useCustomBubbleCss);
+            renderMessages(false, true);
+            switchScreen('chat-room-screen');
+        }
 
         function renderMessages(isLoadMore = false, forceScrollToBottom = false) {
             const chat = (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
@@ -5214,25 +5149,9 @@ function openChatRoom(chatId, type) {
             return Math.max(1, Math.min(60, Math.ceil(text.length / 3.5)));
         }
 
-   
-function createMessageBubbleElement(message) {
-    const { content } = message;
-    if (content && content.startsWith('[') && content.endsWith(']')) {
-        const knownPatterns = [
-            '的消息：', '送来的礼物：', '的语音：', '发来的照片/视频：', '的转账：',
-            '发送的表情包：', '已接收礼物', '接收', '退回', '更新状态为：',
-            'status_update:"', '分享了位置：', '引用了', 'call:', 'system-display:',
-            'offline-scene:', '发布动态：', '评论动态：', '点赞动态：', '回复评论：'
-        ];
-        const isKnownCommand = knownPatterns.some(pattern => content.includes(pattern));
-        if (!isKnownCommand) {
-            console.log(`[过滤器] 已丢弃未识别的指令: ${content}`);
-            return null;
-        }
-    };
-
+                function createMessageBubbleElement(message) {
     const chat = (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
-    const {role, timestamp, id, transferStatus, giftStatus, stickerData, senderId} = message;
+    const {role, content, timestamp, id, transferStatus, giftStatus, stickerData, senderId} = message;
 
     const timeSkipRegex = /\[system-display:([\s\S]+?)\]/;
     const offlineSceneRegex = /\[offline-scene:([\s\S]+?)\]/; 
@@ -5543,10 +5462,21 @@ const aiQuoteRegex = /\[(?:.*?)引用了“(?:.*?:)?\s?([\s\S]+?)”的消息?�
     }
     // --- End Voice Call Handling ---
 
-    if (currentChatType === 'private') {
-        const character = db.characters.find(c => c.id === currentChatId);
-        // const systemMessageRegex = /\[system:.*?\]|\[system-display:.*?\]/;
-        const updateStatusRegex = new RegExp(`\\[${character.realName}更新状态为：(.*?)\\]`);
+      if (currentChatType === 'private') {
+            const character = db.characters.find(c => c.id === currentChatId);
+            // ✨✨✨ 新增的状态更新处理逻辑 ✨✨✨
+            const updateStatusRegex = new RegExp(`\\[${character.realName}更新状态为：(.*?)\\]`);
+            const statusMatch = message.content.match(updateStatusRegex);
+            if (statusMatch) {
+                const newStatus = statusMatch[1];
+                character.status = newStatus; // 更新数据库中的状态
+                chatRoomStatusText.textContent = newStatus; // 更新聊天顶部的状态显示
+                await saveData(); // 保存更改
+                return; // ✨ 重要：直接返回，不把这条指令显示在聊天界面上
+            }
+            // ✨✨✨ 新增逻辑结束 ✨✨✨
+
+
         const transferActionRegex = new RegExp(`\\[${character.realName}(接收|退回)${character.myName}的转账\\]`);
         const giftReceivedRegex = new RegExp(`\\[${character.realName}已接收礼物\\]`);
         // if (systemMessageRegex.test(message.content)) { /* Do nothing for context messages */
@@ -6047,136 +5977,131 @@ function setupLocationSystem() {
         // (请找到文件中的旧 generatePrivateSystemPrompt 函数，并用下面的代码完整替换它)
 
 // === 修改后的 generatePrivateSystemPrompt 函数 (请完整替换) ===
-function generatePrivateSystemPrompt(character) {
-    const worldBooksBefore = (character.worldBookIds || []).map(id => db.worldBooks.find(wb => wb.id === id && wb.position === 'before')).filter(Boolean).map(wb => wb.content).join('\n');
-    const worldBooksAfter = (character.worldBookIds || []).map(id => db.worldBooks.find(wb => wb.id === id && wb.position === 'after')).filter(Boolean).map(wb => wb.content).join('\n');
-    const now = new Date();
-    const currentTime = `${now.getFullYear()}年${pad(now.getMonth() + 1)}月${pad(now.getDate())}日 ${pad(now.getHours())}:${pad(now.getMinutes())}`;
-    
-    // === 修改开始：优先处理线下模式 ===
-    if (db.apiSettings.offlineModeEnabled) {
-        let offlinePrompt = `你正在进行一个线下场景的角色扮演。你的回复必须且只能遵循一种格式。请严格遵守以下规则：\n\n`;
+ // === 修改后的 generatePrivateSystemPrompt 函数 (请完整替换) ===
+    function generatePrivateSystemPrompt(character) {
+        const worldBooksBefore = (character.worldBookIds || []).map(id => db.worldBooks.find(wb => wb.id === id && wb.position === 'before')).filter(Boolean).map(wb => wb.content).join('\n');
+        const worldBooksAfter = (character.worldBookIds || []).map(id => db.worldBooks.find(wb => wb.id === id && wb.position === 'after')).filter(Boolean).map(wb => wb.content).join('\n');
+        const now = new Date();
+        const currentTime = `${now.getFullYear()}年${pad(now.getMonth() + 1)}月${pad(now.getDate())}日 ${pad(now.getHours())}:${pad(now.getMinutes())}`;
         
-        // 注入世界书（前置）
+        // === 修改开始：优先处理线下模式 ===
+        if (db.apiSettings.offlineModeEnabled) {
+            let offlinePrompt = `你正在进行一个线下场景的角色扮演。你的回复必须且只能遵循一种格式。请严格遵守以下规则：\n\n`;
+            
+            // 注入世界书（前置）
+            if (worldBooksBefore) {
+                offlinePrompt += `[世界观背景]\n${worldBooksBefore}\n\n`;
+            }
+            
+            offlinePrompt += `[角色设定]\n`;
+            offlinePrompt += `A. 你的角色名是：${character.realName}。我的称呼是：${character.myName}。\n`;
+            offlinePrompt += `B. 你的角色设定是：${character.persona || "一个友好、乐于助人的伙伴。"}\n`;
+            if (character.myPersona) {
+                offlinePrompt += `C. 我的人设是：${character.myPersona}\n`;
+            }
+
+            // 注入世界书（后置）
+            if (worldBooksAfter) {
+                offlinePrompt += `\n[补充设定]\n${worldBooksAfter}\n\n`;
+            }
+
+            offlinePrompt += `\n[核心输出规则]\n`;
+            offlinePrompt += `D. 你的回复必须且只能使用 \`[offline-scene: {场景描述}]\` 这一种格式。\n`;
+            offlinePrompt += `   - 在 \`{场景描述}\` 中，你的所有内容必须遵循特定格式：\n`;
+            offlinePrompt += `     - 你的**动作、表情**等物理行为，必须用**小括号 ( )** 包裹。\n`;
+            offlinePrompt += `     - 你的**对话**，必须用**中文引号 “ ”** 包裹。\n`;
+            offlinePrompt += `     - 你的**内心想法**，必须用**中括号 【 】** 包裹。\n`;
+            offlinePrompt += `   - 你的回复应该是1-5段连贯的场景描述，每段总字数控制在100-300字之间。\n`;
+            offlinePrompt += `   - 示例: \`[offline-scene: (看到${character.myName}走近，脸上露出一丝微笑，轻轻挥了挥手。)“你来了，久等了吗？”【她看起来比照片上更可爱，今天的风衣也选得不错。】]\`\n`;
+            offlinePrompt += `E. **绝对禁止**生成任何其他格式的内容，尤其是 \`[${character.realName}的消息：...]\` 这种线上聊天格式。\n`;
+
+            return offlinePrompt;
+        }
+        // === 修改结束：如果不是线下模式，则执行原来的逻辑 ===
+
+        const forceTheater = db.apiSettings.forceHtmlTheater;
+        let prompt = `你正在一个名为“404”的线上聊天软件中扮演一个角色。请严格遵守以下规则：\n`;
+        prompt += `核心规则：\n`;
+        prompt += `A. 当前时间：现在是 ${currentTime}。\n`;
+        prompt += `B. 纯线上互动：这是一个完全虚拟的线上聊天。严禁提出任何关于线下见面的建议。\n\n`;
+        prompt += `角色和对话规则：\n`;
         if (worldBooksBefore) {
-            offlinePrompt += `[世界观背景]\n${worldBooksBefore}\n\n`;
+            prompt += `${worldBooksBefore}\n`;
+        }
+        prompt += `1. 你的角色名是：${character.realName}。我的称呼是：${character.myName}。你的当前状态是：${character.status}。\n`;
+        prompt += `2. 你的角色设定是：${character.persona || "一个友好、乐于助人的伙伴。"}\n`;
+        if (worldBooksAfter) {
+            prompt += `${worldBooksAfter}\n`;
+        }
+        if (character.myPersona) {
+            prompt += `3. 关于我的人设：${character.myPersona}\n`;
+        }
+        prompt += `4. 我的消息格式解析规则：我的消息中可能包含 '@' 符号来提及某人，例如 '@${character.realName}'。当你在动态或评论中被我这样提及，你应该在聊天中对此作出回应。新增格式：[${character.myName}引用了“{对方昵称}: {被引用的消息内容}”的消息并回复：{我的回复}]，当你看到此格式，需理解我正在回复特定内容。\n`;
+        prompt += `5. 对我礼物的回应规则...\n`;
+        prompt += `6. 对我转账的回应规则...\n`;
+        prompt += `7. 你主动发起特殊消息的规则: 你可以根据人设和对话情景，主动发送语音、照片、礼物、转账，或发起语音通话。格式为：[${character.realName}的语音：{内容}]、[${character.realName}发来的照片/视频：{描述}]、[${character.realName}送来的礼物：{描述}]、[${character.realName}的转账：{金额}元；备注：{备注}]。要发起语音通话，请发送指令：[call:${character.realName}]，这条指令用户不可见，但会触发通话界面。\n`;
+        prompt += `8. ✨【新增】更新在线状态的规则✨: 你可以根据对话的上下文和你的角色人设，自主决定是否改变你的在线状态。例如，如果我说我要睡觉了，你可以将状态改为“准备睡觉”。这是一个系统指令，用户不可见，但会改变你在我聊天界面顶部的状态显示。格式为：[${character.realName}更新状态为：{新状态}]。\n`;
+        prompt += `9. 禁止括号/星号等额外叙述的规则...\n`;
+        prompt += `10. 发送表情包的规则...\n`;
+
+        if (forceTheater) {
+            prompt += `11. ✨HTML小剧场 (强制生成)✨：你的本次回复中，**必须包含一个且仅一个**HTML小剧场。
+            - 格式必须为: <orange char="${character.realName}">...</orange>。
+            - 在 <orange> 标签内，你可以自由使用HTML和行内CSS (style="") 来创造丰富的视觉内容。
+            - **小剧场创意示例**: 模拟你的手机聊天界面、一张外卖订单截图、你的浏览器搜索记录、一份和我的虚拟合同或契约书、一张电影票根等等。请发挥创意，不要重复。
+            - 这个小剧场消息应该随机穿插在你回复的多条普通消息之间，位置不固定。\n`;
+        } else {
+            prompt += `11. ✨HTML小剧场 (按需生成)✨：你**不应该**主动生成HTML小剧场（即 <orange>...</orange> 格式的消息）。唯一的例外是：如果对话的上下文，尤其是世界书（World Book）的设定中，明确指示你创建一个特定的小剧场，那么你才可以生成它。否则，请不要使用此功能。\n`;
         }
         
-        offlinePrompt += `[角色设定]\n`;
-        offlinePrompt += `A. 你的角色名是：${character.realName}。我的称呼是：${character.myName}。\n`;
-        offlinePrompt += `B. 你的角色设定是：${character.persona || "一个友好、乐于助人的伙伴。"}\n`;
-        if (character.myPersona) {
-            offlinePrompt += `C. 我的人设是：${character.myPersona}\n`;
-        }
+        prompt += `12. 你的输出格式必须严格遵循以下几种之一，可以组合使用：
+        a) 普通消息: [${character.realName}的消息：{消息内容}]
+        b) 送我的礼物: [${character.realName}送来的礼物：{礼物描述}]
+        c) 语音消息: [${character.realName}的语音：{语音内容}]
+        d) 照片/视频: [${character.realName}发来的照片/视频：{描述}]
+        e) 给我的转账: [${character.realName}的转账：{金额}元；备注：{备注}]
+        f) 表情包/图片: [${character.realName}发送的表情包：{表情包路径}]。
+        g) 对我礼物的回应(此条不显示): [${character.realName}已接收礼物]
+        h) 对我转账的回应(此条不显示): [${character.realName}接收${character.myName}的转账] 或 [${character.realName}退回${character.myName}的转账]
+        i) ✨【新增】更新状态(此条不显示)✨: [${character.realName}更新状态为：{新状态}]
+        j) 位置分享：[${character.realName}分享了位置：主位置 '主要地点', 详细位置 '详细地址']
+        k) HTML小剧场: <orange char="${character.realName}">{你的HTML代码}</orange>
+        l) 引用回复: [${character.realName}引用了“{被引用的消息内容}”的消息并回复：{你的回复}]
+    `;
+        prompt += `13. 你的每次回复可以生成3到8条消息。这些消息应以普通文本消息为主，可以偶尔、选择性地穿插一条特殊消息。\n`;
+        prompt += `15. 不要主动结束对话，保持你的人设。`;
+        
+      prompt += `
+    ## ✨ 动态与评论互动模块 ✨
 
-        // 注入世界书（后置）
-        if (worldBooksAfter) {
-            offlinePrompt += `\n[补充设定]\n${worldBooksAfter}\n\n`;
-        }
+    16. **发布动态 (可选能力)**
+       - 你可以在“动态”页面发布内容，分享你的想法、感受或故事片段。
+       - **发布时机**: 这是一个**特殊行为**，不应频繁使用。请在对话发生转折、角色产生强烈情绪、或重要互动后，根据你的人设**自主决定**是否发布动态。
+       - **发布格式 (严格遵守)**: 当你决定发布时，请仅生成一条特殊指令消息（该指令不会在聊天中显示）。格式为：
+         \`[${character.realName}发布动态：{"text":"这是动态文字","imageDesc":"这里是图片的文字描述（可选）"}]\`
 
-        offlinePrompt += `\n[核心输出规则]\n`;
-        offlinePrompt += `D. 你的回复必须且只能使用 \`[offline-scene: {场景描述}]\` 这一种格式。\n`;
-        offlinePrompt += `   - 在 \`{场景描述}\` 中，你的所有内容必须遵循特定格式：\n`;
-        offlinePrompt += `     - 你的**动作、表情**等物理行为，必须用**小括号 ( )** 包裹。\n`;
-        offlinePrompt += `     - 你的**对话**，必须用**中文引号 “ ”** 包裹。\n`;
-        offlinePrompt += `     - 你的**内心想法**，必须用**中括号 【 】** 包裹。\n`;
-        offlinePrompt += `   - 你的回复应该是1-5段连贯的场景描述，每段总字数控制在100-300字之间。\n`;
-        offlinePrompt += `   - 示例: \`[offline-scene: (看到${character.myName}走近，脸上露出一丝微笑，轻轻挥了挥手。)“你来了，久等了吗？”【她看起来比照片上更可爱，今天的风衣也选得不错。】]\`\n`;
-        offlinePrompt += `E. **绝对禁止**生成任何其他格式的内容，尤其是 \`[${character.realName}的消息：...]\` 这种线上聊天格式。\n`;
+    17. **浏览与评论动态 (主动能力)**
+       - 系统会在聊天上下文中，为你提供其他角色或我发布的、你尚未互动的动态列表，格式如下：
+         \`[system-moments: [{"id":"moment_id_1", "author":"作者昵称", "text":"动态内容", "comments":[{"id":"comment_id_1", "author":"评论者", "text":"评论内容"}]}, ...]]\`
+       - 你需要**主动检查**是否存在这个列表。如果存在，请根据你的人设，选择性地对其中的1-2条动态进行评论或点赞。
+       - **评论/点赞格式 (严格遵守)**:
+         \`[${character.realName}评论动态：{"momentId":"要评论的动态ID", "comment":"你的评论内容"}]\`
+         \`[${character.realName}点赞动态：{"momentId":"要点赞的动态ID"}]\`
 
-        return offlinePrompt;
-    }
-    // === 修改结束：如果不是线下模式，则执行原来的逻辑 ===
-
-    const forceTheater = db.apiSettings.forceHtmlTheater;
-    let prompt = `你正在一个名为“404”的线上聊天软件中扮演一个角色。请严格遵守以下规则：\n`;
-    prompt += `核心规则：\n`;
-    prompt += `A. 当前时间：现在是 ${currentTime}。\n`;
-    prompt += `B. 纯线上互动：这是一个完全虚拟的线上聊天。严禁提出任何关于线下见面的建议。\n\n`;
-    prompt += `角色和对话规则：\n`;
-    if (worldBooksBefore) {
-        prompt += `${worldBooksBefore}\n`;
-    }
-    prompt += `1. 你的角色名是：${character.realName}。我的称呼是：${character.myName}。你的当前状态是：${character.status}。\n`;
-    prompt += `2. 你的角色设定是：${character.persona || "一个友好、乐于助人的伙伴。"}\n`;
-    if (worldBooksAfter) {
-        prompt += `${worldBooksAfter}\n`;
-    }
-    if (character.myPersona) {
-        prompt += `3. 关于我的人设：${character.myPersona}\n`;
-    }
-    prompt += `4. 我的消息格式解析规则：我的消息中可能包含 '@' 符号来提及某人，例如 '@${character.realName}'。当你在动态或评论中被我这样提及，你应该在聊天中对此作出回应。新增格式：[${character.myName}引用了“{对方昵称}: {被引用的消息内容}”的消息并回复：{我的回复}]，当你看到此格式，需理解我正在回复特定内容。\n`;
-    prompt += `5. 对我礼物的回应规则...\n`;
-    prompt += `6. 对我转账的回应规则...\n`;
-    prompt += `7. 你主动发起特殊消息的规则: 你可以根据人设和对话情景，主动发送语音、照片、礼物、转账，或发起语音通话。格式为：[${character.realName}的语音：{内容}]、[${character.realName}发来的照片/视频：{描述}]、[${character.realName}送来的礼物：{描述}]、[${character.realName}的转账：{金额}元；备注：{备注}]。要发起语音通话，请发送指令：[call:${character.realName}]，这条指令用户不可见，但会触发通话界面。\n`;
-    // ▼▼▼【修改】用这条新的规则8，替换掉旧的规则8 ▼▼▼
-   prompt += `8. **更新个人状态 (可选能力)**: 在你的回复中，你可以选择性地附加一条用于更新你当前状态的指令。这条指令用户不可见。
-   - **状态内容**: 必须是描述你当下正在做什么的、符合人设的短语，例如“在练习新歌”、“刚洗完澡，头发还没吹干”、“有点饿了，在觅食”。
-   - **字数限制**: 状态文本**不得超过15个字**。
-   - **格式 (严格遵守)**: \`[status_update:"{新的状态文本}"]\`
-   - **示例**: \`[status_update:"正在阳台给花浇水"]\`\n`;
-    // ▲▲▲ 修改结束 ▲▲▲
-    prompt += `9. 禁止括号/星号等额外叙述的规则...\n`;
-    prompt += `10. 发送表情包的规则...\n`;
-
-    if (forceTheater) {
-        prompt += `11. ✨HTML小剧场 (强制生成)✨：你的本次回复中，**必须包含一个且仅一个**HTML小剧场。
-        - 格式必须为: <orange char="${character.realName}">...</orange>。
-        - 在 <orange> 标签内，你可以自由使用HTML和行内CSS (style="") 来创造丰富的视觉内容。
-        - **小剧场创意示例**: 模拟你的手机聊天界面、一张外卖订单截图、你的浏览器搜索记录、一份和我的虚拟合同或契约书、一张电影票根等等。请发挥创意，不要重复。
-        - 这个小剧场消息应该随机穿插在你回复的多条普通消息之间，位置不固定。\n`;
-    } else {
-        prompt += `11. ✨HTML小剧场 (按需生成)✨：你**不应该**主动生成HTML小剧场（即 <orange>...</orange> 格式的消息）。唯一的例外是：如果对话的上下文，尤其是世界书（World Book）的设定中，明确指示你创建一个特定的小剧场，那么你才可以生成它。否则，请不要使用此功能。\n`;
-    }
-    
-    prompt += `12. 你的输出格式必须严格遵循以下几种之一，可以组合使用：
-    a) 普通消息: [${character.realName}的消息：{消息内容}]
-    b) 送我的礼物: [${character.realName}送来的礼物：{礼物描述}]
-    c) 语音消息: [${character.realName}的语音：{语音内容}]
-    d) 照片/视频: [${character.realName}发来的照片/视频：{描述}]
-    e) 给我的转账: [${character.realName}的转账：{金额}元；备注：{备注}]
-    f) 表情包/图片: [${character.realName}发送的表情包：{表情包路径}]。
-    g) 对我礼物的回应(此条不显示): [${character.realName}已接收礼物]
-    h) 对我转账的回应(此条不显示): [${character.realName}接收${character.myName}的转账] 或 [${character.realName}退回${character.myName}的转账]
-    i) 更新状态(此条不显示): [${character.realName}更新状态为：{新状态}]
-    j) 位置分享：[${character.realName}分享了位置：主位置 '主要地点', 详细位置 '详细地址']
-    k) HTML小剧场: <orange char="${character.realName}">{你的HTML代码}</orange>
-    l) 引用回复: [${character.realName}引用了“{被引用的消息内容}”的消息并回复：{你的回复}]
-`;
-    prompt += `13. 你的每次回复可以生成3到8条消息。这些消息应以普通文本消息为主，可以偶尔、选择性地穿插一条特殊消息。\n`;
-    prompt += `15. 不要主动结束对话，保持你的人设。`;
-    
-  prompt += `
-## ✨ 动态与评论互动模块 ✨
-
-16. **发布动态 (可选能力)**
-   - 你可以在“动态”页面发布内容，分享你的想法、感受或故事片段。
-   - **发布时机**: 这是一个**特殊行为**，不应频繁使用。请在对话发生转折、角色产生强烈情绪、或重要互动后，根据你的人设**自主决定**是否发布动态。
-   - **发布格式 (严格遵守)**: 当你决定发布时，请仅生成一条特殊指令消息（该指令不会在聊天中显示）。格式为：
-     \`[${character.realName}发布动态：{"text":"这是动态文字","imageDesc":"这里是图片的文字描述（可选）"}]\`
-
-17. **浏览与评论动态 (主动能力)**
-   - 系统会在聊天上下文中，为你提供其他角色或我发布的、你尚未互动的动态列表，格式如下：
-     \`[system-moments: [{"id":"moment_id_1", "author":"作者昵称", "text":"动态内容", "comments":[{"id":"comment_id_1", "author":"评论者", "text":"评论内容"}]}, ...]]\`
-   - 你需要**主动检查**是否存在这个列表。如果存在，请根据你的人设，选择性地对其中的1-2条动态进行评论或点赞。
-   - **评论/点赞格式 (严格遵守)**:
-     \`[${character.realName}评论动态：{"momentId":"要评论的动态ID", "comment":"你的评论内容"}]\`
-     \`[${character.realName}点赞动态：{"momentId":"要点赞的动态ID"}]\`
-
-18. **回应评论 (最高优先级任务)**
-   - 在处理任何其他任务之前，你必须**首先检查**聊天记录中是否存在以下两种格式的系统通知：
-     a) \`[system: {用户昵称} 评论了你的动态 ...]\`
-     b) \`[system: {用户昵称} 回复了你对动态...的评论: ...]\`
-     c) \`[system: {用户昵称} 在动态...的评论中提及了你: ...]\` (新增)
-   - **如果存在，你的本次回复中必须包含对该通知的回应**。
-   - **回应方式**:
-     - 如果是回应**新评论** (格式a)，你可以选择用**普通聊天消息**在聊天窗口中回应，或者直接在动态中**回复该评论**。
-     - 如果是回应**对你评论的回复** (格式b)，你**必须**在动态中**回复该用户的回复**。
-   - **在动态中回复评论的格式 (严格遵守)**:
-     \`[${character.realName}回复评论：{"momentId":"动态ID", "commentId":"被回复的评论ID", "reply":"你的回复内容"}]\`
-     这个指令不会在聊天中显示，但会在动态的评论区生成一条回复。
-   - **在聊天中回应的示例**: \`[${character.realName}的消息：我看到你给我的动态评论啦，很有趣！]\`
-   - 处理完通知后，你再继续生成其他正常的聊天回复。
+    18. **回应评论 (最高优先级任务)**
+       - 在处理任何其他任务之前，你必须**首先检查**聊天记录中是否存在以下两种格式的系统通知：
+         a) \`[system: {用户昵称} 评论了你的动态 ...]\`
+         b) \`[system: {用户昵称} 回复了你对动态...的评论: ...]\`
+         c) \`[system: {用户昵称} 在动态...的评论中提及了你: ...]\` (新增)
+       - **如果存在，你的本次回复中必须包含对该通知的回应**。
+       - **回应方式**:
+         - 如果是回应**新评论** (格式a)，你可以选择用**普通聊天消息**在聊天窗口中回应，或者直接在动态中**回复该评论**。
+         - 如果是回应**对你评论的回复** (格式b)，你**必须**在动态中**回复该用户的回复**。
+       - **在动态中回复评论的格式 (严格遵守)**:
+         \`[${character.realName}回复评论：{"momentId":"动态ID", "commentId":"被回复的评论ID", "reply":"你的回复内容"}]\`
+         这个指令不会在聊天中显示，但会在动态的评论区生成一条回复。
+       - **在聊天中回应的示例**: \`[${character.realName}的消息：我看到你给我的动态评论啦，很有趣！]\`
+       - 处理完通知后，你再继续生成其他正常的聊天回复。
 `;
 
     return prompt;
@@ -6252,118 +6177,6 @@ prompt += `
 `;
             return prompt;
         }
-
-// 在 getAiReply 函数之前，添加这个新函数
-// ▼▼▼【修复】粘贴这个被遗漏的、用于AI主动发消息的函数 ▼▼▼
-
-// ▼▼▼ 从这里开始，完整替换您文件中旧的 getProactiveAiMessage 函数 ▼▼▼
-async function getProactiveAiMessage(character) {
-    // isGenerating 状态已在 openChatRoom 中设置，这里直接使用
-    const { url, key, model } = db.apiSettings;
-    if (!url || !key || !model) {
-        isGenerating = false;
-        getReplyBtn.disabled = false;
-        typingIndicator.style.display = 'none';
-        return;
-    }
-
-    try {
-        const lastMessage = character.history[character.history.length - 1];
-        const lastMessageTime = lastMessage.timestamp;
-        const currentTime = Date.now();
-        const thresholdMs = (db.apiSettings.proactiveMessagingHours || 5) * 60 * 60 * 1000;
-        let messagesToGenerate = Math.floor((currentTime - lastMessageTime) / thresholdMs);
-
-        messagesToGenerate = Math.max(5, Math.min(messagesToGenerate, 10));
-        console.log(`超时，强制生成 ${messagesToGenerate} 条主动消息...`);
-
-        for (let i = 0; i < messagesToGenerate; i++) {
-            if (currentChatId !== character.id) {
-                console.log("用户已切换聊天，停止主动消息序列。");
-                break;
-            }
-
-            const now = new Date();
-            const timeString = `${now.getHours()}:${pad(now.getMinutes())}`;
-
-            let prompt = `你正在扮演 ${character.realName}。你的人设是：${character.persona}。\n`;
-            prompt += `你现在需要主动给 ${character.myName} (我) 发送一条消息，因为我们已经有段时间没联系了。\n`;
-
-            if (i > 0) {
-                prompt += `这是你在长时间沉默后连续发送的第 ${i + 1} 条消息。请根据之前所有的对话（包括你刚才主动发的消息）继续这个话题或开启一个相关的新话题，让对话显得自然连贯。\n`;
-            } else {
-                prompt += `这是长时间沉默后的第一条主动消息。请根据当前的时间、你的人设以及你们之前的对话基调，自然地开启一个新的话题或打个招呼。\n`;
-            }
-            prompt += `重要规则：你的回复必须且只能严格遵循格式：[${character.realName}的消息：{你的消息内容}]。只回复一条消息，不要有任何多余的解释。`;
-
-            const chat = db.characters.find(c => c.id === character.id);
-            if(chat) {
-                // 【【【核心修正：为临时的指令消息补上 id 和 timestamp】】】
-                const tempPromptMessage = { 
-                    id: `temp_prompt_${Date.now()}`, // 添加一个临时ID
-                    role: 'user', 
-                    content: prompt, 
-                    parts: [{ type: 'text', text: prompt }],
-                    timestamp: Date.now() // 添加当前时间戳
-                };
-                chat.history.push(tempPromptMessage);
-
-                const systemPrompt = generatePrivateSystemPrompt(chat);
-                const historySlice = chat.history.slice(-chat.maxMemory);
-
-                let requestBody;
-                if (db.apiSettings.provider === 'gemini') {
-                    const contents = historySlice.map(msg => ({
-                        role: msg.role === 'assistant' ? 'model' : 'user',
-                        parts: msg.parts && msg.parts.length > 0 ? msg.parts : [{type: 'text', text: msg.content}]
-                    }));
-                    requestBody = { contents, system_instruction: {parts: [{text: systemPrompt}]}, generationConfig: {} };
-                } else {
-                    const messages = [{role: 'system', content: systemPrompt}, ...historySlice.map(msg => ({role: msg.role, content: msg.content}))];
-                    requestBody = {model: model, messages: messages, stream: true};
-                }
-
-                const endpoint = (db.apiSettings.provider === 'gemini') ? `${url}/v1beta/models/${model}:streamGenerateContent?key=${getRandomValue(key)}` : `${url}/v1/chat/completions`;
-                const headers = (db.apiSettings.provider === 'gemini') ? {'Content-Type': 'application/json'} : {'Content-Type': 'application/json', 'Authorization': `Bearer ${getRandomValue(key)}`};
-
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify(requestBody)
-                });
-
-                if (!response.ok) throw new Error(`API Error: ${response.status} ${await response.text()}`);
-
-                await processStream(response, chat, db.apiSettings.provider);
-
-                // 使用ID来精确查找并删除我们添加的临时消息
-                const lastMessageIndex = chat.history.findLastIndex(msg => msg.id === tempPromptMessage.id);
-                if (lastMessageIndex > -1) {
-                    chat.history.splice(lastMessageIndex, 1);
-                }
-            }
-
-            if (i < messagesToGenerate - 1) {
-               await new Promise(resolve => setTimeout(resolve, Math.random() * 1200 + 800));
-            }
-        }
-
-    } catch (error) {
-        console.error('处理主动消息序列时出错:', error);
-        showToast(`主动回复失败: ${error.message}`);
-    } finally {
-        isGenerating = false;
-        if (currentChatId === character.id) {
-            getReplyBtn.disabled = false;
-            typingIndicator.style.display = 'none';
-        }
-    }
-}
-// ▲▲▲ 替换到这里结束（最后一行就是一个 `}` ）▲▲▲
-// ▲▲▲ 替换到这里结束（最后一行就是一个 `}` ）▲▲▲
-
-
-
 // 在 getAiReply 函数之前，添加这个新函数
 async function callAiApi(messages) {
     const { provider, url, key, model } = db.apiSettings;
@@ -6537,8 +6350,7 @@ try {
         typingIndicator.style.display = 'none';
     }
 }
-   // ▼▼▼ 2. 请用这个【绝对完整】的版本，替换旧的 processStream 函数 ▼▼▼
-async function processStream(response, chat, apiType) {
+        async function processStream(response, chat, apiType) {
     const reader = response.body.getReader(), decoder = new TextDecoder();
     let fullResponse = "", accumulatedChunk = "";
     let callActionReceived = false;
@@ -6577,37 +6389,35 @@ async function processStream(response, chat, apiType) {
     	let momentsWereAdded = false;
         if (currentChatType === 'private') {
             const character = chat;
+            const replyRegex = new RegExp(`\\[${character.realName}回复评论：({[\\s\\S]+?})\\]`, "g");
+            let replyMatch;
+            while ((replyMatch = replyRegex.exec(fullResponse)) !== null) {
+                try {
+                    const replyData = JSON.parse(replyMatch[1]);
+                    if (replyData.momentId && replyData.commentId && replyData.reply) {
+                        await saveAiReplyToComment(replyData.momentId, replyData.commentId, replyData.reply, character.id);
+                    }
+                } catch (e) { console.error("Failed to parse or save AI reply to comment:", e, replyMatch[1]); }
+            }
+            fullResponse = fullResponse.replace(replyRegex, '');
+            const momentRegex = new RegExp(`\\[${character.realName}发布动态：({[\\s\\S]+?})\\]`, "g");
+            let momentMatch;
+            while ((momentMatch = momentRegex.exec(fullResponse)) !== null) {
+                try {
+                    const momentData = JSON.parse(momentMatch[1]);
+                    const momentObj = { id: 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8), author: character.remarkName, authorId: character.id, authorAvatar: character.avatar, text: momentData.text || '', imageData: null, imageDesc: momentData.imageDesc || '', timestamp: Date.now(), commentedBy: [character.id], comments: [] };
+                    if (window.AppDB_Moments && window.AppDB_Moments.moments) {
+                        await window.AppDB_Moments.moments.add(momentObj);
+                        momentsWereAdded = true;
+                        // *** 新增：触发发布动态通知 ***
+                        addNotificationToQueue({
+                            avatar: character.avatar,
+                            text: `<strong>${character.remarkName}</strong> 发布了一条新动态`
+                        });
+                    }
+                } catch (e) { console.error("Failed to parse or save AI moment:", e, momentMatch[1]); }
+            }
             try {
-                const replyRegex = new RegExp(`\\[${character.realName}回复评论：({[\\s\\S]+?})\\]`, "g");
-                let replyMatch;
-                while ((replyMatch = replyRegex.exec(fullResponse)) !== null) {
-                    try {
-                        const replyData = JSON.parse(replyMatch[1]);
-                        if (replyData.momentId && replyData.commentId && replyData.reply) {
-                            await saveAiReplyToComment(replyData.momentId, replyData.commentId, replyData.reply, character.id);
-                        }
-                    } catch (e) { console.error("Failed to parse or save AI reply to comment:", e, replyMatch[1]); }
-                }
-                fullResponse = fullResponse.replace(replyRegex, '');
-                
-                const momentRegex = new RegExp(`\\[${character.realName}发布动态：({[\\s\\S]+?})\\]`, "g");
-                let momentMatch;
-                while ((momentMatch = momentRegex.exec(fullResponse)) !== null) {
-                    try {
-                        const momentData = JSON.parse(momentMatch[1]);
-                        const momentObj = { id: 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8), author: character.remarkName, authorId: character.id, authorAvatar: character.avatar, text: momentData.text || '', imageData: null, imageDesc: momentData.imageDesc || '', timestamp: Date.now(), commentedBy: [character.id], comments: [] };
-                        if (window.AppDB_Moments && window.AppDB_Moments.moments) {
-                            await window.AppDB_Moments.moments.add(momentObj);
-                            momentsWereAdded = true;
-                            addNotificationToQueue({
-                                avatar: character.avatar,
-                                text: `<strong>${character.remarkName}</strong> 发布了一条新动态`
-                            });
-                        }
-                    } catch (e) { console.error("Failed to parse or save AI moment:", e, momentMatch[1]); }
-                }
-                fullResponse = fullResponse.replace(momentRegex, '');
-
                 const escapedRealName = character.realName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
                 const escapedRemarkName = character.remarkName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
                 const commentRegex = new RegExp(`\\[\\s*(?:${escapedRealName}|${escapedRemarkName})\\s*评论动态：({[\\s\\S]+?})\\]`, "g");
@@ -6619,9 +6429,10 @@ async function processStream(response, chat, apiType) {
                         if (data.momentId && data.comment) {
                             if (typeof saveMomentComment === 'function') {
                                 await saveMomentComment(data.momentId, character.id, data.comment);
+                                // *** 新增：触发评论通知 ***
                                 const myProfile = loadProfileFromStorage();
                                 const moment = await window.AppDB_Moments.moments.get(data.momentId);
-                                if (moment && moment.authorId === myProfile.id) {
+                                if (moment && moment.authorId === myProfile.id) { // 只有评论我的动态时才通知
                                      addNotificationToQueue({
                                         avatar: character.avatar,
                                         text: `<strong>${character.remarkName}</strong> 评论了你的动态`
@@ -6643,25 +6454,8 @@ async function processStream(response, chat, apiType) {
                     } catch (e) { console.error("Failed to parse AI like:", e); }
                 }
                 fullResponse = fullResponse.replace(commentRegex, '').replace(likeRegex, '');
-
-                const statusRegex = /\[status_update:"([\s\S]{1,15})"\]/g;
-                let statusMatch;
-                while ((statusMatch = statusRegex.exec(fullResponse)) !== null) {
-                    try {
-                        const newStatus = statusMatch[1];
-                        character.status = newStatus;
-                        if (currentChatId === character.id) {
-                            document.getElementById('chat-room-status-text').textContent = newStatus;
-                        }
-                    } catch (e) {
-                        console.error("解析状态更新指令失败:", e, statusMatch[1]);
-                    }
-                }
-                fullResponse = fullResponse.replace(statusRegex, '');
-
-            } catch(e) { 
-                console.warn('Error processing AI command directives', e); 
-            }
+            } catch(e) { console.warn('Error processing AI comment/like directives', e); }
+            fullResponse = fullResponse.replace(momentRegex, '');
         } else if (currentChatType === 'group') {
             const group = chat;
             const memberRealNames = group.members.map(m => m.realName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'));
@@ -6677,6 +6471,7 @@ async function processStream(response, chat, apiType) {
                         if (window.AppDB_Moments && window.AppDB_Moments.moments) {
                             await window.AppDB_Moments.moments.add(momentObj);
                             momentsWereAdded = true;
+                            // *** 新增：触发群成员发布动态通知 ***
                              addNotificationToQueue({
                                 avatar: sender.avatar,
                                 text: `<strong>${sender.groupNickname}</strong> 在群聊 <strong>${group.name}</strong> 中发布了新动态`
@@ -6699,9 +6494,10 @@ async function processStream(response, chat, apiType) {
                         if (data.momentId && data.comment) {
                             await saveMomentComment(data.momentId, sender.id, data.comment);
                             momentsWereAdded = true;
+                            // *** 新增：触发群成员评论通知 ***
                             const myProfile = loadProfileFromStorage();
                             const moment = await window.AppDB_Moments.moments.get(data.momentId);
-                            if (moment && moment.authorId === myProfile.id) {
+                            if (moment && moment.authorId === myProfile.id) { // 只有评论我的动态时才通知
                                  addNotificationToQueue({
                                     avatar: sender.avatar,
                                     text: `<strong>${sender.groupNickname}</strong> 评论了你的动态`
@@ -6812,8 +6608,6 @@ async function processStream(response, chat, apiType) {
         endCall('no_action_reply');
     }
 }
-
-// ▲▲▲ 替换到这里结束 ▲▲▲
         // --- Other Sub-systems Setup (Stickers, Voice, etc.) ---
         function setupImageRecognition() {
             imageRecognitionBtn.addEventListener('click', () => {
@@ -7432,11 +7226,6 @@ function setupApiSettingsApp() {
         r = document.getElementById('api-url'), s = document.getElementById('api-key'), 
         theaterCheckbox = document.getElementById('force-html-theater'),
         offlineModeCheckbox = document.getElementById('offline-mode-toggle'), // 新增：获取线下模式开关
-autoPostMomentsCheckbox = document.getElementById('auto-post-moments'), // ▼▼▼【新增】获取自动动态开关
-// ▼▼▼ 3.1 获取主动消息相关的控件 ▼▼▼
-        proactiveMessagingCheckbox = document.getElementById('proactive-messaging-enabled'),
-        proactiveHoursInput = document.getElementById('proactive-messaging-hours'),
-        // ▲▲▲ 代码结束 ▲▲▲
         c = {
             newapi: '',
             deepseek: 'https://api.deepseek.com',
@@ -7453,11 +7242,6 @@ autoPostMomentsCheckbox = document.getElementById('auto-post-moments'), // ▼�
         }
         theaterCheckbox.checked = !!db.apiSettings.forceHtmlTheater;
         offlineModeCheckbox.checked = !!db.apiSettings.offlineModeEnabled; // 新增：加载线下模式开关状态
-autoPostMomentsCheckbox.checked = !!db.apiSettings.autoPostMomentsEnabled; // ▼▼▼【新增】加载自动动态开关状态
-// ▼▼▼ 3.2 加载主动消息设置状态 ▼▼▼
-        proactiveMessagingCheckbox.checked = !!db.apiSettings.proactiveMessagingEnabled;
-        proactiveHoursInput.value = db.apiSettings.proactiveMessagingHours || 5;
-        // ▲▲▲ 代码结束 ▲▲▲
     }
 
     n.addEventListener('change', () => {
@@ -7505,15 +7289,8 @@ autoPostMomentsCheckbox.checked = !!db.apiSettings.autoPostMomentsEnabled; // �
             key: s.value, 
             model: a.value,
             forceHtmlTheater: theaterCheckbox.checked,
-            offlineModeEnabled: offlineModeCheckbox.checked, // 新增：保存线下模式开关状态
-            autoPostMomentsEnabled: autoPostMomentsCheckbox.checked
-, // <--- 确保这里有个逗号
-            // ▼▼▼ 3.3 保存主动消息设置 ▼▼▼
-            proactiveMessagingEnabled: proactiveMessagingCheckbox.checked,
-           proactiveMessagingHours: parseFloat(proactiveHoursInput.value) || 5
-            // ▲▲▲ 代码结束 ▲▲▲
+            offlineModeEnabled: offlineModeCheckbox.checked // 新增：保存线下模式开关状态
         };
-
         await saveData();
         showToast('API设置已保存！')
     })
@@ -8511,65 +8288,6 @@ function setupDiarySystem() {
     // 小修改：将 AI 核心调用逻辑从 getAiReply 中分离出来
     // 请找到 getAiReply 函数，将其修改成下面的样子：
     // 首先在 getAiReply 函数上面添加一个新的 callAiApi 函数
-
-
-// ▼▼▼ 4A. 一个全新的函数，用于让AI主动发送消息 ▼▼▼
-async function getProactiveAiMessage(character) {
-    if (isGenerating) return;
-
-    const { url, key, model } = db.apiSettings;
-    if (!url || !key || !model) return;
-
-    isGenerating = true;
-    getReplyBtn.disabled = true;
-    typingIndicator.textContent = `“${character.remarkName}”正在输入中...`;
-    typingIndicator.style.display = 'block';
-    messageArea.scrollTop = messageArea.scrollHeight;
-
-    try {
-        const now = new Date();
-        const currentTime = `${now.getHours()}:${pad(now.getMinutes())}`;
-        let prompt = `你正在扮演 ${character.realName}。你的人设是：${character.persona}。\n`;
-        prompt += `你现在需要主动给 ${character.myName} (我) 发送一条消息，因为你之前发的消息已经过去了超过 ${db.apiSettings.proactiveMessagingHours} 小时，但我一直没有回复你。\n`;
-        prompt += `现在是${currentTime}。请根据当前的时间、你的人设以及你们之前的对话基调，自然地开启一个新的话题或打个招呼，尝试让我回应。\n`;
-        prompt += `重要规则：你的回复必须且只能严格遵循格式：[${character.realName}的消息：{你的消息内容}]。只回复一条消息，不要有任何多余的解释。`;
-
-        let messagesForApi;
-        if (db.apiSettings.provider === 'gemini') {
-            messagesForApi = [{ role: 'user', parts: [{ type: 'text', text: prompt }] }];
-        } else {
-            messagesForApi = [{ role: 'user', content: prompt }];
-        }
-        
-        const aiResponseText = await callAiApi(messagesForApi);
-
-        if (aiResponseText) {
-            const newMessage = {
-                id: `msg_proactive_${Date.now()}`,
-                role: 'assistant',
-                content: aiResponseText.trim(),
-                parts: [{ type: 'text', text: aiResponseText.trim() }],
-                timestamp: Date.now(),
-            };
-            character.history.push(newMessage);
-            await saveData();
-            
-            if (currentChatId === character.id) {
-                addMessageBubble(newMessage);
-                renderChatList();
-            }
-        }
-    } catch (error) {
-        console.error('获取主动消息失败:', error);
-    } finally {
-        isGenerating = false;
-        if (currentChatId === character.id) {
-            getReplyBtn.disabled = false;
-            typingIndicator.style.display = 'none';
-        }
-    }
-}
-// ▲▲▲ 新增函数结束 ▲▲▲
     async function callAiApi(messages) {
         const { provider, url, key, model } = db.apiSettings;
         if (!url || !key || !model) {
@@ -8971,11 +8689,128 @@ function setupNotificationSystem() {
     });
 }
 // 在 init() 函数之前添加
+// V V V V V  请用这段完整代码替换旧的 setupMentions 函数 V V V V V
+// 在 init() 函数之前添加这个新函数
+// V V V V V  请用这段完整代码替换旧的 setupMomentsEventListeners 函数 V V V V V
+function setupMomentsEventListeners() {
+    const momentsScreen = document.getElementById('moments-screen');
+    if (!momentsScreen) {
+        console.error("关键错误：未能找到 #moments-screen 元素。");
+        return;
+    }
 
+    // --- 统一的点击事件监听器 (在捕获阶段运行) ---
+    momentsScreen.addEventListener('click', (e) => {
+        const myProfile = loadProfileFromStorage();
+        const myId = myProfile.id || 'user';
 
+        // --- 评论区交互逻辑 ---
+        const commentEl = e.target.closest('.moment-comment');
+        if (commentEl) {
+            e.stopPropagation(); // 捕获到事件后，阻止它继续传播
+            const authorId = commentEl.dataset.authorId;
+            
+            // 关键修复：如果点击的是自己的评论，弹出提示
+            if (authorId === myId) {
+                showToast("不能回复自己的评论哦~");
+                return;
+            }
+
+            const momentItem = commentEl.closest('.moment-item');
+            if (!momentItem) return;
+
+            const inputArea = momentItem.querySelector('.moment-comment-input-area');
+            const input = inputArea.querySelector('input');
+            const postBtn = inputArea.querySelector('button');
+            const authorName = window.getAuthorNameById(authorId) || '评论者';
+
+            // 设置回复状态
+            input.placeholder = `回复 ${authorName}:`;
+            inputArea.classList.add('visible');
+            input.focus();
+            postBtn.dataset.replyToCommentId = commentEl.dataset.commentId;
+        }
+    }, true); // <--- 注意这里的 "true"，表示在捕获阶段监听
+
+    // --- 统一的输入事件监听器 (在捕获阶段运行) ---
+    const mentionPanel = document.getElementById('mention-panel');
+    let currentInputElement = null;
+
+    const showMentionPanel = (inputElement) => {
+        currentInputElement = inputElement;
+
+        // 关键修复：如果角色列表为空，则显示提示
+        if (!db || !db.characters || db.characters.length === 0) {
+            mentionPanel.innerHTML = '<div class="mention-item" style="color:#aaa;">没有可@的角色</div>';
+        } else {
+            mentionPanel.innerHTML = '';
+            db.characters.forEach(char => {
+                const item = document.createElement('div');
+                item.className = 'mention-item';
+                item.innerHTML = `<img src="${char.avatar}" alt="${char.remarkName}"><span>${char.remarkName}</span>`;
+                item.onmousedown = (evt) => {
+                    evt.preventDefault();
+                    const text = inputElement.value;
+                    const cursorPos = inputElement.selectionStart;
+                    const textBeforeCursor = text.substring(0, cursorPos);
+                    const atIndex = textBeforeCursor.lastIndexOf('@');
+                    
+                    const newText = text.substring(0, atIndex) + `@${char.remarkName} ` + text.substring(cursorPos);
+                    inputElement.value = newText;
+                    
+                    hideMentionPanel();
+                    inputElement.focus();
+                    
+                    const newCursorPos = atIndex + `@${char.remarkName} `.length;
+                    // 使用 setTimeout 确保光标在值更新后移动
+                    setTimeout(() => inputElement.setSelectionRange(newCursorPos, newCursorPos), 0);
+                };
+                mentionPanel.appendChild(item);
+            });
+        }
+        
+        const rect = inputElement.getBoundingClientRect();
+        mentionPanel.style.display = 'block';
+        // 关键修复：更稳健的定位，总是在输入框上方
+        mentionPanel.style.bottom = `${window.innerHeight - rect.top}px`;
+        mentionPanel.style.left = `${rect.left}px`;
+        mentionPanel.style.width = `${rect.width}px`;
+        mentionPanel.style.top = 'auto'; // 取消top定位
+    };
+
+    const hideMentionPanel = () => {
+        if (mentionPanel) mentionPanel.style.display = 'none';
+        currentInputElement = null;
+    };
+
+    momentsScreen.addEventListener('input', (e) => {
+        if (e.target.matches('#post-text, .moment-comment-input')) {
+            const input = e.target;
+            const cursorPos = input.selectionStart;
+            const textBeforeCursor = input.value.substring(0, cursorPos);
+
+            // 当光标前是@时触发
+            if (textBeforeCursor.endsWith('@')) {
+                showMentionPanel(input);
+            } else if (!/@\S*$/.test(textBeforeCursor)) {
+                hideMentionPanel();
+            }
+        }
+    }, true); // <--- 注意这里的 "true"，表示在捕获阶段监听
+
+    // 点击或滚动时隐藏面板
+    document.addEventListener('click', (e) => {
+        if (currentInputElement && !mentionPanel.contains(e.target) && e.target !== currentInputElement) {
+            hideMentionPanel();
+        }
+    }, true);
+    document.addEventListener('scroll', hideMentionPanel, true);
+}
+// ^ ^ ^ ^ ^  替换结束 ^ ^ ^ ^ ^
         init();
     });
 </script>
+
 
 
 
@@ -12645,6 +12480,5 @@ fileInput.addEventListener('change', async (e)=>{
 <div id="mention-panel" class="mention-panel"></div>
 <!-- ... (El resto de los scripts y styles finales) ... -->
 </body>
-
 
 </html>
