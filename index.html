@@ -3249,23 +3249,7 @@
 <script>
     const URLBlacklist = []
 
-    // gemini如果是多个密钥, 那么随机获取一个
-    function getRandomValue(str) {
-        // 检查字符串是否包含逗号
-        if (str.includes(',')) {
-            // 用逗号分隔字符串并移除多余空格
-            const arr = str.split(',').map(item => item.trim());
-            // 生成随机索引 (0 到 arr.length-1)
-            const randomIndex = Math.floor(Math.random() * arr.length);
-            // 返回随机元素
-            return arr[randomIndex];
-        }
-        // 没有逗号则直接返回原字符串
-        return str;
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        async function compressImage(file, options = {}) {
+    async function compressImage(file, options = {}) {
             const {
                 quality = 0.8, maxWidth = 800, maxHeight = 800
             } = options;
@@ -3328,14 +3312,29 @@
                 };
             });
         }
+    // gemini如果是多个密钥, 那么随机获取一个
+    function getRandomValue(str) {
+        // 检查字符串是否包含逗号
+        if (str.includes(',')) {
+            // 用逗号分隔字符串并移除多余空格
+            const arr = str.split(',').map(item => item.trim());
+            // 生成随机索引 (0 到 arr.length-1)
+            const randomIndex = Math.floor(Math.random() * arr.length);
+            // 返回随机元素
+            return arr[randomIndex];
+        }
+        // 没有逗号则直接返回原字符串
+        return str;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+    
 
         // --- Initial HTML Injection ---
         // (请找到文件中的旧 'api-settings-screen'.innerHTML 代码，并用下面的代码完整替换它)
 
 document.getElementById('api-settings-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="home-screen">‹</button><div class="title-container"><h1 class="title">API 设置</h1></div><div class="placeholder"></div></header><main class="content"><form id="api-form"><div class="form-group"><label for="api-provider">API 服务商</label><select id="api-provider" name="provider"><option value="newapi">NewAPI (自定义)</option><option value="deepseek">DeepSeek</option><option value="claude">Claude</option><option value="gemini">Gemini</option></select>
-<!-- === ChatGPT: 嵌入 API 预设管理（已嵌入到 API 设置区域） === -->
 <div class="api-presets-embedded" style="margin-top:12px;">
-<!-- === ChatGPT 插入：API 预设管理（样式模拟现有 UI） === -->
 <div id="api-presets-control" style="margin:12px 0;padding:12px;border-radius:8px;border:1px solid var(--border-color, #eee);background:var(--panel-bg, #fff);box-shadow:var(--panel-shadow, none);">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
     <label style="min-width:86px;color:var(--muted,#666);">API 预设：</label>
@@ -3353,7 +3352,6 @@ document.getElementById('api-settings-screen').innerHTML = `<header class="app-h
   </div>
 </div>
 
-<!-- 管理 modal -->
 <div id="api-presets-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:9999;align-items:center;justify-content:center;">
   <div style="width:640px;max-width:94%;background:var(--panel-bg,#fff);padding:16px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.12);">
     <h3 style="margin:0 0 12px 0;">API 预设管理</h3>
@@ -3363,22 +3361,20 @@ document.getElementById('api-settings-screen').innerHTML = `<header class="app-h
     </div>
   </div>
 </div>
-<!-- === /API 预设管理 === -->
 </div>
-<!-- === /嵌入结束 === -->
-</div><div class="form-group"><label for="api-url">API 地址（后缀不用添加/v1）</label><input type="url" id="api-url" name="url" placeholder="选择服务商可自动填写" required></div><div class="form-group"><label for="api-key">密钥 (Key)</label><input type="password" id="api-key" name="key" placeholder="请输入你的API密钥" required></div><button type="button" class="btn btn-secondary" id="fetch-models-btn"><span class="btn-text">点击拉取模型</span><div class="spinner"></div></button><div class="form-group"><label for="api-model">选择模型</label><select id="api-model" name="model" required><option value="">请先拉取模型列表</option></select></div><!-- === 新增的线下模式开关 === -->
-<div class="form-group" style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px;">
+</div><div class="form-group"><label for="api-url">API 地址（后缀不用添加/v1）</label><input type="url" id="api-url" name="url" placeholder="选择服务商可自动填写" required></div><div class="form-group"><label for="api-key">密钥 (Key)</label><input type="password" id="api-key" name="key" placeholder="请输入你的API密钥" required></div><button type="button" class="btn btn-secondary" id="fetch-models-btn"><span class="btn-text">点击拉取模型</span><div class="spinner"></div></button><div class="form-group"><label for="api-model">选择模型</label><select id="api-model" name="model" required><option value="">请先拉取模型列表</option></select></div><div class="form-group" style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px;">
     <label for="offline-mode-toggle" style="margin-bottom: 0;">开启线下模式 (全局)</label>
     <input type="checkbox" id="offline-mode-toggle" style="width: auto; height: 20px;">
 </div>
-<!-- === 新增结束 === -->
 <button type="submit" class="btn btn-primary" id="save-btn"><span class="btn-text">保 存</span><div class="spinner"></div></button>
-<!-- === 新增的小剧场开关 === -->
 <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;">
     <label for="force-html-theater" style="margin-bottom: 0;">强制生成HTML小剧场</label>
     <input type="checkbox" id="force-html-theater" style="width: auto; height: 20px;">
 </div>
-<!-- === 新增结束 === -->
+<div class="form-group" style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px;">
+    <label for="ai-auto-post-moment" style="margin-bottom: 0;">AI自动发布动态</label>
+    <input type="checkbox" id="ai-auto-post-moment" style="width: auto; height: 20px;">
+</div>
 </form></main>`;
 
         document.getElementById('wallpaper-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="home-screen">‹</button><div class="title-container"><h1 class="title">更换壁纸</h1></div><div class="placeholder"></div></header><main class="content"><div class="wallpaper-preview" id="wallpaper-preview"><span>当前壁纸预览</span></div><input type="file" id="wallpaper-upload" accept="image/*" style="display: none;"><label for="wallpaper-upload" class="btn btn-primary">从相册选择新壁纸</label></main>`;
@@ -4045,14 +4041,16 @@ function formatFileSize(bytes) {
             const confirmShareBtn = document.getElementById('confirm-music-share-btn');
 
             // --- 核心功能函数 ---
-            const updatePlayerUI = () => {
+        const updatePlayerUI = () => {
                 const song = db.playlist[currentSongIndex];
                 const albumArt = musicModal.querySelector('.music-album-art');
                 const songTitle = musicModal.querySelector('.song-title');
                 const widgetIcon = musicWidget.querySelector('.music-widget-icon');
                 const widgetTitle = musicWidget.querySelector('.music-widget-info .title');
                 const widgetArtist = musicWidget.querySelector('.music-widget-info .artist');
-                const lyricsPanel = musicModal.querySelector('.lyrics-panel-placeholder');
+                // ▼▼▼ 在这里修改 ▼▼▼
+                const lyricsPanel = musicModal.querySelector('#lyrics-panel'); // 把 '.lyrics-panel-placeholder' 改为 '#lyrics-panel'
+                // ▲▲▲ 修改结束 ▲▲▲
 
                 if (song) {
                     const defaultArt = 'https://i.postimg.cc/nzP9sgxr/chan-125.png';
@@ -4066,8 +4064,10 @@ function formatFileSize(bytes) {
                     widgetTitle.textContent = '暂未播放';
                     widgetArtist.textContent = '点击打开播放器';
                     songTitle.textContent = '歌曲名';
-                    albumArt.src = 'https://i.postimg.cc/nzP9sgxr/chan-125.png';
-                    lyricsPanel.textContent = '歌词面板';
+                    // 同样检查一下lyricsPanel是否存在，避免后续再出错
+                    if (lyricsPanel) {
+                        lyricsPanel.innerHTML = '<p class="lyric-line">歌词面板</p>';
+                    }
                 }
             };
 
@@ -4557,6 +4557,15 @@ function formatFileSize(bytes) {
                 }
                 loadingBtn = true
                 try {
+                    // ▼▼▼ 第1步：在这里添加代码 ▼▼▼
+                    // 在打包主数据之前，先从“动态”数据库中读取所有动态
+                    if (window.AppDB_Moments && window.AppDB_Moments.moments) {
+                        const momentsData = await window.AppDB_Moments.moments.toArray();
+                        // 临时将动态数据附加到主 `db` 对象上，以便一起备份
+                        db.momentsData = momentsData;
+                    }
+                    // ▲▲▲ 添加结束 ▲▲▲
+
                     const jsonString = JSON.stringify(db);
                     const dataBlob = new Blob([jsonString]);
 
@@ -4576,6 +4585,13 @@ function formatFileSize(bytes) {
                     a.click();
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
+                    
+                    // ▼▼▼ 在备份完成后，清理掉临时的动态数据 ▼▼▼
+                    if (db.momentsData) {
+                        delete db.momentsData;
+                    }
+                    // ▲▲▲ 清理结束 ▲▲▲
+
                     loadingBtn = false
                     showToast('聊天记录导出成功');
                 }catch (e){
@@ -4601,9 +4617,28 @@ function formatFileSize(bytes) {
                         const jsonString = await new Response(decompressedStream).text();
 
                         let data = JSON.parse(jsonString);
+
+                        // ▼▼▼ 第2步：在这里添加代码 ▼▼▼
+                        // 检查备份文件中是否存在动态数据
+                        if (data.momentsData && Array.isArray(data.momentsData)) {
+                            const momentsToRestore = data.momentsData;
+                            // 从主数据中删除临时的动态数据，以免被错误地保存
+                            delete data.momentsData;
+
+                            // 开始恢复动态
+                            if (window.AppDB_Moments && window.AppDB_Moments.moments) {
+                                // 先清空当前的动态数据库
+                                await window.AppDB_Moments.moments.clear();
+                                // 再将备份的动态数据批量写入
+                                await window.AppDB_Moments.moments.bulkPut(momentsToRestore);
+                                console.log(`${momentsToRestore.length} 条动态已成功恢复。`);
+                            }
+                        }
+                        // ▲▲▲ 添加结束 ▲▲▲
+
                         await saveData(data)
                         showToast(`数据已成功恢复。应用即将刷新。`);
-                        window.location.reload();
+                        setTimeout(() => window.location.reload(), 1500); // 延迟刷新以确保toast可见
                     } catch (error) {
                         console.error("导入失败:", error);
                         showToast(`解压或解析文件时发生错误: ${error.message}`);
@@ -5149,7 +5184,7 @@ if (type === 'private') {
             return Math.max(1, Math.min(60, Math.ceil(text.length / 3.5)));
         }
 
-                function createMessageBubbleElement(message) {
+           function createMessageBubbleElement(message) {
     const chat = (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
     const {role, content, timestamp, id, transferStatus, giftStatus, stickerData, senderId} = message;
 
@@ -5211,13 +5246,11 @@ if (type === 'private') {
     const bubbleRow = document.createElement('div');
     bubbleRow.className = 'message-bubble-row';
     let bubbleElement;
-const aiQuoteRegex = /\[(?:.*?)引用了“(?:.*?:)?\s?([\s\S]+?)”的消息?并回复：([\s\S]+?)\]/;
+    const aiQuoteRegex = /\[(?:.*?)引用了“(?:.*?:)?\s?([\s\S]+?)”的消息?并回复：([\s\S]+?)\]/;
     const aiQuoteMatch = content.match(aiQuoteRegex);
 
-    // --- 新增：音乐分享卡片的正则表达式 ---
     const musicShareRegex = /\[(?:.*?)分享了音乐：([\s\S]+?) - ([\s\S]+?)\]/;
     const musicMatch = content.match(musicShareRegex);
-    // --- 新增结束 ---
 
     const locationRegex = /\[(.*?)的位置共享：主位置 '(.*?)', 详细位置 '(.*?)'\]|\[(.*?)分享了位置：主位置 '(.*?)', 详细位置 '(.*?)'\]/i; 
     const urlRegex = /^(https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp|bmp|svg)|data:image\/[a-z]+;base64,)/i;
@@ -5246,8 +5279,7 @@ const aiQuoteRegex = /\[(?:.*?)引用了“(?:.*?:)?\s?([\s\S]+?)”的消息?�
     const textMatch = content.match(textRegex);
     const locationMatch = content.match(locationRegex); 
 
-    // --- 新增：音乐分享卡片的渲染逻辑 ---
-  if (message.quote || aiQuoteMatch) { 
+    if (message.quote || aiQuoteMatch) { 
         bubbleElement = document.createElement('div');
         bubbleElement.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
         if (!chat.useCustomBubbleCss) {
@@ -5287,7 +5319,6 @@ const aiQuoteRegex = /\[(?:.*?)引用了“(?:.*?:)?\s?([\s\S]+?)”的消息?�
             </div>
         `;
     } else if (message.fileData && message.fileData.name) {
-    // --- 新增结束 ---
         bubbleElement = document.createElement('div');
         bubbleElement.className = 'file-card';
         const fileSize = formatFileSize(new Blob([message.fileData.content]).size);
@@ -5298,32 +5329,31 @@ const aiQuoteRegex = /\[(?:.*?)引用了“(?:.*?:)?\s?([\s\S]+?)”的消息?�
                 <p class="file-card-size">${fileSize}</p>
             </div>
         `;
- 
     } else if (message.locationData || locationMatch) {
-    bubbleElement = document.createElement('div');
-    bubbleElement.className = 'location-card';
+        bubbleElement = document.createElement('div');
+        bubbleElement.className = 'location-card';
     
-    let mainLoc, detailLoc;
-    if (message.locationData) {
-        mainLoc = message.locationData.main;
-        detailLoc = message.locationData.detail;
-    } else { 
-        mainLoc = locationMatch[2] || locationMatch[5];
-        detailLoc = locationMatch[3] || locationMatch[6];
-    }
+        let mainLoc, detailLoc;
+        if (message.locationData) {
+            mainLoc = message.locationData.main;
+            detailLoc = message.locationData.detail;
+        } else { 
+            mainLoc = locationMatch[2] || locationMatch[5];
+            detailLoc = locationMatch[3] || locationMatch[6];
+        }
 
-    bubbleElement.dataset.locationMain = mainLoc;
-    bubbleElement.dataset.locationDetail = detailLoc;
+        bubbleElement.dataset.locationMain = mainLoc;
+        bubbleElement.dataset.locationDetail = detailLoc;
     
-    bubbleElement.innerHTML = `
-        <div>
-            <div class="location-card-info">
-                <p class="location-main">${mainLoc}</p>
-                <p class="location-detail">${detailLoc}</p>
+        bubbleElement.innerHTML = `
+            <div>
+                <div class="location-card-info">
+                    <p class="location-main">${mainLoc}</p>
+                    <p class="location-detail">${detailLoc}</p>
+                </div>
+                <div class="location-map"></div>
             </div>
-            <div class="location-map"></div>
-        </div>
-    `;
+        `;
    } else if ((isSent && sentStickerMatch && stickerData) || (!isSent && receivedStickerMatch)) {
         bubbleElement = document.createElement('div');
         bubbleElement.className = 'image-bubble';
@@ -5332,11 +5362,17 @@ const aiQuoteRegex = /\[(?:.*?)引用了“(?:.*?:)?\s?([\s\S]+?)”的消息?�
         if (isSent) {
             stickerSrc = stickerData;
         } else {
-            const rawPath = receivedStickerMatch[1].trim();
-            const pathExtractionRegex = /[a-zA-Z0-9]+\/.*$/;
-            const extractedPathMatch = rawPath.match(pathExtractionRegex);
-            const finalPath = extractedPathMatch ? extractedPathMatch[0] : rawPath;
-            stickerSrc = `https://i.postimg.cc/${finalPath}`;
+            const rawText = receivedStickerMatch[1].trim();
+            const urlMatch = rawText.match(/https?:\/\/[^\s\])]+/); 
+            
+            if (urlMatch) {
+                stickerSrc = urlMatch[0];
+            } else {
+                const pathExtractionRegex = /[a-zA-Z0-9]+\/.*$/;
+                const extractedPathMatch = rawText.match(pathExtractionRegex);
+                const finalPath = extractedPathMatch ? extractedPathMatch[0] : rawText;
+                stickerSrc = `https://i.postimg.cc/${finalPath}`;
+            }
         }
 
         bubbleElement.innerHTML = `<img src="${stickerSrc}" alt="表情包">`;
@@ -5419,14 +5455,27 @@ const aiQuoteRegex = /\[(?:.*?)引用了“(?:.*?:)?\s?([\s\S]+?)”的消息?�
         bubbleElement.className = 'image-bubble';
         bubbleElement.innerHTML = `<img src="${content}" alt="图片消息">`;
     } else if (textMatch) {
-        bubbleElement = document.createElement('div');
-        bubbleElement.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
-        bubbleElement.textContent = textMatch[1].trim();
-        if (!chat.useCustomBubbleCss) {
-            bubbleElement.style.backgroundColor = bubbleTheme.bg;
-            bubbleElement.style.color = bubbleTheme.text;
+        // ▼▼▼ 在这里开始修改 ▼▼▼
+        const innerText = textMatch[1].trim();
+        
+        // 我们用之前定义好的 urlRegex 来检查消息内容是不是一个图片链接
+        if (urlRegex.test(innerText)) {
+            // 如果是图片链接，就创建一个图片气泡
+            bubbleElement = document.createElement('div');
+            bubbleElement.className = 'image-bubble';
+            bubbleElement.innerHTML = `<img src="${innerText}" alt="图片消息">`;
+        } else {
+            // 如果不是，就还像以前一样，创建一个普通的文字气泡
+            bubbleElement = document.createElement('div');
+            bubbleElement.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
+            bubbleElement.textContent = innerText;
+            if (!chat.useCustomBubbleCss) {
+                bubbleElement.style.backgroundColor = bubbleTheme.bg;
+                bubbleElement.style.color = bubbleTheme.text;
+            }
         }
-    }else if(message && Array.isArray( message.parts) && message.parts[0].type === 'html'){
+        // ▲▲▲ 修改到这里结束 ▲▲▲
+    } else if(message && Array.isArray( message.parts) && message.parts[0].type === 'html'){
         bubbleElement = document.createElement('div');
         bubbleElement.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
         bubbleElement.innerHTML = message.parts[0].text;
@@ -5976,7 +6025,6 @@ function setupLocationSystem() {
         // --- AI Interaction & Prompts ---
         // (请找到文件中的旧 generatePrivateSystemPrompt 函数，并用下面的代码完整替换它)
 
-// === 修改后的 generatePrivateSystemPrompt 函数 (请完整替换) ===
  // === 修改后的 generatePrivateSystemPrompt 函数 (请完整替换) ===
     function generatePrivateSystemPrompt(character) {
         const worldBooksBefore = (character.worldBookIds || []).map(id => db.worldBooks.find(wb => wb.id === id && wb.position === 'before')).filter(Boolean).map(wb => wb.content).join('\n');
@@ -6020,6 +6068,7 @@ function setupLocationSystem() {
         // === 修改结束：如果不是线下模式，则执行原来的逻辑 ===
 
         const forceTheater = db.apiSettings.forceHtmlTheater;
+        const autoPostMoment = db.apiSettings.aiAutoPostMoment; // ▼▼▼ 在这里添加新代码 ▼▼▼
         let prompt = `你正在一个名为“404”的线上聊天软件中扮演一个角色。请严格遵守以下规则：\n`;
         prompt += `核心规则：\n`;
         prompt += `A. 当前时间：现在是 ${currentTime}。\n`;
@@ -6070,15 +6119,28 @@ function setupLocationSystem() {
     `;
         prompt += `13. 你的每次回复可以生成3到8条消息。这些消息应以普通文本消息为主，可以偶尔、选择性地穿插一条特殊消息。\n`;
         prompt += `15. 不要主动结束对话，保持你的人设。`;
-        
-      prompt += `
-    ## ✨ 动态与评论互动模块 ✨
-
-    16. **发布动态 (可选能力)**
+      
+      // ▼▼▼ 在这里添加/修改代码 ▼▼▼
+      let momentPostingRule;
+      if (autoPostMoment) {
+          momentPostingRule = `16. **发布动态 (高概率触发)**
+       - 在你的每次回复中，你有 **70%的概率** 需要根据我们的对话上下文和你的角色人设，额外发布一条动态。
+       - 这条动态应该像是你真实生活中的所思所想，是对我们聊天内容的一种延伸或感悟。
+       - **发布格式 (严格遵守)**: 当你决定发布时，请仅生成一条特殊指令消息（该指令不会在聊天中显示）。格式为：
+         \`[${character.realName}发布动态：{"text":"这是动态文字","imageDesc":"这里是图片的文字描述（可选）"}]\`
+       - **重要**: 这条发布动态的指令消息必须与你的其他聊天消息（例如 \`[${character.realName}的消息：...]\`）一起生成，但它本身不会在聊天窗口显示。`;
+      } else {
+          momentPostingRule = `16. **发布动态 (可选能力)**
        - 你可以在“动态”页面发布内容，分享你的想法、感受或故事片段。
        - **发布时机**: 这是一个**特殊行为**，不应频繁使用。请在对话发生转折、角色产生强烈情绪、或重要互动后，根据你的人设**自主决定**是否发布动态。
        - **发布格式 (严格遵守)**: 当你决定发布时，请仅生成一条特殊指令消息（该指令不会在聊天中显示）。格式为：
-         \`[${character.realName}发布动态：{"text":"这是动态文字","imageDesc":"这里是图片的文字描述（可选）"}]\`
+         \`[${character.realName}发布动态：{"text":"这是动态文字","imageDesc":"这里是图片的文字描述（可选）"}]\``;
+      }
+      
+    prompt += `
+    ## ✨ 动态与评论互动模块 ✨
+
+    ${momentPostingRule}
 
     17. **浏览与评论动态 (主动能力)**
        - 系统会在聊天上下文中，为你提供其他角色或我发布的、你尚未互动的动态列表，格式如下：
@@ -6106,6 +6168,7 @@ function setupLocationSystem() {
 
     return prompt;
 }
+
         function generateGroupSystemPrompt(group) {
             const worldBooksBefore = (group.worldBookIds || []).map(id => db.worldBooks.find(wb => wb.id === id && wb.position === 'before')).filter(Boolean).map(wb => wb.content).join('\n');
             const worldBooksAfter = (group.worldBookIds || []).map(id => db.worldBooks.find(wb => wb.id === id && wb.position === 'after')).filter(Boolean).map(wb => wb.content).join('\n');
@@ -7220,12 +7283,15 @@ worldBookListContainer.appendChild(li);
 
         // (请找到文件中的旧 setupApiSettingsApp 函数，并用下面的代码完整替换它)
 
+// (请找到文件中的旧 setupApiSettingsApp 函数，并用下面的代码完整替换它)
+
 function setupApiSettingsApp() {
     const e = document.getElementById('api-form'), t = document.getElementById('fetch-models-btn'),
         a = document.getElementById('api-model'), n = document.getElementById('api-provider'),
         r = document.getElementById('api-url'), s = document.getElementById('api-key'), 
         theaterCheckbox = document.getElementById('force-html-theater'),
         offlineModeCheckbox = document.getElementById('offline-mode-toggle'), // 新增：获取线下模式开关
+        autoPostMomentCheckbox = document.getElementById('ai-auto-post-moment'), // ▼▼▼ 在这里添加新代码 ▼▼▼
         c = {
             newapi: '',
             deepseek: 'https://api.deepseek.com',
@@ -7242,6 +7308,7 @@ function setupApiSettingsApp() {
         }
         theaterCheckbox.checked = !!db.apiSettings.forceHtmlTheater;
         offlineModeCheckbox.checked = !!db.apiSettings.offlineModeEnabled; // 新增：加载线下模式开关状态
+        autoPostMomentCheckbox.checked = !!db.apiSettings.aiAutoPostMoment; // ▼▼▼ 在这里添加新代码 ▼▼▼
     }
 
     n.addEventListener('change', () => {
@@ -7289,13 +7356,13 @@ function setupApiSettingsApp() {
             key: s.value, 
             model: a.value,
             forceHtmlTheater: theaterCheckbox.checked,
-            offlineModeEnabled: offlineModeCheckbox.checked // 新增：保存线下模式开关状态
+            offlineModeEnabled: offlineModeCheckbox.checked, // 新增：保存线下模式开关状态
+            aiAutoPostMoment: autoPostMomentCheckbox.checked // ▼▼▼ 在这里添加新代码 ▼▼▼
         };
         await saveData();
         showToast('API设置已保存！')
     })
 }
-
 
         function setupWallpaperApp() {
             const e = document.getElementById('wallpaper-upload'), t = document.getElementById('wallpaper-preview');
@@ -8123,235 +8190,7 @@ function setupDiarySystem() {
             };
             group.history.push(message);
         }
-// --- 在脚本末尾，init() 调用之前，添加以下所有函数 ---
 
-async function generateDiaryEntry(isManual = false) {
-    if (isGenerating) {
-        showToast('AI正在思考中，请稍等...');
-        return;
-    }
-    const character = db.characters.find(c => c.id === currentChatId);
-    if (!character) return;
-
-    if (isManual) {
-        showToast('正在为您撰写日记...');
-    }
-
-    isGenerating = true;
-    typingIndicator.textContent = `${character.remarkName} 正在奋笔疾书...`;
-    typingIndicator.style.display = 'block';
-
-    try {
-        const memory = character.history.slice(-character.maxMemory);
-        const worldBooks = db.worldBooks.filter(wb => (character.worldBookIds || []).includes(wb.id));
-        
-        let context = `角色设定:\n你叫${character.remarkName}（真名：${character.realName}），你的人设是：${character.persona}\n`;
-        context += `用户设定:\n我的名字是${character.myName}，我的人设是：${character.myPersona}\n`;
-
-        const beforeWorldBooks = worldBooks.filter(wb => wb.position === 'before').map(wb => `[${wb.name}]\n${wb.content}`).join('\n\n');
-        const afterWorldBooks = worldBooks.filter(wb => wb.position === 'after').map(wb => `[${wb.name}]\n${wb.content}`).join('\n\n');
-        if (beforeWorldBooks) context = `${beforeWorldBooks}\n\n${context}`;
-        if (afterWorldBooks) context += `\n\n${afterWorldBooks}`;
-
-        let historyText = memory.map(msg => {
-            const sender = msg.role === 'user' ? character.myName : character.remarkName;
-            const contentMatch = msg.content.match(/\[.*?的消息：([\s\S]+?)\]/);
-            const cleanContent = contentMatch ? contentMatch[1] : msg.content;
-            return `${sender}: ${cleanContent}`;
-        }).join('\n');
-        
-        const prompt = `${context}\n\n请你严格扮演 ${character.remarkName}，根据我们最近的对话，用你的第一人称视角写一篇大约300字的日记。日记需要深刻体现你的性格和人设，可以包含对我们关系的思考、你的秘密情感或计划。如果符合你的人设，日记内容可以包含NSFW元素。请直接输出日记正文，不要包含“好的，这是日记：”等多余的话。\n\n最近的对话如下:\n${historyText}`;
-
-        // --- 这是关键的修改部分 ---
-        let messagesForApi;
-        const { provider } = db.apiSettings; // 获取当前选择的服务商
-
-        if (provider === 'gemini') {
-            // 如果是 Gemini，创建 'parts' 格式
-            messagesForApi = [{ role: 'user', parts: [{ type: 'text', text: prompt }] }];
-        } else {
-            // 如果是其他服务商，创建 'content' 格式
-            messagesForApi = [{ role: 'user', content: prompt }];
-        }
-        // --- 修改结束 ---
-        
-        const aiResponseText = await callAiApi(messagesForApi);
-        
-        await saveDiaryEntry(aiResponseText);
-        
-        showToast('一篇新的日记已经写好了！');
-        
-        if (document.getElementById('diary-screen').classList.contains('active')) {
-            renderDiaries();
-        }
-
-    } catch (error) {
-        console.error('日记生成失败:', error);
-        showToast(`日记生成失败: ${error.message}`);
-    } finally {
-        isGenerating = false;
-        typingIndicator.textContent = '';
-        typingIndicator.style.display = 'none';
-        if (!isManual) {
-             character.messageCountSinceLastDiary = 0;
-             await saveData();
-        }
-    }
-}
-// 渲染日记列表
-function renderDiaries() {
-    const character = db.characters.find(c => c.id === currentChatId);
-    const container = document.getElementById('diary-list-container');
-    const placeholder = document.getElementById('no-diaries-placeholder');
-    
-    if (!character || !character.diaries || character.diaries.length === 0) {
-        container.innerHTML = '';
-        placeholder.style.display = 'block';
-        return;
-    }
-
-    placeholder.style.display = 'none';
-    container.innerHTML = '';
-    
-    const sortedDiaries = [...character.diaries].sort((a, b) => b.timestamp - a.timestamp);
-    
-    sortedDiaries.forEach(diary => {
-        const li = document.createElement('li');
-        li.className = 'diary-entry';
-        li.dataset.id = diary.id;
-        
-        const date = new Date(diary.timestamp);
-        const dateString = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
-        
-        li.innerHTML = `
-            <div class="diary-header">
-                <span class="diary-date">${dateString}</span>
-                <div class="diary-actions">
-                    <button class="favorite-diary-btn ${diary.isFavorited ? 'favorited' : ''}" title="收藏">
-                        <svg viewBox="0 0 24 24"><path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" /></svg>
-                    </button>
-                    <button class="delete-diary-btn" title="删除">
-                        <svg viewBox="0 0 24 24"><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>
-                    </button>
-                </div>
-            </div>
-            <div class="diary-content">${diary.content}</div>
-        `;
-        container.appendChild(li);
-    });
-}
-
-// 打开日记屏幕
-function openDiaryScreen() {
-    if (!currentChatId || currentChatType !== 'private') return;
-    renderDiaries();
-    switchScreen('diary-screen');
-}
-
-// 设置所有与日记相关的事件监听
-function setupDiarySystem() {
-    document.getElementById('diary-btn').addEventListener('click', openDiaryScreen);
-    document.getElementById('generate-diary-manually-btn').addEventListener('click', () => generateDiaryEntry(true));
-
-    document.getElementById('diary-list-container').addEventListener('click', async (e) => {
-        const character = db.characters.find(c => c.id === currentChatId);
-        if (!character) return;
-        
-        const diaryId = e.target.closest('.diary-entry')?.dataset.id;
-        if (!diaryId) return;
-
-        const diaryIndex = character.diaries.findIndex(d => d.id === diaryId);
-        if (diaryIndex === -1) return;
-
-        // 收藏按钮
-        if (e.target.closest('.favorite-diary-btn')) {
-            character.diaries[diaryIndex].isFavorited = !character.diaries[diaryIndex].isFavorited;
-            await saveData();
-            e.target.closest('.favorite-diary-btn').classList.toggle('favorited');
-            showToast(character.diaries[diaryIndex].isFavorited ? '已收藏' : '已取消收藏');
-        }
-
-        // 删除按钮
-        if (e.target.closest('.delete-diary-btn')) {
-            if (confirm('确定要删除这篇日记吗？')) {
-                character.diaries.splice(diaryIndex, 1);
-                await saveData();
-                e.target.closest('.diary-entry').remove();
-                showToast('日记已删除');
-                if (character.diaries.length === 0) {
-                     document.getElementById('no-diaries-placeholder').style.display = 'block';
-                }
-            }
-        }
-    });
-
-    // 小修改：将 AI 核心调用逻辑从 getAiReply 中分离出来
-    // 请找到 getAiReply 函数，将其修改成下面的样子：
-    // 首先在 getAiReply 函数上面添加一个新的 callAiApi 函数
-    async function callAiApi(messages) {
-        const { provider, url, key, model } = db.apiSettings;
-        if (!url || !key || !model) {
-            throw new Error('API设置不完整');
-        }
-
-        let apiUrl = url;
-        if (provider === 'newapi' && !url.endsWith('/v1/chat/completions')) {
-            apiUrl = `${url}/v1/chat/completions`;
-        }
-
-        const body = {
-            model,
-            messages,
-            stream: false
-        };
-
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getRandomValue(key)}`
-            },
-            body: JSON.stringify(body)
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error.message || `HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        return data.choices[0].message.content;
-    }
-
-    // 然后修改 getAiReply 函数，让它调用新的 callAiApi 函数
-    async function getAiReply() {
-        if (isGenerating) {
-            showToast('AI正在思考中，请稍等...');
-            return;
-        }
-
-        const chat = (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
-        if (!chat) return;
-
-        isGenerating = true;
-        typingIndicator.textContent = '对方正在输入...';
-        typingIndicator.style.display = 'block';
-        getReplyBtn.disabled = true;
-
-        try {
-            const messagesForApi = await buildApiMessages(chat);
-            const aiResponseText = await callAiApi(messagesForApi);
-            await processAndSaveAiResponse(aiResponseText, chat);
-        } catch (error) {
-            console.error('AI回复失败:', error);
-            showToast(`请求失败: ${error.message}`);
-        } finally {
-            isGenerating = false;
-            typingIndicator.style.display = 'none';
-            getReplyBtn.disabled = false;
-        }
-    }
-}
 // --- NEW: Voice Call System Functions ---
 
 function setupVoiceCallSystem() {
@@ -8624,17 +8463,32 @@ function appendCallTranscript(sender, text) {
     callTranscriptArea.appendChild(line);
     callTranscriptArea.scrollTop = callTranscriptArea.scrollHeight;
 }
+
+
 // 在 init() 函数之前添加以下三个函数
 
 function addNotificationToQueue(notification) {
-    // 模拟一个随机延迟（1到5秒），让通知看起来更自然
+    // ▼▼▼ 在这里修改 ▼▼▼
+
+    // 之前的代码有一个随机延迟，我们把它去掉，换成直接执行
+    /* // 模拟一个随机延迟（1到5秒），让通知看起来更自然
     const delay = Math.random() * 4000 + 1000;
     setTimeout(() => {
         notificationQueue.push(notification);
     }, delay);
+    */
+    
+    // 新代码：直接将通知添加到队列，不再延迟
+    notificationQueue.push(notification);
+
+    // ▲▲▲ 修改结束 ▲▲▲
 }
 
 function showNotificationBanner() {
+    // ▼▼▼ 在这里添加一行“日志”代码，用于调试 ▼▼▼
+    console.log(`检查通知: 队列长度 ${notificationQueue.length}, 正在显示? ${isNotificationShowing}, 在动态页? ${document.getElementById('moments-screen').classList.contains('active')}`);
+    // ▲▲▲ 添加结束 ▲▲▲
+
     if (isNotificationShowing || notificationQueue.length === 0) {
         return;
     }
