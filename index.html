@@ -2373,6 +2373,11 @@
   transform: none !important;
   will-change: auto !important;
 }
+
+/* --- 调整右上角按钮组的间距 --- */
+.app-header .action-btn-group {
+    gap: 2px; /* 将按钮间的默认间距从 10px 减小到 4px */
+}
 /* === 主屏幕音乐小部件尺寸控制器 (粘贴到 <style> 标签末尾) === */
 .music-widget {
     /* --- 在这里修改大小 --- */
@@ -2396,6 +2401,8 @@
     font-size: calc(13px * var(--music-widget-scale));
 }
 </style>
+
+
 <!-- === /patch === -->
 
 <style>
@@ -2447,9 +2454,16 @@
                     <span id="chat-room-status-text">在线</span>
                 </div>
             </div>
-            <button class="action-btn" id="chat-settings-btn"><img src="https://i.postimg.cc/nhwP4pQy/chan-73.png"
+            <div class="action-btn-group">
+                <button class="action-btn" id="ai-trajectory-btn">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:24px; height:24px; color:var(--primary-color);">
+                        <path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" />
+                    </svg>
+                </button>
+                <button class="action-btn" id="chat-settings-btn"><img src="https://i.postimg.cc/nhwP4pQy/chan-73.png"
                                                                    alt="设置"></button>
-        </header>
+            </div>
+            </header>
         <header class="app-header" id="chat-room-header-select" style="display: none;">
             <button class="action-btn" id="cancel-multi-select-btn">取消</button>
             <div class="title-container">
@@ -2461,6 +2475,7 @@
             <div class="message-area" id="message-area"></div>
             <div class="typing-indicator" id="typing-indicator"></div>
         </main>
+        ```
         <div class="chat-input-wrapper">
         	<!-- 找到 <div class="chat-input-wrapper"> 在其内部最前面添加 -->
 <div id="quote-reply-bar" style="padding: 8px 12px; background-color: rgba(240, 240, 240, 0.9); border-top: 1px solid #eee; display: none; align-items: center; gap: 8px; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);">
@@ -3962,6 +3977,8 @@ function formatFileSize(bytes) {
             setupMusicPlayer();
             setupNotificationSystem();
             setupMomentsEventListeners();
+setupTrajectorySystem();
+
  };
 
 
@@ -5184,16 +5201,16 @@ if (type === 'private') {
             return Math.max(1, Math.min(60, Math.ceil(text.length / 3.5)));
         }
 
-           function createMessageBubbleElement(message) {
+         function createMessageBubbleElement(message) {
     const chat = (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
     const {role, content, timestamp, id, transferStatus, giftStatus, stickerData, senderId} = message;
 
     const timeSkipRegex = /\[system-display:([\s\S]+?)\]/;
-    const offlineSceneRegex = /\[offline-scene:([\s\S]+?)\]/; 
+    const offlineSceneRegex = /\[offline-scene:([\s\S]+?)\]/;
     const inviteRegex = /\[(.*?)邀请(.*?)加入了群聊\]/;
     const renameRegex = /\[(.*?)修改群名为：(.*?)\]/;
     const timeSkipMatch = content.match(timeSkipRegex);
-    const offlineSceneMatch = content.match(offlineSceneRegex); 
+    const offlineSceneMatch = content.match(offlineSceneRegex);
     const inviteMatch = content.match(inviteRegex);
     const renameMatch = content.match(renameRegex);
     const invisibleRegex = /\[.*?(?:接收|退回).*?的转账\]|\[.*?更新状态为：.*?\]|\[.*?已接收礼物\]|\[system:.*?\]/;
@@ -5204,11 +5221,11 @@ if (type === 'private') {
     const wrapper = document.createElement('div');
     wrapper.dataset.id = id;
 
-    if (timeSkipMatch || inviteMatch || renameMatch || offlineSceneMatch) { 
+    if (timeSkipMatch || inviteMatch || renameMatch || offlineSceneMatch) {
         wrapper.className = 'message-wrapper system-notification';
         let bubbleText = '';
         if (timeSkipMatch) bubbleText = timeSkipMatch[1];
-        if (offlineSceneMatch) bubbleText = offlineSceneMatch[1].replace(/\n/g, '<br>'); 
+        if (offlineSceneMatch) bubbleText = offlineSceneMatch[1].replace(/\n/g, '<br>');
         if (inviteMatch) bubbleText = `${inviteMatch[1]}邀请${inviteMatch[2]}加入了群聊`;
         if (renameMatch) bubbleText = `${renameMatch[1]}修改群名为“${renameMatch[2]}”`;
         wrapper.innerHTML = `<div class="system-notification-bubble">${bubbleText}</div>`;
@@ -5252,10 +5269,13 @@ if (type === 'private') {
     const musicShareRegex = /\[(?:.*?)分享了音乐：([\s\S]+?) - ([\s\S]+?)\]/;
     const musicMatch = content.match(musicShareRegex);
 
-    const locationRegex = /\[(.*?)的位置共享：主位置 '(.*?)', 详细位置 '(.*?)'\]|\[(.*?)分享了位置：主位置 '(.*?)', 详细位置 '(.*?)'\]/i; 
+    const locationRegex = /\[(.*?)的位置共享：主位置 '(.*?)', 详细位置 '(.*?)'\]|\[(.*?)分享了位置：主位置 '(.*?)', 详细位置 '(.*?)'\]/i;
     const urlRegex = /^(https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp|bmp|svg)|data:image\/[a-z]+;base64,)/i;
     const sentStickerRegex = /\[(?:.+?)的表情包：.+?\]/i;
     const receivedStickerRegex = /\[(?:.+?)发送的表情包：([\s\S]+?)\]/i;
+    // ▼▼▼ 修正后的位置：在这里定义新规则 ▼▼▼
+    const bareImageLinkRegex = /^\[(https?:\/\/[^\s]+\.(?:jpg|jpeg|png|gif|webp|bmp|svg))\]$/i;
+    // ▲▲▲ 修正结束 ▲▲▲
     const voiceRegex = /\[(?:.+?)的语音：([\s\S]+?)\]/;
     const photoVideoRegex = /\[(?:.+?)发来的照片\/视频：([\s\S]+?)\]/;
     const privateSentTransferRegex = /\[.*?给你转账：([\d.]+)元；备注：(.*?)\]/;
@@ -5268,6 +5288,7 @@ if (type === 'private') {
 
     const sentStickerMatch = content.match(sentStickerRegex);
     const receivedStickerMatch = content.match(receivedStickerRegex);
+    const bareImageLinkMatch = content.match(bareImageLinkRegex); // 使用新规则进行匹配
     const voiceMatch = content.match(voiceRegex);
     const photoVideoMatch = content.match(photoVideoRegex);
     const privateSentTransferMatch = content.match(privateSentTransferRegex);
@@ -5277,28 +5298,25 @@ if (type === 'private') {
     const groupGiftMatch = content.match(groupGiftRegex);
     const imageRecogMatch = content.match(imageRecogRegex);
     const textMatch = content.match(textRegex);
-    const locationMatch = content.match(locationRegex); 
+    const locationMatch = content.match(locationRegex);
 
-    if (message.quote || aiQuoteMatch) { 
+    if (message.quote || aiQuoteMatch) {
         bubbleElement = document.createElement('div');
         bubbleElement.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
         if (!chat.useCustomBubbleCss) {
             bubbleElement.style.backgroundColor = bubbleTheme.bg;
             bubbleElement.style.color = bubbleTheme.text;
         }
-
         let quotedSender, quotedText, replyText;
-
-        if (message.quote) { // 用户发送的引用
+        if (message.quote) {
             quotedSender = message.quote.sender;
             quotedText = message.quote.content;
             replyText = message.replyText;
-        } else { // AI发送的引用
+        } else {
             quotedSender = senderNickname || (currentChatType === 'private' ? chat.remarkName : '群成员');
             quotedText = aiQuoteMatch[1].trim();
             replyText = aiQuoteMatch[2].trim();
         }
-
         bubbleElement.innerHTML = `
             <div class="quoted-content">
                 <div class="quoted-sender">${quotedSender}</div>
@@ -5311,60 +5329,35 @@ if (type === 'private') {
         bubbleElement.className = 'music-card';
         const songTitle = musicMatch[1].trim();
         const artist = musicMatch[2].trim();
-        bubbleElement.innerHTML = `
-            <img src="https://i.postimg.cc/d10J4VzR/image.png" alt="music icon" class="music-card-icon">
-            <div class="music-card-info">
-                <p class="music-card-title">${songTitle}</p>
-                <p class="music-card-artist">${artist}</p>
-            </div>
-        `;
+        bubbleElement.innerHTML = `<img src="https://i.postimg.cc/d10J4VzR/image.png" alt="music icon" class="music-card-icon"><div class="music-card-info"><p class="music-card-title">${songTitle}</p><p class="music-card-artist">${artist}</p></div>`;
     } else if (message.fileData && message.fileData.name) {
         bubbleElement = document.createElement('div');
         bubbleElement.className = 'file-card';
         const fileSize = formatFileSize(new Blob([message.fileData.content]).size);
-        bubbleElement.innerHTML = `
-            <img src="https://i.postimg.cc/vms1Vd9X/1040g2sg31hh9ub1v3oeg5pbsckvn39vt3mbflao.png" alt="file icon" class="file-card-icon">
-            <div class="file-card-info">
-                <p class="file-card-name">${message.fileData.name}</p>
-                <p class="file-card-size">${fileSize}</p>
-            </div>
-        `;
+        bubbleElement.innerHTML = `<img src="https://i.postimg.cc/vms1Vd9X/1040g2sg31hh9ub1v3oeg5pbsckvn39vt3mbflao.png" alt="file icon" class="file-card-icon"><div class="file-card-info"><p class="file-card-name">${message.fileData.name}</p><p class="file-card-size">${fileSize}</p></div>`;
     } else if (message.locationData || locationMatch) {
         bubbleElement = document.createElement('div');
         bubbleElement.className = 'location-card';
-    
         let mainLoc, detailLoc;
         if (message.locationData) {
             mainLoc = message.locationData.main;
             detailLoc = message.locationData.detail;
-        } else { 
+        } else {
             mainLoc = locationMatch[2] || locationMatch[5];
             detailLoc = locationMatch[3] || locationMatch[6];
         }
-
         bubbleElement.dataset.locationMain = mainLoc;
         bubbleElement.dataset.locationDetail = detailLoc;
-    
-        bubbleElement.innerHTML = `
-            <div>
-                <div class="location-card-info">
-                    <p class="location-main">${mainLoc}</p>
-                    <p class="location-detail">${detailLoc}</p>
-                </div>
-                <div class="location-map"></div>
-            </div>
-        `;
-   } else if ((isSent && sentStickerMatch && stickerData) || (!isSent && receivedStickerMatch)) {
+        bubbleElement.innerHTML = `<div><div class="location-card-info"><p class="location-main">${mainLoc}</p><p class="location-detail">${detailLoc}</p></div><div class="location-map"></div></div>`;
+    } else if ((isSent && sentStickerMatch && stickerData) || (!isSent && receivedStickerMatch)) {
         bubbleElement = document.createElement('div');
         bubbleElement.className = 'image-bubble';
         let stickerSrc = '';
-
         if (isSent) {
             stickerSrc = stickerData;
         } else {
             const rawText = receivedStickerMatch[1].trim();
-            const urlMatch = rawText.match(/https?:\/\/[^\s\])]+/); 
-            
+            const urlMatch = rawText.match(/https?:\/\/[^\s\])]+/);
             if (urlMatch) {
                 stickerSrc = urlMatch[0];
             } else {
@@ -5374,8 +5367,13 @@ if (type === 'private') {
                 stickerSrc = `https://i.postimg.cc/${finalPath}`;
             }
         }
-
         bubbleElement.innerHTML = `<img src="${stickerSrc}" alt="表情包">`;
+    } else if (!isSent && bareImageLinkMatch) {
+        // ▼▼▼ 这就是我们新增的、完整的处理逻辑 ▼▼▼
+        bubbleElement = document.createElement('div');
+        bubbleElement.className = 'image-bubble';
+        const imageUrl = bareImageLinkMatch[1];
+        bubbleElement.innerHTML = `<img src="${imageUrl}" alt="表情包">`;
     } else if (privateGiftMatch || groupGiftMatch) {
         const match = privateGiftMatch || groupGiftMatch;
         bubbleElement = document.createElement('div');
@@ -5383,7 +5381,6 @@ if (type === 'private') {
         if (giftStatus === 'received') {
             bubbleElement.classList.add('received');
         }
-
         let giftText;
         if (groupGiftMatch) {
             const from = groupGiftMatch[1];
@@ -5393,7 +5390,6 @@ if (type === 'private') {
             giftText = isSent ? '您有一份礼物～' : '您有一份礼物～';
         }
         bubbleElement.innerHTML = `<img src="https://i.postimg.cc/rp0Yg31K/chan-75.png" alt="gift" class="gift-card-icon"><div class="gift-card-text">${giftText}</div><div class="gift-card-received-stamp">已查收</div>`;
-
         const description = groupGiftMatch ? groupGiftMatch[3].trim() : match[1].trim();
         const descriptionDiv = document.createElement('div');
         descriptionDiv.className = 'gift-card-description';
@@ -5418,7 +5414,6 @@ if (type === 'private') {
     } else if (privateSentTransferMatch || privateReceivedTransferMatch || groupTransferMatch) {
         const isSentTransfer = !!privateSentTransferMatch || (groupTransferMatch && isSent);
         const match = privateSentTransferMatch || privateReceivedTransferMatch || groupTransferMatch;
-
         let amount, remarkText, titleText;
         if (groupTransferMatch) {
             const from = groupTransferMatch[1];
@@ -5426,17 +5421,15 @@ if (type === 'private') {
             amount = parseFloat(groupTransferMatch[3]).toFixed(2);
             remarkText = groupTransferMatch[4] || '';
             titleText = isSent ? `向 ${to} 转账` : `${from} 向你转账`;
-        } else { // Private chat
+        } else {
             amount = parseFloat(match[1]).toFixed(2);
             remarkText = match[2] || '';
             titleText = isSentTransfer ? '给你转账' : '转账';
         }
-
         bubbleElement = document.createElement('div');
         bubbleElement.className = `transfer-card ${isSentTransfer ? 'sent-transfer' : 'received-transfer'}`;
-
         let statusText = isSentTransfer ? '待查收' : '转账给你';
-        if (groupTransferMatch && !isSent) statusText = '转账给Ta'; // AI to AI
+        if (groupTransferMatch && !isSent) statusText = '转账给Ta';
         if (transferStatus === 'received') {
             statusText = '已收款';
             bubbleElement.classList.add('received');
@@ -5447,7 +5440,6 @@ if (type === 'private') {
         if ((transferStatus !== 'pending' && currentChatType === 'private') || currentChatType === 'group') {
             bubbleElement.style.cursor = 'default';
         }
-
         const remarkHTML = remarkText ? `<p class="transfer-remark">${remarkText}</p>` : '';
         bubbleElement.innerHTML = `<div class="overlay"></div><div class="transfer-content"><p class="transfer-title">${titleText}</p><p class="transfer-amount">¥${amount}</p>${remarkHTML}<p class="transfer-status">${statusText}</p></div>`;
     } else if (imageRecogMatch || urlRegex.test(content)) {
@@ -5455,17 +5447,12 @@ if (type === 'private') {
         bubbleElement.className = 'image-bubble';
         bubbleElement.innerHTML = `<img src="${content}" alt="图片消息">`;
     } else if (textMatch) {
-        // ▼▼▼ 在这里开始修改 ▼▼▼
         const innerText = textMatch[1].trim();
-        
-        // 我们用之前定义好的 urlRegex 来检查消息内容是不是一个图片链接
         if (urlRegex.test(innerText)) {
-            // 如果是图片链接，就创建一个图片气泡
             bubbleElement = document.createElement('div');
             bubbleElement.className = 'image-bubble';
             bubbleElement.innerHTML = `<img src="${innerText}" alt="图片消息">`;
         } else {
-            // 如果不是，就还像以前一样，创建一个普通的文字气泡
             bubbleElement = document.createElement('div');
             bubbleElement.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
             bubbleElement.textContent = innerText;
@@ -5474,8 +5461,7 @@ if (type === 'private') {
                 bubbleElement.style.color = bubbleTheme.text;
             }
         }
-        // ▲▲▲ 修改到这里结束 ▲▲▲
-    } else if(message && Array.isArray( message.parts) && message.parts[0].type === 'html'){
+    } else if (message && Array.isArray(message.parts) && message.parts[0].type === 'html') {
         bubbleElement = document.createElement('div');
         bubbleElement.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
         bubbleElement.innerHTML = message.parts[0].text;
@@ -6089,7 +6075,7 @@ function setupLocationSystem() {
         prompt += `5. 对我礼物的回应规则...\n`;
         prompt += `6. 对我转账的回应规则...\n`;
         prompt += `7. 你主动发起特殊消息的规则: 你可以根据人设和对话情景，主动发送语音、照片、礼物、转账，或发起语音通话。格式为：[${character.realName}的语音：{内容}]、[${character.realName}发来的照片/视频：{描述}]、[${character.realName}送来的礼物：{描述}]、[${character.realName}的转账：{金额}元；备注：{备注}]。要发起语音通话，请发送指令：[call:${character.realName}]，这条指令用户不可见，但会触发通话界面。\n`;
-        prompt += `8. ✨【新增】更新在线状态的规则✨: 你可以根据对话的上下文和你的角色人设，自主决定是否改变你的在线状态。例如，如果我说我要睡觉了，你可以将状态改为“准备睡觉”。这是一个系统指令，用户不可见，但会改变你在我聊天界面顶部的状态显示。格式为：[${character.realName}更新状态为：{新状态}]。\n`;
+       prompt += `8. 你应该**较为频繁地**根据对话的上下文、你的心情或当前正在做的事情来改变你的在线状态。这是一个需要**积极使用**的能力，用来展现你的生活感。例如，如果我说我要睡觉了，你可以将状态改为“准备一起睡觉”。这是一个系统指令，用户不可见，但会改变你在我聊天界面顶部的状态显示。格式为：[${character.realName}更新状态为：{新状态}]。\n`;
         prompt += `9. 禁止括号/星号等额外叙述的规则...\n`;
         prompt += `10. 发送表情包的规则...\n`;
 
@@ -6241,34 +6227,31 @@ prompt += `
             return prompt;
         }
 // 在 getAiReply 函数之前，添加这个新函数
+// ▼▼▼ 请用这个新版本，完整替换掉旧的 callAiApi 函数 ▼▼▼
 async function callAiApi(messages) {
     const { provider, url, key, model } = db.apiSettings;
     if (!url || !key || !model) {
         throw new Error('API设置不完整');
     }
 
-    // 根据不同的服务商构建请求体
+    let endpoint = url;
+    let headers = { 'Content-Type': 'application/json' };
     let requestBody;
-    let endpoint = `${url}/v1/chat/completions`; // 默认 endpoint
-    let headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getRandomValue(key)}`
-    };
 
+    // 根据不同的服务商构建请求
     if (provider === 'gemini') {
-        // Gemini 的请求体和 endpoint 不同
         endpoint = `${url}/v1beta/models/${model}:generateContent?key=${getRandomValue(key)}`;
-        headers = {'Content-Type': 'application/json'};
         requestBody = {
-            contents: messages, // Gemini 直接使用 messages 数组
+            contents: messages,
             generationConfig: {}
         };
-    } else {
-        // OpenAI / DeepSeek / Claude / NewAPI 的请求体
+    } else { // OpenAI, DeepSeek, Claude, NewAPI 等兼容格式
+        endpoint = `${url}/v1/chat/completions`;
+        headers['Authorization'] = `Bearer ${getRandomValue(key)}`;
         requestBody = {
             model,
             messages,
-            stream: false // 日记生成不需要流式输出
+            stream: false // 非流式输出
         };
     }
 
@@ -6281,17 +6264,28 @@ async function callAiApi(messages) {
     if (!response.ok) {
         const errorText = await response.text();
         console.error("API Error Response:", errorText);
-        throw new Error(`AI 服务请求失败: ${response.status} ${errorText}`);
+        // 直接抛出HTML错误页面，让上层知道内容格式不对
+        if (errorText.trim().startsWith('<')) {
+            throw new Error(`API返回了一个错误页面(HTML)，而不是JSON数据。`);
+        }
+        throw new Error(`AI服务请求失败: ${response.status} ${errorText}`);
     }
 
     const data = await response.json();
 
-    // 根据不同服务商解析响应
+    // 根据不同服务商解析最终的文本内容
     if (provider === 'gemini') {
-        return data.candidates[0].content.parts[0].text;
+        if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
+            return data.candidates[0].content.parts[0].text;
+        }
     } else {
-        return data.choices[0].message.content;
+        if (data.choices && data.choices[0].message) {
+            return data.choices[0].message.content;
+        }
     }
+    
+    // 如果上面的路径都找不到，抛出错误，而不是返回undefined
+    throw new Error('未能从API响应中解析出有效的文本内容。');
 }
         // 用这个新版本，替换掉你原来的整个 getAiReply 函数
 // (请找到文件中的旧 getAiReply 函数，并用下面的代码完整替换它)
@@ -8661,6 +8655,140 @@ function setupMomentsEventListeners() {
     document.addEventListener('scroll', hideMentionPanel, true);
 }
 // ^ ^ ^ ^ ^  替换结束 ^ ^ ^ ^ ^
+
+
+// --- AI轨迹功能 ---
+
+// 1. 生成向AI请求轨迹的指令
+// ▼▼▼ 请用这个新版本，完整替换掉旧的 generateTrajectoryPrompt 函数 ▼▼▼
+function generateTrajectoryPrompt(character) {
+    // --- 新增：获取当前时间 ---
+    const now = new Date();
+    const currentHour = String(now.getHours()).padStart(2, '0');
+    const currentMinute = String(now.getMinutes()).padStart(2, '0');
+    const currentTimeString = `${currentHour}:${currentMinute}`;
+    // --- 新增结束 ---
+
+    const memory = character.history.slice(-15);
+    let historyText = memory.map(msg => {
+        const sender = msg.role === 'user' ? character.myName : character.remarkName;
+        const contentMatch = msg.content.match(/\[.*?的消息：([\s\S]+?)\]/);
+        const cleanContent = contentMatch ? contentMatch[1] : msg.content;
+        return `${sender}: ${cleanContent}`;
+    }).join('\n');
+
+    let prompt = `你正在扮演角色“${character.realName}”，人设是：${character.persona}。`;
+    prompt += `请根据你的人设和我们最近的对话，想象一下你今天从早上到现在的生活轨迹。\n`;
+    prompt += `规则：\n`;
+    prompt += `1. 生成10个关键的时间点和对应的事件或想法。\n`;
+    prompt += `2. 时间点需从早到晚排列。\n`;
+    // --- 核心修改：添加下面两条新规则 ---
+    prompt += `3. 事件内容要符合你的人设，并且其中至少有2-3条需要与我（${character.myName}）相关，例如：想我了、看我们的聊天记录、准备给我的惊喜等。\n`;
+    prompt += `4. 所有时间点都不能晚于当前时间 ${currentTimeString}。\n`;
+    // --- 修改结束 ---
+    prompt += `5. 每个事件的描述必须非常简洁，不能超过12个字。\n`;
+    prompt += `6. 你的输出必须严格遵循以下JSON格式，不要包含任何额外的解释或文字：\n`;
+    prompt += `[{"time": "HH:MM", "event": "事件描述"}, {"time": "HH:MM", "event": "事件描述"}, ...]\n\n`;
+    prompt += `最近的对话参考如下:\n${historyText}`;
+
+    return prompt;
+}
+
+// 2. 显示轨迹弹窗并填充数据
+function renderTrajectoryTimeline(trajectoryData, characterName) {
+    const timeline = document.getElementById('trajectory-timeline');
+    const title = document.getElementById('trajectory-modal-title');
+    
+    title.textContent = `${characterName}的轨迹`;
+    timeline.innerHTML = ''; // 清空旧内容
+
+    if (!trajectoryData || trajectoryData.length === 0) {
+        timeline.innerHTML = '<div class="placeholder-text">未能获取到轨迹信息。</div>';
+        return;
+    }
+
+    trajectoryData.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'trajectory-item';
+        div.innerHTML = `
+            <span class="trajectory-time">${item.time}</span>
+            <p class="trajectory-event">${item.event}</p>
+        `;
+        timeline.appendChild(div);
+    });
+}
+
+// 3. 设置所有相关的事件监听
+// ▼▼▼ 请用这个新版本，完整替换掉旧的 setupTrajectorySystem 函数 ▼▼▼
+// ▼▼▼ 请用这个新版本，完整替换掉旧的 setupTrajectorySystem 函数 ▼▼▼
+function setupTrajectorySystem() {
+    const trajectoryBtn = document.getElementById('ai-trajectory-btn');
+    const trajectoryModal = document.getElementById('trajectory-modal');
+    const closeBtn = document.getElementById('close-trajectory-modal-btn');
+
+    trajectoryBtn.addEventListener('click', async () => {
+        if (currentChatType !== 'private' || !currentChatId) return;
+        const character = db.characters.find(c => c.id === currentChatId);
+        if (!character) return;
+
+        let aiResponseText = ''; // 在 try 之前声明，以便 catch 中也能访问
+
+        // 打开弹窗并显示加载状态
+        trajectoryModal.classList.add('visible');
+        document.getElementById('trajectory-timeline').innerHTML = '<div class="placeholder-text">正在加载轨迹...</div>';
+
+        try {
+            const prompt = generateTrajectoryPrompt(character);
+            let messagesForApi;
+            const { provider } = db.apiSettings;
+
+            if (provider === 'gemini') {
+                messagesForApi = [{ role: 'user', parts: [{ type: 'text', text: prompt }] }];
+            } else {
+                messagesForApi = [{ role: 'user', content: prompt }];
+            }
+
+            aiResponseText = await callAiApi(messagesForApi);
+            
+            // --- 核心修正：从AI的回复中提取出纯净的JSON部分 ---
+            // 使用正则表达式寻找被方括号[]包裹的所有内容
+            const jsonMatch = aiResponseText.match(/\[[\s\S]*\]/); 
+            
+            if (!jsonMatch) {
+                // 如果找不到，就说明AI返回的内容完全不符合预期
+                throw new Error("AI的回复中没有找到有效的JSON数组。");
+            }
+            
+            // 提取匹配到的、干净的JSON字符串
+            const cleanJsonString = jsonMatch[0]; 
+            // --- 修正结束 ---
+
+            // 使用清理过的字符串进行解析
+            const trajectoryData = JSON.parse(cleanJsonString);
+            renderTrajectoryTimeline(trajectoryData, character.remarkName);
+
+        } catch (error) {
+            console.error('获取AI轨迹失败:', error);
+            console.log('--- 导致错误的AI原始回复 ---');
+            console.log(aiResponseText);
+            console.log('--------------------------');
+            document.getElementById('trajectory-timeline').innerHTML = `<div class="placeholder-text" style="color:red;">获取轨迹失败：${error.message}<br><br>请检查浏览器控制台（按F12）查看AI返回的原始错误信息。</div>`;
+        }
+    });
+
+    closeBtn.addEventListener('click', () => {
+        trajectoryModal.classList.remove('visible');
+    });
+
+    trajectoryModal.addEventListener('click', (e) => {
+        if (e.target === trajectoryModal) {
+            trajectoryModal.classList.remove('visible');
+        }
+    });
+}
+
+
+
         init();
     });
 </script>
@@ -9856,6 +9984,59 @@ function cancelQuoteReply() {
     border-radius: 50%;
     object-fit: cover;
 }
+
+/* --- AI轨迹弹窗样式 --- */
+#trajectory-modal {
+    z-index: 105; /* 确保它在其他元素之上 */
+}
+
+#trajectory-modal .modal-window {
+    width: 90%;
+    max-width: 380px;
+    padding: 20px;
+}
+
+#trajectory-timeline {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 15px; /* 为滚动条留出空间 */
+    position: relative;
+    border-left: 2px solid #fce4ec; /* 时间轴的竖线 */
+    margin-left: 25px;
+}
+
+.trajectory-item {
+    position: relative;
+    padding: 10px 0 15px 25px;
+}
+
+.trajectory-item::before {
+    content: '';
+    position: absolute;
+    left: -7px; /* (12px / 2) + 2px border */
+    top: 12px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    border: 2px solid #fff;
+    z-index: 1;
+}
+
+.trajectory-time {
+    font-weight: bold;
+    color: var(--primary-color);
+    font-size: 16px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.trajectory-event {
+    font-size: 14px;
+    color: var(--text-color);
+    line-height: 1.5;
+}
+
 </style>
 
 <div id="bottom-nav-host" data-managed-by="injection" style="display:none;">
@@ -10788,6 +10969,42 @@ async function saveAiReplyToComment(momentId, commentId, replyText, aiAuthorId) 
         console.warn('[injected patch] Dexie not available.');
     }
 
+// ▼▼▼ 在 renderMomentsSafe 函数的正上方，粘贴这个新函数 ▼▼▼
+function getAuthorProfile(authorId) {
+    // 默认备用信息
+    let profile = { name: '未知用户', avatar: 'https://i.postimg.cc/Y96LPskq/o-o-2.jpg' };
+
+    // 1. 检查是不是用户自己
+    const myProfile = (typeof loadProfileFromStorage === 'function') ? loadProfileFromStorage() : {};
+    if (authorId === (myProfile.id || 'user')) {
+        return { name: myProfile.name || '我', avatar: myProfile.avatar };
+    }
+
+    // 2. 在所有AI角色中查找
+    if (window.db && Array.isArray(window.db.characters)) {
+        const character = window.db.characters.find(c => c.id === authorId);
+        if (character) {
+            return { name: character.remarkName, avatar: character.avatar };
+        }
+    }
+
+    // 3. 在所有群聊的成员中查找 (以防是群聊成员发的动态)
+    if (window.db && Array.isArray(window.db.groups)) {
+        for (const group of window.db.groups) {
+            if (Array.isArray(group.members)) {
+                const member = group.members.find(m => m.id === authorId);
+                if (member) {
+                    return { name: member.groupNickname, avatar: member.avatar };
+                }
+            }
+        }
+    }
+    
+    return profile; // 如果都找不到，返回默认信息
+}
+// ▲▲▲ 添加结束 ▲▲▲
+
+// ▼▼▼ 用这个新版本，完整替换掉旧的 renderMomentsSafe 函数 ▼▼▼
     window.renderMomentsSafe = async function renderMomentsSafe() {
       try {
         const container = document.getElementById('moments-container') || (document.getElementById('moments-screen') && document.getElementById('moments-screen').querySelector('#moments-container'));
@@ -10804,7 +11021,6 @@ async function saveAiReplyToComment(momentId, commentId, replyText, aiAuthorId) 
             list = [];
           }
         } else {
-          // try fallback global db objects if present
           try {
             const maybeDb = window.AppDB_Moments || null;
             if (maybeDb && maybeDb.moments) {
@@ -10836,142 +11052,145 @@ async function saveAiReplyToComment(momentId, commentId, replyText, aiAuthorId) 
             div.dataset.id = m.id || (m.id = (Math.random()+''+Date.now()));
             const head = document.createElement('div'); head.className = 'moment-head';
             const avatar = document.createElement('img'); avatar.className = 'moment-avatar';
-            avatar.src = m.authorAvatar || 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2264%22%20height%3D%2264%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23e9f5ff%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2224%22%20r%3D%2212%22%20fill%3D%22%237fb3ff%22/%3E%3Crect%20x%3D%228%22%20y%3D%2240%22%20width%3D%2248%22%20height%3D%2212%22%20rx%3D%226%22%20fill%3D%22%23cfe9ff%22/%3E%3C/svg%3E';
             const meta = document.createElement('div'); meta.className = 'moment-meta';
-            const name = document.createElement('div'); name.textContent = window.getAuthorNameById(m.authorId) || m.author || '我'; name.style.fontWeight='700';
+            const name = document.createElement('div'); name.style.fontWeight='700';
             const time = document.createElement('div'); time.style.fontSize='12px'; time.style.color='#999';
             try { time.textContent = new Date(m.timestamp).toLocaleString(); } catch(e) { time.textContent = ''; }
-            meta.appendChild(name); meta.appendChild(time);
-            head.appendChild(avatar); head.appendChild(meta);
+            
+            // --- 核心修改在这里 ---
+            const authorInfo = getAuthorProfile(m.authorId); // 使用新函数查找作者信息
+            name.textContent = authorInfo.name || m.author || '未知用户'; // 优先用新找到的名字，找不到再用快照里的旧名字
+            avatar.src = authorInfo.avatar || m.authorAvatar || 'https://i.postimg.cc/Y96LPskq/o-o-2.jpg'; // 优先用新找到的头像，找不到再用快照里的
+            // --- 修改结束 ---
+
+            meta.appendChild(name);
+            meta.appendChild(time);
+            head.appendChild(avatar);
+            head.appendChild(meta);
             div.appendChild(head);
 
             const txt = document.createElement('div'); txt.className='moment-text'; txt.textContent = m.text || '';
             div.appendChild(txt);
 
             if (m.imageData && m.imageData !== 'null' && m.imageData !== 'undefined' && m.imageData.length>10) {
-  const im = document.createElement('img'); im.className = 'moment-image';
-  im.src = m.imageData;
-  im.alt = m.imageDesc ? m.imageDesc : (m.text || '动态图片');
-  div.appendChild(im);
-  if (m.imageDesc) {
-    const desc = document.createElement('div'); desc.style.fontSize='13px'; desc.style.color='#666';
-    desc.textContent = '图片：' + m.imageDesc;
-    div.appendChild(desc);
-  }
-} else if (m.imageDesc) {
-  const descCard = document.createElement('div'); descCard.className = 'moment-image-desc-card';
-  if (m.id) descCard.dataset.momentId = m.id || '';
-  const descContent = document.createElement('p'); descContent.className = 'desc-content';
-  descContent.textContent = m.imageDesc;
-  descCard.appendChild(descContent);
-  descCard.setAttribute('role', 'img');
-  descCard.setAttribute('aria-label', m.imageDesc);
-  descCard.addEventListener('click', function () { /* show detail */ });
-  div.appendChild(descCard);
-}
-
-        // --- 新增：点赞和评论的UI与逻辑 ---
-        const actions = document.createElement('div');
-        actions.className = 'moment-actions';
-        
-        const likeBtn = document.createElement('button');
-        likeBtn.className = 'moment-action-btn';
-        const likes = m.likes || [];
-        const myProfile = loadProfileFromStorage();
-        const myId = myProfile.id || 'user';
-        if (likes.includes(myId)) {
-            likeBtn.classList.add('liked');
-        }
-        likeBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span>${likes.length > 0 ? likes.length : '点赞'}</span>`;
-        
-        likeBtn.addEventListener('click', async (event) => {
-            const btn = event.currentTarget;
-            const momentItem = btn.closest('.moment-item');
-            const currentLikes = m.likes || [];
-            const myIdx = currentLikes.indexOf(myId);
-
-            if (myIdx > -1) {
-                currentLikes.splice(myIdx, 1);
-                btn.classList.remove('liked');
-            } else {
-                currentLikes.push(myId);
-                btn.classList.add('liked');
-            }
-            m.likes = currentLikes;
-            await db.moments.put(m);
-
-            // 直接更新UI，避免重新渲染整个列表
-            const span = btn.querySelector('span');
-            if (span) {
-                span.textContent = currentLikes.length > 0 ? currentLikes.length : '点赞';
+              const im = document.createElement('img'); im.className = 'moment-image';
+              im.src = m.imageData;
+              im.alt = m.imageDesc ? m.imageDesc : (m.text || '动态图片');
+              div.appendChild(im);
+              if (m.imageDesc) {
+                const desc = document.createElement('div'); desc.style.fontSize='13px'; desc.style.color='#666';
+                desc.textContent = '图片：' + m.imageDesc;
+                div.appendChild(desc);
+              }
+            } else if (m.imageDesc) {
+              const descCard = document.createElement('div'); descCard.className = 'moment-image-desc-card';
+              if (m.id) descCard.dataset.momentId = m.id || '';
+              const descContent = document.createElement('p'); descContent.className = 'desc-content';
+              descContent.textContent = m.imageDesc;
+              descCard.appendChild(descContent);
+              descCard.setAttribute('role', 'img');
+              descCard.setAttribute('aria-label', m.imageDesc);
+              descCard.addEventListener('click', function () { /* show detail */ });
+              div.appendChild(descCard);
             }
 
-            const likesWrap = momentItem.querySelector('.moment-likes');
-            if (likesWrap) {
-                if (currentLikes.length > 0) {
-                    const likeNames = currentLikes.map(likeId => window.getAuthorNameById(likeId)).join(', ');
-                    likesWrap.innerHTML = `<span class="like-icon">♥</span> ${likeNames}`;
-                    likesWrap.classList.add('visible');
+            const actions = document.createElement('div');
+            actions.className = 'moment-actions';
+            
+            const likeBtn = document.createElement('button');
+            likeBtn.className = 'moment-action-btn';
+            const likes = m.likes || [];
+            const myProfile = loadProfileFromStorage();
+            const myId = myProfile.id || 'user';
+            if (likes.includes(myId)) {
+                likeBtn.classList.add('liked');
+            }
+            likeBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg><span>${likes.length > 0 ? likes.length : '点赞'}</span>`;
+            
+            likeBtn.addEventListener('click', async (event) => {
+                const btn = event.currentTarget;
+                const momentItem = btn.closest('.moment-item');
+                const currentLikes = m.likes || [];
+                const myIdx = currentLikes.indexOf(myId);
+
+                if (myIdx > -1) {
+                    currentLikes.splice(myIdx, 1);
+                    btn.classList.remove('liked');
                 } else {
-                    likesWrap.classList.remove('visible');
+                    currentLikes.push(myId);
+                    btn.classList.add('liked');
                 }
-            }
-        });
+                m.likes = currentLikes;
+                await db.moments.put(m);
 
-        const commentBtn = document.createElement('button');
-        commentBtn.className = 'moment-action-btn';
-        commentBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg><span>评论</span>`;
-        commentBtn.addEventListener('click', (event) => {
-            event.stopPropagation();
-            const btn = event.currentTarget;
-            const momentItem = btn.closest('.moment-item');
-            if (momentItem) {
-                const inputArea = momentItem.querySelector('.moment-comment-input-area');
-                if (inputArea) {
-                    inputArea.classList.toggle('visible');
-                    if (inputArea.classList.contains('visible')) {
-                        inputArea.querySelector('input').focus();
+                const span = btn.querySelector('span');
+                if (span) {
+                    span.textContent = currentLikes.length > 0 ? currentLikes.length : '点赞';
+                }
+
+                const likesWrap = momentItem.querySelector('.moment-likes');
+                if (likesWrap) {
+                    if (currentLikes.length > 0) {
+                        const likeNames = currentLikes.map(likeId => window.getAuthorNameById(likeId)).join(', ');
+                        likesWrap.innerHTML = `<span class="like-icon">♥</span> ${likeNames}`;
+                        likesWrap.classList.add('visible');
+                    } else {
+                        likesWrap.classList.remove('visible');
                     }
                 }
+            });
+
+            const commentBtn = document.createElement('button');
+            commentBtn.className = 'moment-action-btn';
+            commentBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg><span>评论</span>`;
+            commentBtn.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const btn = event.currentTarget;
+                const momentItem = btn.closest('.moment-item');
+                if (momentItem) {
+                    const inputArea = momentItem.querySelector('.moment-comment-input-area');
+                    if (inputArea) {
+                        inputArea.classList.toggle('visible');
+                        if (inputArea.classList.contains('visible')) {
+                            inputArea.querySelector('input').focus();
+                        }
+                    }
+                }
+            });
+
+            actions.appendChild(likeBtn);
+            actions.appendChild(commentBtn);
+            div.appendChild(actions);
+
+            if (likes.length > 0) {
+                const likesWrap = document.createElement('div');
+                likesWrap.className = 'moment-likes visible';
+                const likeNames = likes.map(likeId => window.getAuthorNameById(likeId)).join(', ');
+                likesWrap.innerHTML = `<span class="like-icon">♥</span> ${likeNames}`;
+                div.appendChild(likesWrap);
             }
-        });
 
-        actions.appendChild(likeBtn);
-        actions.appendChild(commentBtn);
-        div.appendChild(actions);
+            const commentsWrap = document.createElement('div'); commentsWrap.className = 'moment-comments';
+            if (m.comments && m.comments.length) {
+              m.comments.forEach(c => {
+                const cm = document.createElement('div'); cm.className='moment-comment';
+                const authorName = window.getAuthorNameById(c.roleId || c.role);
+                cm.textContent = `${authorName}：${c.text}`;
+                commentsWrap.appendChild(cm);
+              });
+            } else {
+              const none = document.createElement('div'); none.style.color='#bbb'; none.textContent = '暂时没有评论';
+              commentsWrap.appendChild(none);
+            }
+            div.appendChild(commentsWrap);
 
-        // 点赞列表
-        if (likes.length > 0) {
-            const likesWrap = document.createElement('div');
-            likesWrap.className = 'moment-likes visible';
-            const likeNames = likes.map(likeId => window.getAuthorNameById(likeId)).join(', ');
-            likesWrap.innerHTML = `<span class="like-icon">♥</span> ${likeNames}`;
-            div.appendChild(likesWrap);
-        }
-
-        // comments
-        const commentsWrap = document.createElement('div'); commentsWrap.className = 'moment-comments';
-        if (m.comments && m.comments.length) {
-          m.comments.forEach(c => {
-            const cm = document.createElement('div'); cm.className='moment-comment';
-            const authorName = window.getAuthorNameById(c.roleId || c.role);
-            cm.textContent = `${authorName}：${c.text}`;
-            commentsWrap.appendChild(cm);
-          });
-        } else {
-          const none = document.createElement('div'); none.style.color='#bbb'; none.textContent = '暂时没有评论';
-          commentsWrap.appendChild(none);
-        }
-        div.appendChild(commentsWrap);
-
-        // --- 新增：用户评论输入框 ---
-        const commentInputArea = document.createElement('div');
-        commentInputArea.className = 'moment-comment-input-area';
-        commentInputArea.innerHTML = `
-          <input type="text" class="moment-comment-input" placeholder="添加评论...">
-          <button class="post-comment-btn" data-moment-id="${m.id}">发布</button>
-        `;
-        div.appendChild(commentInputArea);
+            const commentInputArea = document.createElement('div');
+            commentInputArea.className = 'moment-comment-input-area';
+            commentInputArea.innerHTML = `
+              <input type="text" class="moment-comment-input" placeholder="添加评论...">
+              <button class="post-comment-btn" data-moment-id="${m.id}">发布</button>
+            `;
+            div.appendChild(commentInputArea);
             container.appendChild(div);
           } catch (innerErr) {
             console.error('[injected patch] render single moment failed', innerErr, m);
@@ -10986,6 +11205,8 @@ async function saveAiReplyToComment(momentId, commentId, replyText, aiAuthorId) 
         }
       }
     };
+// ▲▲▲ 替换结束 ▲▲▲
+  
 
     // Attach to app:screenChanged and mutation observer
     document.addEventListener('app:screenChanged', (ev) => {
@@ -12330,7 +12551,21 @@ fileInput.addEventListener('change', async (e)=>{
   gap: 8px !important;
 }
 </style>
+
+
+
 <!-- 在 </body> 之前添加 -->
+
+<div id="trajectory-modal" class="modal-overlay">
+    <div class="modal-window">
+        <h3 id="trajectory-modal-title">Ta的轨迹</h3>
+        <div id="trajectory-timeline">
+            <div class="placeholder-text">正在加载轨迹...</div>
+        </div>
+        <button id="close-trajectory-modal-btn" class="btn btn-primary" style="margin-top: 20px;">关闭</button>
+    </div>
+</div>
+
 <div id="mention-panel" class="mention-panel"></div>
 <!-- ... (El resto de los scripts y styles finales) ... -->
 </body>
