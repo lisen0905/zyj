@@ -1169,9 +1169,52 @@
     -ms-overflow-style: none;  /* IE 10+ */
 }
 
-/* 可选：隐藏 Webkit 浏览器 (Chrome, Safari) 的滚动条 */
-#sticker-bar::-webkit-scrollbar {
-    display: none;
+
+
+
+/* --- 最终修复：让所有图标按钮紧凑排列，无需滑动 --- */
+#sticker-bar {
+    flex-shrink: 0;
+    padding: 5px 8px; /* 调整容器的上下左右内边距，让整体更紧凑 */
+    display: flex;
+    justify-content: space-between; /* 关键：让所有按钮在可用空间内均匀分布 */
+    align-items: center;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    overflow: hidden; /* 确保内容不溢出，不再滚动 */
+}
+
+#sticker-bar .sticker-bar-btn {
+    padding: 5px; /* 减小按钮的内边距，让它本身更小 */
+    margin: 0; /* 移除所有按钮可能存在的外边距 */
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+#sticker-bar .sticker-bar-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+#sticker-bar .sticker-bar-btn svg {
+    width: 24px;  /* 关键：适当缩小图标本身的大小以适应空间 */
+    height: 24px;
+    fill: #888; /* 确保所有图标都有一个统一的默认颜色 */
+}
+
+/* 如果特定按钮有额外样式，比如背景色，可以单独设置 */
+#rollback-btn {
+    /* 保持默认的背景，或者可以设置一个更亮的颜色 */
+    background: rgba(0, 0, 0, 0.03); /* 稍微有点背景色，但保持间距 */
+    border-radius: 50%; /* 保持圆形 */
+}
+#rollback-btn:hover {
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
         .sticker-bar-btn {
@@ -2412,6 +2455,11 @@
 .bottom-nav { z-index: 200 !important; } /* ensure bottom nav overlays feed */
 .modal-overlay, .action-sheet-overlay, .context-menu { z-index: 300 !important; }
 #moments-screen { z-index: 0 !important; } /* keep moments below nav/modals by default */
+/* --- 修复：论坛页面顶部导航栏遮挡内容 --- */
+#forum-screen .content,
+#forum-thread-screen .content {
+    padding-top: 60px; /* 为固定的导航栏留出空间，您可以根据实际高度微调这个数值 */
+}
 </style>
 <!-- === /zindex-patch === -->
 </head>
@@ -2475,76 +2523,57 @@
             <div class="message-area" id="message-area"></div>
             <div class="typing-indicator" id="typing-indicator"></div>
         </main>
-        ```
+        
         <div class="chat-input-wrapper">
         	<!-- 找到 <div class="chat-input-wrapper"> 在其内部最前面添加 -->
 <div id="quote-reply-bar" style="padding: 8px 12px; background-color: rgba(240, 240, 240, 0.9); border-top: 1px solid #eee; display: none; align-items: center; gap: 8px; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);">
     <div id="quoted-message-preview" style="flex-grow: 1; font-size: 13px; color: #666; border-left: 3px solid var(--primary-color); padding-left: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div>
     <button id="cancel-quote-reply-btn" style="background: none; border: none; font-size: 20px; color: #888; cursor: pointer; padding: 0 5px;">&times;</button>
 </div>
-            <div id="sticker-bar">
-                <button class="sticker-bar-btn" id="sticker-toggle-btn">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
-                    </svg>
-                </button>
-                <button class="sticker-bar-btn" id="photo-video-btn">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z"/>
-                    </svg>
-                </button>
-                <button class="sticker-bar-btn" id="image-recognition-btn">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M21.58,16.09L19.66,18L18.24,16.58L21,13.83C21.39,13.44 22,13.44 22.39,13.83L23.17,14.61C23.56,15 23.56,15.64 23.17,16.03L21.58,17.62M20.13,12.25L18.71,13.66L20.41,15.36L21.83,13.94L20.13,12.25M5.93,19H5C3.9,19 3,18.1 3,17V5C3,3.9 3.9,3 5,3H19C20.1,3 21,3.9 21,5V11.08L19,13.08V5H5V17H5.93L13.5,9.43L16.29,12.21L12.08,16.42L5.93,19Z"/>
-                    </svg>
-                </button>
-                <button class="sticker-bar-btn" id="voice-message-btn">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
-                    </svg>
-                </button>
-                <!-- NEW: Voice Call Button -->
-<button class="sticker-bar-btn" id="voice-call-btn">
-    <svg viewBox="0 0 24 24">
-        <path d="M6.62,10.79C8.06,13.62 10.38,15.94 13.21,17.38L15.41,15.18C15.69,14.9 16.08,14.82 16.43,14.93C17.55,15.3 18.75,15.5 20,15.5A1,1 0 0,1 21,16.5V20A1,1 0 0,1 20,21A17,17 0 0,1 3,4A1,1 0 0,1 4,3H7.5A1,1 0 0,1 8.5,4C8.5,5.25 8.7,6.45 9.07,7.57C9.18,7.92 9.1,8.31 8.82,8.59L6.62,10.79Z" />
-    </svg>
-</button>
-                <button class="sticker-bar-btn" id="wallet-btn">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM20 18H4V8H20V18ZM4 6H20V6H4Z"/>
-                    </svg>
-                </button>
-                <button class="sticker-bar-btn" id="gift-btn">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M20,8L12,13L4,8V6H20M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M12.5,18C12.5,17.29 12.17,16.65 11.64,16.27C12.17,15.89 12.5,15.26 12.5,14.55C12.5,13.6 11.83,12.79 11,12.58V12H13V10H11V8H13V6H11V5C11,4.45 10.55,4 10,4H8C7.45,4 7,4.45 7,5V6H9V8H7V10H9V12H7V12.58C6.17,12.79 5.5,13.6 5.5,14.55C5.5,15.26 5.83,15.89 6.36,16.27C5.83,16.65 5.5,17.29 5.5,18H12.5Z"/>
-                    </svg>
-                </button>
-                <!-- 在 id="sticker-bar" 内部，找到 id="gift-btn" 的 </button> -->
-<!-- 在它后面添加以下代码 -->
-<button class="sticker-bar-btn" id="diary-btn" style="display: none;"> <!-- 默认隐藏 -->
-    <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3M14 17H7V15H14V17M17 13H7V11H17V13M17 9H7V7H17V9Z" />
-    </svg>
-</button>
-                <!-- NEW: Time Skip Button -->
-                <button class="sticker-bar-btn" id="time-skip-btn">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M4 5v14l7-7-7-7zm9 0v14l7-7-7-7z"></path>
-                    </svg>
-                </button>
-                <!-- NEW: File Button -->
-<button class="sticker-bar-btn" id="file-btn">
-    <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
-    </svg>
-</button>
-<!-- NEW: Location Button -->
-<button class="sticker-bar-btn" id="location-btn">
-    <svg viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12C20,15.08 18.05,17.78 15.42,19.23L12,14.5L8.58,19.23C5.95,17.78 4,15.08 4,12A8,8 0 0,1 12,4M12,6.5A5.5,5.5 0 0,0 6.5,12A5.5,5.5 0 0,0 12,17.5A5.5,5.5 0 0,0 17.5,12A5.5,5.5 0 0,0 12,6.5Z" />
-    </svg>
-</button>
-            </div>
+          
+   <div id="sticker-bar">
+    <button class="sticker-bar-btn" id="rollback-btn" title="撤回并重写">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12.5,8C9.85,8 7.45,9 5.6,10.6L2,7V16H11L7.38,12.38C8.77,11.22 10.54,10.5 12.5,10.5C16.04,10.5 19.05,12.81 20.1,16L22.47,15.22C21.08,11.03 17.15,8 12.5,8Z"></path>
+        </svg>
+    </button>
+    <button class="sticker-bar-btn" id="sticker-toggle-btn">
+        <svg viewBox="0 0 24 24">
+            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"></path>
+        </svg>
+    </button>
+    <button class="sticker-bar-btn" id="photo-video-btn">
+        <svg viewBox="0 0 24 24"><path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z"></path></svg>
+    </button>
+    <button class="sticker-bar-btn" id="image-recognition-btn">
+        <svg viewBox="0 0 24 24"><path d="M21.58,16.09L19.66,18L18.24,16.58L21,13.83C21.39,13.44 22,13.44 22.39,13.83L23.17,14.61C23.56,15 23.56,15.64 23.17,16.03L21.58,17.62M20.13,12.25L18.71,13.66L20.41,15.36L21.83,13.94L20.13,12.25M5.93,19H5C3.9,19 3,18.1 3,17V5C3,3.9 3.9,3 5,3H19C20.1,3 21,3.9 21,5V11.08L19,13.08V5H5V17H5.93L13.5,9.43L16.29,12.21L12.08,16.42L5.93,19Z"></path></svg>
+    </button>
+    <button class="sticker-bar-btn" id="voice-message-btn">
+        <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"></path></svg>
+    </button>
+    <button class="sticker-bar-btn" id="voice-call-btn">
+        <svg viewBox="0 0 24 24"><path d="M6.62,10.79C8.06,13.62 10.38,15.94 13.21,17.38L15.41,15.18C15.69,14.9 16.08,14.82 16.43,14.93C17.55,15.3 18.75,15.5 20,15.5A1,1 0 0,1 21,16.5V20A1,1 0 0,1 20,21A17,17 0 0,1 3,4A1,1 0 0,1 4,3H7.5A1,1 0 0,1 8.5,4C8.5,5.25 8.7,6.45 9.07,7.57C9.18,7.92 9.1,8.31 8.82,8.59L6.62,10.79Z"></path></svg>
+    </button>
+    <button class="sticker-bar-btn" id="wallet-btn">
+        <svg viewBox="0 0 24 24"><path d="M20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM20 18H4V8H20V18ZM4 6H20V6H4Z"></path></svg>
+    </button>
+    <button class="sticker-bar-btn" id="gift-btn">
+        <svg viewBox="0 0 24 24"><path d="M20,8L12,13L4,8V6H20M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M12.5,18C12.5,17.29 12.17,16.65 11.64,16.27C12.17,15.89 12.5,15.26 12.5,14.55C12.5,13.6 11.83,12.79 11,12.58V12H13V10H11V8H13V6H11V5C11,4.45 10.55,4 10,4H8C7.45,4 7,4.45 7,5V6H9V8H7V10H9V12H7V12.58C6.17,12.79 5.5,13.6 5.5,14.55C5.5,15.26 5.83,15.89 6.36,16.27C5.83,16.65 5.5,17.29 5.5,18H12.5Z"></path></svg>
+    </button>
+    <button class="sticker-bar-btn" id="diary-btn" style="display: none;">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3M14 17H7V15H14V17M17 13H7V11H17V13M17 9H7V7H17V9Z"></path></svg>
+    </button>
+    <button class="sticker-bar-btn" id="time-skip-btn">
+        <svg viewBox="0 0 24 24"><path d="M4 5v14l7-7-7-7zm9 0v14l7-7-7-7z"></path></svg>
+    </button>
+    <button class="sticker-bar-btn" id="file-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"></path></svg>
+    </button>
+    <button class="sticker-bar-btn" id="location-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12C20,15.08 18.05,17.78 15.42,19.23L12,14.5L8.58,19.23C5.95,17.78 4,15.08 4,12A8,8 0 0,1 12,4M12,6.5A5.5,5.5 0 0,0 6.5,12A5.5,5.5 0 0,0 12,17.5A5.5,5.5 0 0,0 17.5,12A5.5,5.5 0 0,0 12,6.5Z"></path></svg>
+    </button>
+</div>
+      
             <div class="message-input-area" id="message-input-default">
                 <input type="text" id="message-input" placeholder="输入消息...">
                 <button id="send-message-btn" class="icon-btn send-btn">➤</button>
@@ -2646,6 +2675,59 @@
     <div id="font-settings-screen" class="screen"></div>
     <div id="customize-screen" class="screen"></div>
     <div id="tutorial-screen" class="screen"></div>
+  <div id="forum-screen" class="screen">
+    <header class="app-header">
+        <button class="back-btn" data-target="chat-list-screen">‹</button>
+        <div class="title-container">
+            <div class="forum-header" id="forum-header">
+                <h1 id="forum-board-title-header">生活闲聊</h1>
+                <svg class="dropdown-arrow" viewBox="0 0 24 24"><path d="M7,10L12,15L17,10H7Z"></path></svg>
+            </div>
+        </div>
+        <button class="action-btn" id="refresh-board-btn">
+             <svg viewBox="0 0 24 24" fill="currentColor" style="width:24px; height:24px;"><path d="M17.65,6.35C16.2,4.9, 14.21,4, 12,4A8,8, 0, 0,0, 4,12A8,8, 0, 0,0, 12,20C15.73,20, 18.84,17.45, 19.73,14H17.65C16.83,16.33, 14.61,18, 12,18A6,6, 0, 0,1, 6,12A6,6, 0, 0,1, 12,6C13.66,6, 15.14,6.69, 16.22,7.78L13,11H20V4L17.65,6.35Z"></path></svg>
+        </button>
+    </header>
+    <main class="content">
+        <div class="forum-dropdown-menu" id="forum-dropdown-menu"></div>
+        <div class="thread-list-container" id="thread-list-container">
+            </div>
+     
+    </main>
+</div>
+
+<div id="forum-thread-screen" class="screen">
+    <header class="app-header">
+        <button class="back-btn" data-target="forum-screen">‹</button>
+        <div class="title-container"><h1 class="title" id="thread-detail-title">帖子详情</h1></div>
+        <button class="action-btn" id="share-thread-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:24px; height:24px;"><path d="M18,16.08C17.24,16.08, 16.56,16.38, 16.04,16.85L8.91,12.7C8.96,12.47, 9,12.24, 9,12C9,11.76, 8.96,11.53, 8.91,11.3L16.04,7.15C16.56,7.62, 17.24,7.92, 18,7.92A3,3, 0, 0,0, 18,2A3,3, 0, 0,0, 15,5C15,5.24, 15.04,5.47, 15.09,5.7L7.96,9.85C7.44,9.38, 6.76,9.08, 6,9.08A3,3, 0, 0,0, 6,15C6.76,15, 7.44,14.72, 7.96,14.25L15.09,18.3C15.04,18.53, 15,18.76, 15,19A3,3, 0, 0,0, 18,22A3,3, 0, 0,0, 21,19C21,17.42, 19.66,16.08, 18,16.08Z"></path></svg>
+        </button>
+    </header>
+    <main class="content" id="thread-content-container">
+        </main>
+</div>
+
+<div id="new-post-modal" class="modal-overlay">
+    <div class="modal-window">
+        <h3>发布新帖</h3>
+        <form id="new-post-form">
+            <div class="form-group">
+                <label for="post-title-input">帖子标题</label>
+                <input type="text" id="post-title-input" required>
+            </div>
+            <div class="form-group">
+                <label for="post-content-input">帖子内容</label>
+                <textarea id="post-content-input" rows="6" required></textarea>
+            </div>
+            <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; margin-top: 15px;">
+                <label for="post-anonymous-checkbox" style="margin-bottom: 0;">匿名发布</label>
+                <input type="checkbox" id="post-anonymous-checkbox" style="width: auto; height: 20px;">
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top: 20px;">发布</button>
+        </form>
+    </div>
+</div>
     <div id="toast-notification" class="toast"></div>
     <input type="file" id="image-upload-input" accept="image/*" style="display:none;">
     <div id="add-char-modal" class="modal-overlay">
@@ -3793,6 +3875,8 @@ const locationBtn = document.getElementById('location-btn'),
             if (!db.worldBooks) db.worldBooks = [];
             if (!db.fontUrl) db.fontUrl = '';
             if (!db.customIcons) db.customIcons = {};
+
+if (!db.forumData) db.forumData = {}; 
             db.characters.forEach(c => {
                 if (c.isPinned === undefined) c.isPinned = false;
                 if (c.status === undefined) c.status = '在线';
@@ -3914,7 +3998,55 @@ function formatFileSize(bytes) {
             previewContainer.appendChild(receivedBubble);
             previewContainer.appendChild(sentBubble);
         }
+// ▼▼▼ 在 init() 函数的正上方，粘贴下面这个完整的新函数 ▼▼▼
 
+function setupRollbackFeature() {
+    const rollbackBtn = document.getElementById('rollback-btn');
+    if (!rollbackBtn) return; // 安全检查，确保按钮存在
+
+    // 为“撤回并重写”按钮绑定核心的点击事件
+    rollbackBtn.addEventListener('click', async () => {
+        // 如果AI正在生成中，则阻止操作
+        if (isGenerating) {
+            showToast('AI正在思考中，请稍后再试...');
+            return;
+        }
+
+        // 获取当前的聊天对象
+        const chat = (currentChatType === 'private') 
+            ? db.characters.find(c => c.id === currentChatId) 
+            : db.groups.find(g => g.id === currentChatId);
+            
+        if (!chat || chat.history.length === 0) return;
+
+        // 1. 从后往前查找，定位到最后一个【用户】消息的位置
+        let lastUserMessageIndex = -1;
+        for (let i = chat.history.length - 1; i >= 0; i--) {
+            if (chat.history[i].role === 'user') {
+                lastUserMessageIndex = i;
+                break;
+            }
+        }
+
+        // 如果找不到用户消息，或者最后一条消息已经是用户消息，则说明没有可撤回的AI回复
+        if (lastUserMessageIndex === -1 || lastUserMessageIndex === chat.history.length - 1) {
+            showToast('找不到可以重新生成的AI回复。');
+            return;
+        }
+
+        // 2. 删除从最后一个用户消息之后的所有AI消息
+        chat.history.splice(lastUserMessageIndex + 1);
+        
+        // 3. 更新界面显示，并保存数据
+        renderMessages(false, true); // 重新渲染聊天气泡，并滚动到底部
+        await saveData();
+        renderChatList(); // 更新左侧列表的最后消息预览
+        
+        // 4. 再次调用AI，生成新的回复
+        getAiReply();
+    });
+}
+// ▲▲▲ 新函数到此结束 ▲▲▲
         const init = async () => {
             await loadData();
             window.db = db;
@@ -3978,7 +4110,9 @@ function formatFileSize(bytes) {
             setupNotificationSystem();
             setupMomentsEventListeners();
 setupTrajectorySystem();
-
+ setupForumSystem();
+          setupRollbackFeature(); 
+  
  };
 
 
@@ -6151,7 +6285,16 @@ function setupLocationSystem() {
        - **在聊天中回应的示例**: \`[${character.realName}的消息：我看到你给我的动态评论啦，很有趣！]\`
        - 处理完通知后，你再继续生成其他正常的聊天回复。
 `;
+// ▼▼▼ 在这里添加关于论坛的新规则 #19 ▼▼▼
+    prompt += `
+## ✨ 论坛互动模块 ✨
 
+19. **论坛帖子的被动回忆**
+   - 系统有时会在聊天记录中插入一条格式为 \`[system-forum-post: {"title":"帖子标题", "content":"帖子内容"}]\` 的信息。
+   - 这条信息代表我（用户）正在向你询问关于这个帖子的事情。
+   - 当你看到这条信息时，你的回复**必须**围绕这个帖子的内容展开，表现出你已经看过这个帖子的样子，并根据你的人设进行自然的讨论。
+`;
+    // ▲▲▲ 添加结束 ▲▲▲
     return prompt;
 }
 
@@ -6226,8 +6369,8 @@ prompt += `
 `;
             return prompt;
         }
-// 在 getAiReply 函数之前，添加这个新函数
-// ▼▼▼ 请用这个新版本，完整替换掉旧的 callAiApi 函数 ▼▼▼
+
+// ▼▼▼ 请用这个【新的】函数，完整替换掉您文件中旧的 callAiApi 函数 ▼▼▼
 async function callAiApi(messages) {
     const { provider, url, key, model } = db.apiSettings;
     if (!url || !key || !model) {
@@ -6251,7 +6394,7 @@ async function callAiApi(messages) {
         requestBody = {
             model,
             messages,
-            stream: false // 非流式输出
+            stream: false // 论坛功能需要非流式输出
         };
     }
 
@@ -6264,7 +6407,7 @@ async function callAiApi(messages) {
     if (!response.ok) {
         const errorText = await response.text();
         console.error("API Error Response:", errorText);
-        // 直接抛出HTML错误页面，让上层知道内容格式不对
+        // 如果返回的是HTML错误页面，给出更清晰的提示
         if (errorText.trim().startsWith('<')) {
             throw new Error(`API返回了一个错误页面(HTML)，而不是JSON数据。`);
         }
@@ -6278,17 +6421,166 @@ async function callAiApi(messages) {
         if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts) {
             return data.candidates[0].content.parts[0].text;
         }
+   } else { // OpenAI, DeepSeek, Claude, NewAPI 等兼容格式
+    if (data.choices && data.choices.length > 0 && data.choices[0].message) {
+        // 确保 choices 数组不是空的
+        return data.choices[0].message.content;
     } else {
-        if (data.choices && data.choices[0].message) {
-            return data.choices[0].message.content;
+        // 如果 choices 数组是空的, 抛出一个更明确的错误
+        const finishReason = data.choices && data.choices.length > 0 ? data.choices[0].finish_reason : 'unknown';
+        if (finishReason === 'content_filter') {
+            throw new Error("内容触发了API的安全审核被拦截。");
         }
+        throw new Error("API返回了空结果，请检查模型或提示词。");
     }
+}
     
-    // 如果上面的路径都找不到，抛出错误，而不是返回undefined
+    // 如果上面的路径都找不到，抛出错误
     throw new Error('未能从API响应中解析出有效的文本内容。');
 }
-        // 用这个新版本，替换掉你原来的整个 getAiReply 函数
-// (请找到文件中的旧 getAiReply 函数，并用下面的代码完整替换它)
+// ▲▲▲ 替换结束 ▲▲▲
+                           
+// ▼▼▼ 请用这个【毫无省略】的完整函数，替换掉您文件中旧的同名函数 ▼▼▼
+async function getAiReply() {
+    if (isGenerating) return;
+    const {url, key, model} = db.apiSettings;
+    if (!url || !key || !model) {
+        showToast('请先在“api”应用中完成设置！');
+        switchScreen('api-settings-screen');
+        return;
+    }
+
+    const banApi = URLBlacklist.some((api)=>{
+        return url.indexOf(api) !== -1
+    })
+    if(banApi){
+        alert('此API网址已加入黑名单，请勿使用')
+        return
+    }
+    const chat = (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
+    if (!chat) return;
+    
+    isGenerating = true;
+    getReplyBtn.disabled = true;
+    const typingName = currentChatType === 'private' ? chat.remarkName : chat.name;
+    typingIndicator.textContent = `“${typingName}”正在输入中...`;
+    typingIndicator.style.display = 'block';
+    messageArea.scrollTop = messageArea.scrollHeight;
+
+    try {
+        let systemPrompt, requestBody;
+        if (currentChatType === 'private') {
+            systemPrompt = generatePrivateSystemPrompt(chat);
+        } else {
+            systemPrompt = generateGroupSystemPrompt(chat);
+        }
+        const historySlice = chat.history.slice(-chat.maxMemory);
+        
+        // --- 核心修改：在这里加入“论坛帖子回忆”逻辑 ---
+        if (currentChatType === 'private') {
+            const lastUserMessage = historySlice[historySlice.length - 1]?.content;
+            // 检查用户的最后一句话是否在询问关于帖子的事
+            if (lastUserMessage && /帖子|论坛|分享/.test(lastUserMessage)) {
+                // 在所有缓存的版块中，寻找用户最近发布的帖子
+                let latestUserPost = null;
+                for (const boardId in forumCache) {
+                    const userPost = forumCache[boardId].find(t => t.authorId === 'user');
+                    if (userPost && (!latestUserPost || userPost.id > latestUserPost.id)) {
+                        latestUserPost = userPost;
+                    }
+                }
+                
+                // 如果找到了，就向AI的记忆里注入这个帖子的信息
+                if (latestUserPost) {
+                    const postContext = `[system-forum-post: {"title":"${latestUserPost.title}", "content":"${latestUserPost.content}"}]`;
+                    historySlice.push({
+                        role: 'user',
+                        content: postContext,
+                        parts: [{ type: 'text', text: postContext }]
+                    });
+                    showToast('AI正在回忆您的帖子...');
+                }
+            }
+        }
+        // --- 修改结束 ---
+
+        try {
+            const character = chat;
+            const pendingMoments = (typeof getPendingMomentsForRole === 'function') ? await getPendingMomentsForRole(character.id, 3) : [];
+            let momentsPromptPart = '';
+            if (pendingMoments && pendingMoments.length > 0) {
+                const momentsData = pendingMoments.map(m => ({
+                    id: m.id,
+                    author: m.author,
+                    text: m.text,
+                    imageDesc: m.imageDesc
+                }));
+                momentsPromptPart = `\n[system-moments: ${JSON.stringify(momentsData)}]`;
+            }
+            if (momentsPromptPart) {
+                historySlice.push({
+                    role: 'user',
+                    content: momentsPromptPart,
+                    parts: [{ type: 'text', text: momentsPromptPart }]
+                });
+            }
+        } catch(e) {
+            console.warn('attach pending moments failed', e);
+        }
+
+        if (db.apiSettings.provider === 'gemini') {
+            const contents = historySlice.map(msg => {
+                const role = msg.role === 'assistant' ? 'model' : 'user';
+                let parts = msg.parts && msg.parts.length > 0 ? msg.parts.map(p => {
+                    if (p.type === 'text' || p.type === 'html') return {text: p.text};
+                    if (p.type === 'image') {
+                        const match = p.data.match(/^data:(image\/(.+));base64,(.*)$/);
+                        if (match) return {inline_data: {mime_type: match[1], data: match[3]}};
+                    }
+                    return null;
+                }).filter(p => p) : [{text: msg.content}];
+                return {role, parts};
+            });
+            requestBody = {
+                contents: contents,
+                system_instruction: {parts: [{text: systemPrompt}]},
+                generationConfig: {}
+            };
+        } else {
+            const messages = [
+                {role: 'system', content: systemPrompt}, 
+                ...historySlice.map(msg => {
+                    return {role: msg.role, content: msg.content};
+                })
+            ];
+            requestBody = {model: model, messages: messages, stream: true};
+        }
+        
+        const endpoint = (db.apiSettings.provider === 'gemini') ? `${url}/v1beta/models/${model}:streamGenerateContent?key=${getRandomValue(key)}` : `${url}/v1/chat/completions`;
+        const headers = (db.apiSettings.provider === 'gemini') ? {'Content-Type': 'application/json'} : {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${getRandomValue(key)}`
+        };
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(requestBody)
+        });
+        if (!response.ok) throw new Error(`API Error: ${response.status} ${await response.text()}`);
+        await processStream(response, chat, db.apiSettings.provider);
+
+    } catch (error) {
+        console.error('AI回复失败:', error);
+        showToast(`AI回复失败: ${error.message}`);
+        if (isCallRinging) {
+            endCall('error');
+        }
+    } finally {
+        isGenerating = false;
+        getReplyBtn.disabled = false;
+        typingIndicator.style.display = 'none';
+    }
+}
 
 async function getAiReply() {
     if (isGenerating) return;
@@ -8720,7 +9012,6 @@ function renderTrajectoryTimeline(trajectoryData, characterName) {
 
 // 3. 设置所有相关的事件监听
 // ▼▼▼ 请用这个新版本，完整替换掉旧的 setupTrajectorySystem 函数 ▼▼▼
-// ▼▼▼ 请用这个新版本，完整替换掉旧的 setupTrajectorySystem 函数 ▼▼▼
 function setupTrajectorySystem() {
     const trajectoryBtn = document.getElementById('ai-trajectory-btn');
     const trajectoryModal = document.getElementById('trajectory-modal');
@@ -8788,6 +9079,379 @@ function setupTrajectorySystem() {
 }
 
 
+// --- 论坛AI功能：为用户的帖子生成评论 ---
+// --- 论坛AI功能：为指定版块生成帖子列表 ---
+function generateForumBoardPrompt(boardId, boardName, characterList) {
+    // 从角色列表中随机挑选2到3名角色
+    let shuffled = [...characterList].sort(() => 0.5 - Math.random());
+    const selectedCharacters = shuffled.slice(0, Math.min(shuffled.length, Math.floor(Math.random() * 2) + 2)); // 随机选2或3个
+
+    let charactersPromptPart = '以下是本次参与发帖的AI角色和他们的设定：\n';
+    selectedCharacters.forEach(char => {
+        charactersPromptPart += `- 角色“${char.realName}”（昵称：${char.remarkName}），人设：${char.persona}\n`;
+    });
+
+    let prompt = `你是一个论坛内容生成AI。${charactersPromptPart}\n`;
+    prompt += `你正在为虚拟手机应用的“论坛”里的【${boardName}】版块，***必须***生成**10条**帖子摘要。\n\n`;
+    prompt += `规则：\n`;
+    prompt += `1. **严格围绕【${boardName}】的主题**来创作帖子内容。\n`;
+    prompt += `2. **这10条帖子中，上方名单里的每一个AI角色都必须至少发布1条**。他们的帖子要符合他们各自的人设，AI角色可以匿名，但要括号标出是谁。\n`;
+    prompt += `3. 其余的帖子由你虚构的“路人甲”或其他符合角色世界观的NPC发表。\n`;
+    prompt += `4. 每条帖子都需要包含：标题(title), 作者(author), 3条评论预览(comments), 点赞数(likes), 以及是否热门(isHot)。\n`;
+    prompt += `5. 你的输出必须严格遵循以下JSON数组格式，不要包含任何额外的解释或文字：\n`;
+    prompt += `[{"title": "帖子标题", "author": "作者名", "likes": 35, "isHot": true, "comments": [{"author":"评论者A", "text":"这是第一条评论"}, ...]}, ...]`;
+
+    return prompt;
+}
+
+// --- 论坛AI功能：为指定帖子生成正文和详细评论 ---
+function generateForumThreadPrompt(threadTitle, threadAuthor, character) {
+    const boards = {
+        life: '生活闲聊',
+        secrets: '秘密树洞',
+        gossip: '八卦吃瓜',
+        travel: '旅游美食'
+    };
+    let prompt = `你正在扮演角色“${character.realName}”，人设是：${character.persona}。\n`;
+    prompt += `我正在论坛里查看一个帖子，请你为这个帖子生成详细的“正文(content)”和“评论区(comments)”。\n\n`;
+    prompt += `帖子的标题是：“${threadTitle}”\n`;
+    prompt += `帖子的作者是：“${threadAuthor}”\n\n`;
+    prompt += `生成规则：\n`;
+    prompt += `1. **正文(content)**：根据标题和作者，创作一段大约100-200字的帖子正文，内容要符合作者的人设和帖子的主题。\n`;
+    prompt += `2. **评论区(comments)**：生成5-10条评论。其中，必须有1-2条是你（${character.realName}）自己发表的评论，其余由你虚构的“路人甲”或相关NPC发表。\n`;
+    prompt += `3. **楼中楼**：在生成的评论中，随机为2-3条评论，再生成2-3条“对评论的回复”（楼中楼）。\n`;
+    prompt += `4. **你的输出必须严格遵循以下JSON格式**，不要包含任何额外的解释或文字：\n`;
+    prompt += `{"content": "这里是帖子正文...", "comments": [{"author": "评论者A", "text": "这是评论内容", "replies": [{"author": "回复者B", "text": "这是对A的回复"}, ...]}, ...]}`;
+    
+    return prompt;
+}
+
+
+// ▲▲▲ 添加结束 ▲▲▲
+
+
+  
+// --- 论坛AI功能：为指定版块生成帖子列表 ---
+// ▼▼▼ 请将下面这个新函数，粘贴到 generateForumThreadPrompt 函数的正上方 ▼▼▼
+function generateSharePostPrompt(postTitle, postContent, character) {
+    let prompt = `你正在扮演角色“${character.realName}”，人设是：${character.persona}。\n`;
+    prompt += `你刚刚在我们的应用论坛里，看到了我（${character.myName}）新发布的帖子，你觉得很有趣/很有感触，决定立刻把它转发到我们的私人聊天里，并对此发表一些你的看法。\n\n`;
+    prompt += `我的帖子标题： "${postTitle}"\n`;
+    prompt += `我的帖子正文： "${postContent}"\n\n`;
+    prompt += `你的任务：\n`;
+    prompt += `1. **你的第一条消息必须是引用我的帖子**，格式为：\`[${character.realName}转发了帖子“${postTitle}”]\`\n`;
+    prompt += `2. **然后，请根据你的角色人设和帖子内容，生成5-12条对此的聊天消息**。你的回复要自然、连贯，就像真的看到了这个帖子一样。\n`;
+    prompt += `3. 你的输出必须严格遵循多条消息的格式，例如：\n`;
+    prompt += `[${character.realName}转发了帖子“帖子标题”]\n`;
+    prompt += `[${character.realName}的消息：天哪！你也太有爱心了吧！]\n`;
+    prompt += `[${character.realName}的消息：它长什么样子？快给我看看照片！]\n`;
+    prompt += `[${character.realName}的消息：我觉得你应该先带它去检查一下身体。]`;
+    
+    return prompt;
+}
+// ▲▲▲ 添加结束 ▲▲▲
+
+      
+// --- 论坛AI功能：为指定帖子生成正文和详细评论 ---
+function generateForumThreadPrompt(threadTitle, threadAuthor, character) {
+    const boards = {
+        life: '生活闲聊',
+        secrets: '秘密树洞',
+        gossip: '八卦吃瓜',
+        travel: '旅游美食'
+    };
+    let prompt = `你正在扮演角色“${character.realName}”，人设是：${character.persona}。\n`;
+    prompt += `我正在论坛里查看一个帖子，请你为这个帖子生成详细的“正文(content)”和“评论区(comments)”。\n\n`;
+    prompt += `帖子的标题是：“${threadTitle}”\n`;
+    prompt += `帖子的作者是：“${threadAuthor}”\n\n`;
+    prompt += `生成规则：\n`;
+    prompt += `1. **正文(content)**：根据标题和作者，创作一段大约100-200字的帖子正文，内容要符合作者的人设和帖子的主题。\n`;
+    prompt += `2. **评论区(comments)**：生成5-10条评论。其中，必须有1-2条是你（${character.realName}）自己发表的评论，其余由你虚构的“路人甲”或相关NPC发表。\n`;
+    prompt += `3. **楼中楼**：在生成的评论中，随机为2-3条评论，再生成2-3条“对评论的回复”（楼中楼）。\n`;
+    prompt += `4. **你的输出必须严格遵循以下JSON格式**，不要包含任何额外的解释或文字：\n`;
+    prompt += `{"content": "这里是帖子正文...", "comments": [{"author": "评论者A", "text": "这是评论内容", "replies": [{"author": "回复者B", "text": "这是对A的回复"}, ...]}, ...]}`;
+    
+    return prompt;
+}
+// ▼▼▼ 把下面这个完整的 setupForumSystem 函数粘贴在这里 ▼▼▼
+function setupForumSystem() {
+    const boards = {
+        life: '生活闲聊',
+        secrets: '秘密树洞',
+        gossip: '八卦吃瓜',
+        travel: '旅游美食'
+    };
+    let currentBoardId = 'life';
+    
+
+    const forumHeader = document.getElementById('forum-header');
+    const boardTitleHeader = document.getElementById('forum-board-title-header');
+    const dropdownMenu = document.getElementById('forum-dropdown-menu');
+    const threadListContainer = document.getElementById('thread-list-container');
+    const refreshBtn = document.getElementById('refresh-board-btn');
+    const threadContentContainer = document.getElementById('thread-content-container');
+
+    function renderDropdownMenu() {
+        dropdownMenu.innerHTML = '';
+        Object.entries(boards).forEach(([id, name]) => {
+            if (id !== currentBoardId) {
+                const item = document.createElement('div');
+                item.className = 'forum-dropdown-item';
+                item.dataset.boardId = id;
+                item.textContent = name;
+                dropdownMenu.appendChild(item);
+            }
+        });
+    }
+
+    function renderThreadList(boardId) {
+        const threads = db.forumData[boardId] || [];
+        threadListContainer.innerHTML = ''; 
+        if (threads.length === 0) {
+            threadListContainer.innerHTML = `<p class="placeholder-text">点击右上角刷新按钮<br>发现【${boards[boardId]}】的新帖子吧！</p>`;
+            return;
+        }
+        threads.forEach(thread => {
+            const threadEl = document.createElement('div');
+            threadEl.className = 'thread-list-item';
+            threadEl.dataset.threadTitle = thread.title;
+            threadEl.dataset.threadAuthor = thread.author;
+            const commentsPreviewHTML = (thread.comments || []).slice(0, 3).map(comment => `<div class="comment"><span class="comment-author">${comment.author}:</span><span class="comment-text">${comment.text}</span></div>`).join('');
+            threadEl.innerHTML = `<div class="thread-title">${thread.isHot ? '<span class="hot-icon">🔥</span>' : ''} ${thread.title}</div><div class="thread-meta">由 <span class="author">${thread.author}</span> 发布 | ❤️ <span class="likes">${thread.likes}</span></div><div class="thread-comment-preview">${commentsPreviewHTML || '还没有评论哦~'}</div>`;
+            threadListContainer.appendChild(threadEl);
+        });
+    }
+
+    function updateForumView() {
+        const currentBoardName = boards[currentBoardId];
+        boardTitleHeader.textContent = currentBoardName;
+        renderThreadList(currentBoardId);
+    }
+    
+    function toggleDropdown(show) {
+        const isVisible = dropdownMenu.classList.contains('visible');
+        if (show === isVisible) return;
+        if (show) {
+            renderDropdownMenu();
+            forumHeader.classList.add('open');
+            dropdownMenu.classList.add('visible');
+        } else {
+            forumHeader.classList.remove('open');
+            dropdownMenu.classList.remove('visible');
+        }
+    }
+
+    forumHeader.addEventListener('click', (e) => { e.stopPropagation(); toggleDropdown(!dropdownMenu.classList.contains('visible')); });
+    dropdownMenu.addEventListener('click', (e) => {
+        const item = e.target.closest('.forum-dropdown-item');
+        if (item) {
+            currentBoardId = item.dataset.boardId;
+            updateForumView();
+            toggleDropdown(false);
+        }
+    });
+    document.addEventListener('click', (e) => { if (!forumHeader.contains(e.target)) { toggleDropdown(false); } });
+    
+    // --- 这是我们最终的、正确的刷新逻辑 ---
+    refreshBtn.addEventListener('click', async () => {
+        if (isGenerating) return;
+
+        // 检查是否有AI角色存在
+        if (!db.characters || db.characters.length === 0) {
+            showToast('请先创建至少一个AI角色！');
+            return;
+        }
+        
+        showToast(`正在为【${boards[currentBoardId]}】版块创作中...`);
+        isGenerating = true;
+        refreshBtn.disabled = true;
+        
+        try {
+            // 生成剧本时，传入所有AI角色的列表
+            const prompt = generateForumBoardPrompt(currentBoardId, boards[currentBoardId], db.characters);
+            
+            let messagesForApi;
+            if (db.apiSettings.provider === 'gemini') {
+                messagesForApi = [{ role: 'user', parts: [{ type: 'text', text: prompt }] }];
+            } else {
+                messagesForApi = [{ role: 'user', content: prompt }];
+            }
+
+            const aiResponseText = await callAiApi(messagesForApi);
+            const jsonMatch = aiResponseText.match(/\[[\s\S]*\]/);
+            if (!jsonMatch) { throw new Error("AI的回复中没有找到有效的JSON数组。"); }
+            
+            const newThreads = JSON.parse(jsonMatch[0]);
+            
+            db.forumData[currentBoardId] = newThreads; // 存入长期数据库
+await saveData(); // 立即保存到本地
+            renderThreadList(currentBoardId);
+
+        } catch (error) {
+            console.error('生成论坛帖子失败:', error);
+            showToast(`生成帖子失败: ${error.message}`);
+        } finally {
+            isGenerating = false;
+            refreshBtn.disabled = false;
+        }
+    });
+    
+    threadListContainer.addEventListener('click', async (e) => {
+        const threadItem = e.target.closest('.thread-list-item');
+        if (!threadItem) return;
+
+        const threadTitle = threadItem.dataset.threadTitle;
+        const threadAuthor = threadItem.dataset.threadAuthor;
+        
+        // 随机选择一个AI来“脑补”帖子详情
+        const character = db.characters[Math.floor(Math.random() * db.characters.length)];
+        if (!character) {
+             showToast('没有找到AI角色来生成帖子详情。');
+            return;
+        }
+
+        switchScreen('forum-thread-screen');
+        threadContentContainer.innerHTML = `<p class="placeholder-text">正在加载“${threadTitle}”的详细内容...</p>`;
+
+        try {
+            const prompt = generateForumThreadPrompt(threadTitle, threadAuthor, character);
+            let messagesForApi;
+            if (db.apiSettings.provider === 'gemini') {
+                messagesForApi = [{ role: 'user', parts: [{ type: 'text', text: prompt }] }];
+            } else {
+                messagesForApi = [{ role: 'user', content: prompt }];
+            }
+            const aiResponseText = await callAiApi(messagesForApi);
+            const jsonMatch = aiResponseText.match(/{[\s\S]*}/);
+            if (!jsonMatch) { throw new Error("AI的回复中没有找到有效的JSON对象。"); }
+            const threadData = JSON.parse(jsonMatch[0]);
+            let commentsHTML = '';
+            (threadData.comments || []).forEach(comment => {
+                let repliesHTML = '';
+                if (comment.replies && comment.replies.length > 0) {
+                    repliesHTML = comment.replies.map(reply => `<div class="thread-reply"><strong>${reply.author}:</strong> ${reply.text}</div>`).join('');
+                }
+                commentsHTML += `<div class="thread-comment"><p><strong>${comment.author}:</strong> ${comment.text}</p>${repliesHTML}</div>`;
+            });
+            threadContentContainer.innerHTML = `<div class="thread-full-content"><h2>${threadTitle}</h2><p class="author-line">由 ${threadAuthor} 发布</p><div class="main-post-body">${threadData.content}</div></div><hr><div class="comments-section"><h3>评论区</h3>${commentsHTML}</div>`;
+        } catch (error) {
+            console.error('生成帖子详情失败:', error);
+            threadContentContainer.innerHTML = `<p class="placeholder-text" style="color:red;">加载帖子详情失败: ${error.message}</p>`;
+        }
+    });
+
+    updateForumView();
+}
+const shareThreadBtn = document.getElementById('share-thread-btn');
+const sharePostModal = document.getElementById('share-post-modal');
+const sharePostSelectionList = document.getElementById('share-post-selection-list');
+const confirmPostShareBtn = document.getElementById('confirm-post-share-btn');
+const cancelPostShareBtn = document.getElementById('cancel-post-share-btn');
+let currentPostToShare = { title: '', content: '' };
+
+// 1. 给帖子详情页的“分享”按钮添加点击事件
+shareThreadBtn.addEventListener('click', () => {
+    // 获取当前正在查看的帖子的标题和内容
+    const titleEl = document.getElementById('thread-detail-title');
+    const contentEl = document.querySelector('.main-post-body');
+
+    if (!titleEl || !contentEl) {
+        showToast('无法获取帖子内容');
+        return;
+    }
+
+    currentPostToShare.title = titleEl.textContent;
+    currentPostToShare.content = contentEl.textContent;
+
+    // 渲染角色选择列表
+    sharePostSelectionList.innerHTML = '';
+    if (db.characters.length === 0) {
+        sharePostSelectionList.innerHTML = '<li>没有可以分享的AI角色</li>';
+    } else {
+        db.characters.forEach(char => {
+            const li = document.createElement('li');
+            li.className = 'world-book-select-item'; // 复用现有样式
+            // 使用 radio 按钮实现单选
+            li.innerHTML = `
+                <input type="radio" id="share-select-${char.id}" name="share-char-selection" value="${char.id}">
+                <label for="share-select-${char.id}" style="display: flex; align-items: center; width: 100%; gap: 10px;">
+                    <img src="${char.avatar}" alt="${char.remarkName}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                    <span>${char.remarkName}</span>
+                </label>
+            `;
+            sharePostSelectionList.appendChild(li);
+        });
+    }
+
+    // 显示分享弹窗
+    sharePostModal.classList.add('visible');
+});
+
+// 2. 给分享弹窗的“取消”按钮添加事件
+cancelPostShareBtn.addEventListener('click', () => {
+    sharePostModal.classList.remove('visible');
+});
+
+// 3. 给分享弹窗的“确认分享”按钮添加事件 (核心)
+confirmPostShareBtn.addEventListener('click', async () => {
+    const selectedRadio = sharePostSelectionList.querySelector('input[name="share-char-selection"]:checked');
+    if (!selectedRadio) {
+        showToast('请选择一个分享对象');
+        return;
+    }
+
+    const charId = selectedRadio.value;
+    const character = db.characters.find(c => c.id === charId);
+    if (!character) {
+        showToast('找不到该角色');
+        return;
+    }
+
+    sharePostModal.classList.remove('visible');
+    showToast(`正在将帖子分享给 ${character.remarkName}...`);
+
+    try {
+        // 使用我们新创建的函数来生成AI指令
+        const prompt = generateSharePostPrompt(currentPostToShare.title, currentPostToShare.content, character);
+
+        let messagesForApi;
+        if (db.apiSettings.provider === 'gemini') {
+            messagesForApi = [{ role: 'user', parts: [{ type: 'text', text: prompt }] }];
+        } else {
+            messagesForApi = [{ role: 'user', content: prompt }];
+        }
+
+        // 调用AI接口
+        const aiResponseText = await callAiApi(messagesForApi);
+
+        // 将AI返回的多条回复添加到对应的聊天记录中
+        const replies = aiResponseText.split('\n').filter(line => line.trim() !== '');
+        replies.forEach(replyContent => {
+            const message = {
+                id: `msg_shared_post_reply_${Date.now()}_${Math.random()}`,
+                role: 'assistant',
+                content: replyContent.trim(),
+                parts: [{ type: 'text', text: replyContent.trim() }],
+                timestamp: Date.now()
+            };
+            character.history.push(message);
+        });
+
+        await saveData();
+        showToast('分享成功！AI已在聊天中回复你。');
+
+        // 自动跳转到对应的聊天界面
+        currentChatId = character.id;
+        currentChatType = 'private';
+        openChatRoom(currentChatId, currentChatType);
+
+    } catch (error) {
+        console.error('分享帖子并获取AI回复失败:', error);
+        showToast(`分享失败: ${error.message}`);
+    }
+});
+      
+// ▲▲▲ 粘贴到这里结束 ▲▲▲
 
         init();
     });
@@ -9905,8 +10569,151 @@ function cancelQuoteReply() {
 .message-bubble .reply-text {
     margin-top: 5px;
 }
-  
+  /* --- 论坛“+”号发帖按钮美化与定位 --- */
+.new-post-btn {
+    position: absolute; /* 使用绝对定位，让它浮动起来 */
+    bottom: 80px;       /* 距离底部20像素 */
+    right: 20px;        /* 距离右侧20像素 */
+    
+    /* 以下是美化样式 */
+    width: 60px;
+    height: 60px;
+    border-radius: 50%; /* 变成圆形 */
+    background-color: var(--primary-color); /* 使用主题粉色 */
+    color: white;
+    font-size: 36px;
+    font-weight: 300; /* 让“+”号细一点，更好看 */
+    line-height: 60px; /* 垂直居中“+”号 */
+    text-align: center; /* 水平居中“+”号 */
+    box-shadow: 0 4px 15px rgba(255,128,171,0.4); /* 添加漂亮的粉色阴影 */
+    cursor: pointer;
+    z-index: 100; /* 确保它在帖子列表的上方 */
+    transition: transform 0.2s ease; /* 添加一个小的交互动画 */
+}
+
+/* 鼠标悬停时，按钮稍微放大一点点 */
+.new-post-btn:hover {
+    transform: scale(1.1);
+}
 /* --- 在 <style> 标签末尾添加 --- */
+
+/* --- 论坛功能最终布局和样式 (严格参考已有范例) --- */
+
+/* 核心：让内容区正确填充，并居中版块按钮 */
+#forum-screen .content {
+    height: auto !important;
+    flex-grow: 1 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 20px !important;
+    position: relative;
+    overflow: hidden; /* 防止动画元素溢出 */
+}
+
+/* 顶部导航栏下拉菜单触发器 */
+#forum-screen .forum-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+}
+#forum-screen .forum-header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-color);
+}
+#forum-screen .forum-header .dropdown-arrow {
+    width: 24px;
+    height: 24px;
+    fill: var(--text-color);
+    margin-left: 5px;
+    transition: transform 0.2s ease;
+}
+#forum-screen .forum-header.open .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* 下拉菜单本体 */
+.forum-dropdown-menu {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    z-index: 200;
+    display: none;
+}
+.forum-dropdown-menu.visible {
+    display: block;
+}
+.forum-dropdown-item {
+    padding: 15px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+}
+.forum-dropdown-item:last-child {
+    border-bottom: none;
+}
+.forum-dropdown-item:hover {
+    background-color: #fce4ec;
+}
+
+/* 动画效果 */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 四个版块的格子布局 */
+.forum-board-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    width: 100%;
+}
+
+/* 版块卡片美化 */
+.forum-board-card {
+    background: linear-gradient(145deg, #ffffff, #fff0f5);
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: 0 8px 25px rgba(255, 128, 171, 0.1);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    opacity: 0;
+    animation: fadeInUp 0.5s ease forwards;
+}
+.forum-board-card:nth-child(1) { animation-delay: 0.1s; }
+.forum-board-card:nth-child(2) { animation-delay: 0.2s; }
+.forum-board-card:nth-child(3) { animation-delay: 0.3s; }
+.forum-board-card:nth-child(4) { animation-delay: 0.4s; }
+.forum-board-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(255, 128, 171, 0.2);
+}
+.forum-board-card img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+.forum-board-card .board-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+  
 .notification-banner {
     position: absolute;
     top: 45px; /* 根据你的header高度微调 */
@@ -9955,7 +10762,163 @@ function cancelQuoteReply() {
     cursor: pointer;
     padding: 0 5px;
 }
+  /* --- 论坛发帖弹窗美化 --- */
+#new-post-modal .modal-window {
+    background: #fff8fa; /* 淡粉色背景 */
+    border: 1px solid #fce4ec;
+}
+#new-post-modal h3 {
+    color: var(--primary-color);
+    text-align: center;
+}
+#new-post-modal .form-group label {
+    color: var(--secondary-color);
+    font-weight: 600;
+    font-size: 14px;
+}
+#new-post-modal .form-group input[type="text"],
+#new-post-modal .form-group textarea {
+    background-color: #fff;
+    border: 2px solid #fde9f2;
+    border-radius: 12px;
+    padding: 12px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+#new-post-modal .form-group input[type="text"]:focus,
+#new-post-modal .form-group textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 8px rgba(255, 128, 171, 0.2);
+    outline: none;
+}
+#new-post-modal .form-group input[type="checkbox"] {
+    accent-color: var(--primary-color); /* 让勾选框也变成粉色 */
+    transform: scale(1.2); /* 稍微放大一点点 */
+    cursor: pointer;
+}
+
+
+  /* --- 论坛帖子列表与详情页美化 --- */
+
+/* 帖子列表项的整体样式 */
+.thread-list-item {
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.thread-list-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+.thread-list-item.pinned {
+    background-color: #fffafc;
+    border-left: 4px solid var(--primary-color);
+}
+/* 帖子标题 */
+.thread-title {
+    font-weight: bold;
+    font-size: 17px;
+    margin-bottom: 12px;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+.thread-title .hot-icon { font-size: 18px; margin-right: 5px; }
+
+/* 作者、点赞等元信息 */
+.thread-meta {
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f5f5f5;
+}
+.thread-meta .author {
+    color: #5c7e9f;
+    font-weight: bold;
+}
+.thread-meta .likes {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* 评论预览区 */
+.thread-comment-preview {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+}
+.thread-comment-preview .comment { margin-bottom: 8px; }
+.thread-comment-preview .comment:last-child { margin-bottom: 0; }
+.thread-comment-preview .comment-author {
+    font-weight: bold;
+    color: #444;
+    margin-right: 5px;
+}
+
+/* --- 帖子详情页美化 --- */
+.thread-full-content {
+    padding: 20px;
+}
+.thread-full-content h2 { /* 详情页标题 */
+    font-size: 22px;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 10px 0;
+}
+.thread-full-content .author-line { /* 作者信息行 */
+    font-size: 14px;
+    color: #888;
+    margin: 0 0 20px 0;
+}
+.thread-full-content .main-post-body { /* 帖子正文 */
+    font-size: 16px;
+    line-height: 1.8;
+    color: #444;
+}
+.comments-section {
+    padding: 0 20px 20px 20px;
+}
+.comments-section h3 { /* “评论区”标题 */
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--secondary-color);
+    padding-bottom: 10px;
+    border-bottom: 2px solid #fce4ec;
+    margin-bottom: 15px;
+}
+.thread-comment {
+    border-bottom: 1px solid #f5f5f5;
+    padding: 15px 0;
+}
+.thread-comment:last-child {
+    border-bottom: none;
+}
+.thread-reply { /* 楼中楼回复 */
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 10px;
+    margin-left: 20px;
+    font-size: 14px;
+}
+
+/* --- 论坛内容区域防遮挡修复 --- */
+#forum-screen .thread-list-container,
+#forum-thread-screen .content {
+    /* 增加一个足够高的底部内边距，为导航栏留出空间 */
+    padding-bottom: 80px; 
+}
+  
 /* --- 在 <style> 标签末尾添加 --- */
+
+
+
+  
 .mention-panel {
     position: absolute;
     background: white;
@@ -10043,6 +11006,7 @@ function cancelQuoteReply() {
   <div class="bottom-nav" id="bottom-nav">
     <button class="nav-btn active" data-target="chat-list-screen">聊天</button>
     <button class="nav-btn" data-target="moments-screen">动态</button>
+    <button class="nav-btn" data-target="forum-screen">论坛</button>
   </div>
 </div>
 
@@ -10755,15 +11719,24 @@ async function saveAiReplyToComment(momentId, commentId, replyText, aiAuthorId) 
     }
 }
       // 位置更新函数：根据 chat-list-screen 的 active 类显示/隐藏
-      function updateBottomNavVisibilityByActive() {
-        const chatCls = document.getElementById('chat-list-screen');
-        const momentsCls = document.getElementById('moments-screen');
-        if ((chatCls && chatCls.classList.contains('active')) || (momentsCls && momentsCls.classList.contains('active'))) {
-          bottomNavHost.style.display = '';
-        } else {
-          bottomNavHost.style.display = 'none';
-        }
-      }
+function updateBottomNavVisibilityByActive() {
+    const chatCls = document.getElementById('chat-list-screen');
+    const momentsCls = document.getElementById('moments-screen');
+    const forumScreen = document.getElementById('forum-screen');
+    const forumThreadScreen = document.getElementById('forum-thread-screen');
+
+    // --- 修改：在判断条件里加入对论坛页面的检查 ---
+    if ((chatCls && chatCls.classList.contains('active')) ||
+        (momentsCls && momentsCls.classList.contains('active')) ||
+        (forumScreen && forumScreen.classList.contains('active')) ||
+        (forumThreadScreen && forumThreadScreen.classList.contains('active'))
+       ) {
+      bottomNavHost.style.display = '';
+    } else {
+      bottomNavHost.style.display = 'none';
+    }
+}
+// ▲▲▲ 替换结束 ▲▲▲
       // 立即执行一次
       updateBottomNavVisibilityByActive();
 
@@ -11935,152 +12908,8 @@ fileInput.addEventListener('change', async (e)=>{
 </script>
 
 <!-- Remove/hide avatars in moments list while preserving top avatar -->
-<script>
-(function(){
-  'use strict';
 
-  function isTopAvatarElement(el){
-    if(!el) return false;
-    try {
-      var topSelectors = ['#icity-avatar', '.icity-avatar-wrap img', '.top-avatar', '.header-avatar img', '.profile-avatar img'];
-      for(var i=0;i<topSelectors.length;i++){
-        var sel = topSelectors[i];
-        if(el.matches && el.matches(sel)) return true;
-        // Also check if el is inside an element that matches a top selector (e.g., wrapper)
-        var wrapper = document.querySelector(sel);
-        if(wrapper && (wrapper === el || wrapper.contains(el))) return true;
-      }
-      // common 'my-avatar' class on top - check if element has that class and is in header
-      if(el.classList && el.classList.contains('my-avatar')){
-        // check if inside header
-        if(el.closest('header, .header, .profile-top, .topbar')) return true;
-      }
-    } catch(e){}
-    return false;
-  }
 
-  function isInNavOrFooter(el){
-    try {
-      if(!el) return false;
-      if(el.closest('nav, .navbar, .bottom-nav, .footer, footer, .tabbar')) return true;
-    } catch(e){}
-    return false;
-  }
-
-  function looksLikeListAvatar(el){
-    try {
-      if(!el) return false;
-      // require it to be an IMG element or have data-role attribute
-      if(el.tagName !== 'IMG' && !el.hasAttribute('data-role')) return false;
-      // class-based heuristics
-      var cls = (el.className || '').toLowerCase();
-      if(cls.indexOf('moment-avatar') !== -1 || cls.indexOf('avatar-img') !== -1 || cls.indexOf('author-avatar') !== -1 || cls.indexOf('post-avatar') !== -1 || cls.indexOf('item-avatar') !== -1) return true;
-      if(el.getAttribute('data-role') === 'avatar') return true;
-      // check if inside a moment/post/list container
-      if(el.closest('.moment, .post, .item, .comment, .feed, .timeline, .moments, #moments-screen')) return true;
-    } catch(e){}
-    return false;
-  }
-
-  function hideListAvatar(el){
-    try {
-      if(!el || el.dataset && el.dataset.avatarRemoved) return;
-      // Safety: do not remove images inside nav/footer or top avatar
-      if(isTopAvatarElement(el)) return;
-      if(isInNavOrFooter(el)) return;
-      if(!looksLikeListAvatar(el)) return;
-      // hide visually but keep DOM to avoid breaking layouts
-      el.style.setProperty('display','none','important');
-      el.setAttribute('data-avatar-removed','1');
-    } catch(e){}
-  }
-
-  function processAllPotentialAvatars(){
-    try {
-      // inspect all img elements once and hide those that look like list avatars
-      Array.prototype.slice.call(document.querySelectorAll('img')).forEach(function(img){
-        hideListAvatar(img);
-      });
-      // also elements with data-role='avatar' that are not IMG
-      Array.prototype.slice.call(document.querySelectorAll('[data-role="avatar"]')).forEach(function(el){
-        hideListAvatar(el);
-      });
-    } catch(e){}
-  }
-
-  // Observe DOM changes to hide newly created avatars
-  var obs = new MutationObserver(function(muts){
-    try {
-      muts.forEach(function(m){
-        if(m.type === 'childList' && m.addedNodes && m.addedNodes.length){
-          m.addedNodes.forEach(function(node){
-            try {
-              if(node.nodeType !== 1) return;
-              if(node.tagName === 'IMG') hideListAvatar(node);
-              // find descendant imgs
-              var imgs = node.querySelectorAll && node.querySelectorAll('img, [data-role="avatar"]');
-              if(imgs && imgs.length){
-                imgs.forEach(function(i){ hideListAvatar(i); });
-              }
-            } catch(e){}
-          });
-        } else if(m.type === 'attributes' && (m.attributeName === 'src' || m.attributeName === 'class' || m.attributeName === 'data-author-id')){
-          var tgt = m.target;
-          if(tgt && tgt.tagName === 'IMG') hideListAvatar(tgt);
-        }
-      });
-    } catch(e){}
-  });
-
-  try {
-    obs.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['src','class','data-author-id','data-author'] });
-  } catch(e){}
-
-  // Also intercept clicks on publish buttons to run processAllPotentialAvatars afterwards
-  function attachPublishListener(){
-    try {
-      // heuristic selectors for publish buttons
-      var selectors = ['button.publish','button[type="submit"]','.btn-publish','.publish-btn','#publish','.post-btn','.send','button[data-action="publish"]'];
-      var found = false;
-      selectors.forEach(function(sel){
-        Array.prototype.slice.call(document.querySelectorAll(sel)).forEach(function(btn){
-          try {
-            if(btn._avatarHideAttached) return;
-            btn.addEventListener('click', function(){
-              setTimeout(processAllPotentialAvatars, 50);
-            }, false);
-            btn._avatarHideAttached = true;
-            found = true;
-          } catch(e){}
-        });
-      });
-      // also attach a global delegation for any element with innerText '发布'
-      if(!found){
-        document.body.addEventListener('click', function(ev){
-          try {
-            var tgt = ev.target;
-            if(!tgt) return;
-            var text = (tgt.textContent || '').trim();
-            if(text === '发布' || text === '发表' || text === '发送'){
-              setTimeout(processAllPotentialAvatars, 50);
-            }
-          } catch(e){}
-        }, true);
-      }
-    } catch(e){}
-  }
-
-  // Run initial pass
-  try { setTimeout(processAllPotentialAvatars, 60); } catch(e){}
-  try { setTimeout(attachPublishListener, 120); } catch(e){}
-
-  // Expose control
-  window.__removeListAvatars = function(){
-    processAllPotentialAvatars();
-  };
-
-})();
-</script>
 
 <!-- Avatar fill patch: make avatar image fully fill its circular container (remove inner white gap) -->
 <style>
@@ -12112,86 +12941,7 @@ fileInput.addEventListener('change', async (e)=>{
 }
 </style>
 
-<script>
-(function(){
-  'use strict';
-  // Target selectors to clean up inline styles or extra wrapper padding
-  var containerSelectors = [
-    '#icity-avatar', '.icity-avatar-wrap', '.avatar-wrap', '.profile-avatar', '.header-avatar', '.my-avatar', '.top-avatar', '.avatar-circle', '.avatar-holder'
-  ];
-  var imgSelectors = [
-    '.icity-avatar-wrap img', '.avatar-wrap img', '.profile-avatar img', '.header-avatar img', '.my-avatar img', '.top-avatar img', 'img.avatar-img', 'img[data-role="avatar"]'
-  ];
 
-  function applyAvatarFillOnce(){
-    try {
-      containerSelectors.forEach(function(sel){
-        document.querySelectorAll(sel).forEach(function(el){
-          try {
-            // Do not touch elements that are inside nav/footer to avoid breaking bottom nav
-            if(el.closest && (el.closest('nav, .navbar, .bottom-nav, footer, .tabbar, .tab-bar'))) return;
-            el.style.background = 'transparent';
-            el.style.padding = '0';
-            el.style.border = '0';
-            el.style.overflow = 'hidden';
-            el.style.borderRadius = '50%';
-            // ensure width/height exist: if wrapper uses fixed px size, keep it
-            // nothing else forced to avoid layout shifts
-          } catch(e){}
-        });
-      });
-      imgSelectors.forEach(function(sel){
-        document.querySelectorAll(sel).forEach(function(img){
-          try {
-            if(img.closest && (img.closest('nav, .navbar, .bottom-nav, footer, .tabbar, .tab-bar'))) return;
-            img.style.width = '100%';
-            img.style.height = '100%';
-            img.style.objectFit = 'cover';
-            img.style.display = 'block';
-            img.style.borderRadius = '50%';
-            img.style.background = 'transparent';
-            img.style.padding = '0';
-            img.style.margin = '0 auto';
-          } catch(e){}
-        });
-      });
-    } catch(e){}
-  }
-
-  // Run on load and after small delay
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){ setTimeout(applyAvatarFillOnce,50); });
-  } else {
-    setTimeout(applyAvatarFillOnce,50);
-  }
-
-  // Observe for dynamic changes to re-apply if new avatars are added
-  try {
-    var mo = new MutationObserver(function(muts){
-      var applied = false;
-      muts.forEach(function(m){
-        try {
-          if(m.type === 'childList' && m.addedNodes && m.addedNodes.length){
-            applied = true;
-          } else if(m.type === 'attributes' && (m.attributeName === 'class' || m.attributeName === 'style' || m.attributeName === 'src')){
-            applied = true;
-          }
-        } catch(e){}
-      });
-      if(applied) {
-        // throttle a bit
-        clearTimeout(window.__avatarFillTimer);
-        window.__avatarFillTimer = setTimeout(applyAvatarFillOnce, 40);
-      }
-    });
-    mo.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class','style','src'] });
-  } catch(e){}
-
-  // Expose for manual invocation
-  try { window.__applyAvatarFill = applyAvatarFillOnce; } catch(e){}
-
-})();
-</script>
 
 <!-- Moments 多选删除底部操作栏 -->
 <div id="moments-multi-select-bar" class="multi-select-bar" aria-hidden="true">
@@ -12204,130 +12954,7 @@ fileInput.addEventListener('change', async (e)=>{
   </div>
 </div>
 
-<script>
-(function(){
-  // State
-  let isInMomentsDeleteMode = false;
-  const selectedMomentIds = new Set();
 
-  // Helpers to find DB
-  const maybeDb = window.db || window.AppDB_Moments || (window.AppDB && window.AppDB.moments? window.AppDB : null);
-
-  const momentsScreen = document.getElementById('moments-screen');
-  const momentsContainer = document.getElementById('moments-list') || document.getElementById('moments-container') || document.getElementById('moments-list');
-  const deleteBtn = document.getElementById('moments-delete-btn');
-  const actionGroup = document.querySelector('#moments-screen .action-btn-group');
-  const msBar = document.getElementById('moments-multi-select-bar');
-  const msCount = document.getElementById('moments-selected-count');
-  const msConfirm = document.getElementById('moments-confirm-delete');
-  const msCancel = document.getElementById('moments-cancel-delete');
-  const backBtn = document.querySelector('#moments-screen .back-btn');
-
-  function updateCount(){
-    msCount.textContent = '已选择 ' + selectedMomentIds.size + ' 项';
-  }
-  function enterDeleteMode(){
-    if(isInMomentsDeleteMode) return;
-    isInMomentsDeleteMode = true;
-    if(momentsScreen) momentsScreen.classList.add('is-delete-mode');
-    if(actionGroup) actionGroup.style.display = 'none';
-    if(msBar) msBar.classList.add('show');
-    selectedMomentIds.clear();
-    document.querySelectorAll('.moment-item.is-selected').forEach(el=>el.classList.remove('is-selected'));
-    updateCount();
-  }
-  function exitDeleteMode(){
-    if(!isInMomentsDeleteMode) return;
-    isInMomentsDeleteMode = false;
-    if(momentsScreen) momentsScreen.classList.remove('is-delete-mode');
-    if(actionGroup) actionGroup.style.display = '';
-    if(msBar) msBar.classList.remove('show');
-    selectedMomentIds.clear();
-    document.querySelectorAll('.moment-item.is-selected').forEach(el=>el.classList.remove('is-selected'));
-    updateCount();
-  }
-
-  // Click delete button to enter mode
-  if(deleteBtn) deleteBtn.addEventListener('click', function(e){
-    e.preventDefault();
-    enterDeleteMode();
-  });
-
-  // Cancel
-  if(msCancel) msCancel.addEventListener('click', function(e){
-    e.preventDefault();
-    exitDeleteMode();
-  });
-
-  // Container delegation for selecting items
-  if(momentsContainer){
-    momentsContainer.addEventListener('click', function(e){
-      if(!isInMomentsDeleteMode) return;
-      // find closest .moment-item
-      let el = e.target;
-      while(el && !el.classList.contains('moment-item')) el = el.parentElement;
-      if(!el) return;
-      e.preventDefault(); e.stopPropagation();
-      const id = el.dataset && el.dataset.id;
-      if(!id) return;
-      if(selectedMomentIds.has(id)){
-        selectedMomentIds.delete(id);
-        el.classList.remove('is-selected');
-      } else {
-        selectedMomentIds.add(id);
-        el.classList.add('is-selected');
-      }
-      updateCount();
-    }, true);
-  }
-
-  // Confirm delete
-  if(msConfirm){
-    msConfirm.addEventListener('click', async function(e){
-      e.preventDefault();
-      if(selectedMomentIds.size === 0){
-        alert('未选择项目');
-        return;
-      }
-      if(!confirm('确定删除选中的 ' + selectedMomentIds.size + ' 条动态？此操作不可撤销')) return;
-      const ids = Array.from(selectedMomentIds);
-      try {
-        if(maybeDb && maybeDb.moments && typeof maybeDb.moments.bulkDelete === 'function'){
-          await maybeDb.moments.bulkDelete(ids);
-        } else if(maybeDb && maybeDb.moments){
-          // fallback: delete one by one
-          for(const id of ids){
-            try{ await maybeDb.moments.delete(id); }catch(e){}
-          }
-        } else if(window.AppDB_Moments && window.AppDB_Moments.moments && typeof window.AppDB_Moments.moments.bulkDelete === 'function'){
-          await window.AppDB_Moments.moments.bulkDelete(ids);
-        } else {
-          console.warn('No Dexie moments DB found for deletion');
-        }
-        // refresh render if available
-        if(typeof renderMoments === 'function') try{ await renderMoments(); }catch(e){}
-        if(typeof window.renderMomentsSafe === 'function') try{ await window.renderMomentsSafe(); }catch(e){}
-        exitDeleteMode();
-        alert('删除成功');
-      } catch (err){
-        console.error('批量删除失败', err);
-        alert('删除失败，请查看控制台。');
-      }
-    });
-  }
-
-  // Back button behavior
-  if(backBtn){
-    backBtn.addEventListener('click', function(e){
-      if(isInMomentsDeleteMode){
-        e.preventDefault();
-        exitDeleteMode();
-      }
-    });
-  }
-
-})();
-</script>
 
 <!-- 覆盖：确保 moment 图片描述卡的底色与文字颜色生效（放在文件末尾以覆盖所有样式） -->
 <style>
@@ -12556,6 +13183,24 @@ fileInput.addEventListener('change', async (e)=>{
 
 <!-- 在 </body> 之前添加 -->
 
+
+    <div id="mention-panel" class="mention-panel"></div>
+
+    <div class="modal-overlay" id="share-post-modal">
+        <div class="modal-window">
+            <h3>分享帖子给...</h3>
+            <ul id="share-post-selection-list" class="list-container" style="max-height: 40vh; overflow-y: auto;">
+                </ul>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-neutral" id="cancel-post-share-btn" style="flex: 1;">取消</button>
+                <button class="btn btn-primary" id="confirm-post-share-btn" style="flex: 1;">确认分享</button>
+            </div>
+        </div>
+    </div>
+   
+   
+
+  
 <div id="trajectory-modal" class="modal-overlay">
     <div class="modal-window">
         <h3 id="trajectory-modal-title">Ta的轨迹</h3>
