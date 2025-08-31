@@ -1172,16 +1172,27 @@
 
 
 
-/* --- 最终修复：让所有图标按钮紧凑排列，无需滑动 --- */
+/* --- 恢复图标栏的左右滑动功能 --- */
 #sticker-bar {
     flex-shrink: 0;
-    padding: 5px 8px; /* 调整容器的上下左右内边距，让整体更紧凑 */
+    padding: 5px 10px; /* 左右留出一些边距 */
     display: flex;
-    justify-content: space-between; /* 关键：让所有按钮在可用空间内均匀分布 */
     align-items: center;
+    gap: 0px; /* 设置图标之间的固定间距 */
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(10px);
-    overflow: hidden; /* 确保内容不溢出，不再滚动 */
+
+    /* 核心改动：允许X轴（横向）滚动 */
+    overflow-x: auto; 
+    overflow-y: hidden; /* 禁止垂直方向滚动 */
+
+    /* 以下代码是为了在视觉上隐藏滚动条，但保留滚动功能，让界面更美观 */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE 10+ */
+}
+
+#sticker-bar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
 }
 
 #sticker-bar .sticker-bar-btn {
@@ -2421,6 +2432,10 @@
 .app-header .action-btn-group {
     gap: 2px; /* 将按钮间的默认间距从 10px 减小到 4px */
 }
+/* --- 将回忆图标移动到标题栏最右侧 --- */
+.app-header .action-btn-group #ai-memories-btn {
+    order: 99;
+}
 /* === 主屏幕音乐小部件尺寸控制器 (粘贴到 <style> 标签末尾) === */
 .music-widget {
     /* --- 在这里修改大小 --- */
@@ -2493,31 +2508,24 @@
         </main>
     </div>
     <div id="chat-room-screen" class="screen">
-        <header class="app-header" id="chat-room-header-default">
-            <button class="back-btn" data-target="chat-list-screen">‹</button>
-            <div class="title-container">
-                <h1 class="title" id="chat-room-title">...</h1>
-                <div class="subtitle" id="chat-room-subtitle">
-                    <div class="online-indicator"></div>
-                    <span id="chat-room-status-text">在线</span>
-                </div>
-            </div>
-            <div class="action-btn-group">
-
-              <button class="action-btn" id="ai-memories-btn">
-                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:24px; height:24px; color:var(--primary-color);">
-                        <path d="M20,2H8A2,2 0 0,0 6,4V16A2,2 0 0,0 8,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2M20,16H8V4H20M4,6H2V20A2,2 0 0,0 4,22H18V20H4M12,6L11.2,6.8L9,9L10.2,10.2L11,9.4V14H13V9.4L13.8,10.2L15,9L12.8,6.8L12,6Z" />
-                    </svg>
-                </button>
-                <button class="action-btn" id="ai-trajectory-btn">
-                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:24px; height:24px; color:var(--primary-color);">
-                        <path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" />
-                    </svg>
-                </button>
-                <button class="action-btn" id="chat-settings-btn"><img src="https://i.postimg.cc/nhwP4pQy/chan-73.png"
-                                                                   alt="设置"></button>
-            </div>
-            </header>
+   <header class="app-header" id="chat-room-header-default">
+    <button class="back-btn" data-target="chat-list-screen">‹</button>
+    <div class="title-container">
+        <h1 class="title" id="chat-room-title">...</h1>
+        <div class="subtitle" id="chat-room-subtitle">
+            <div class="online-indicator"></div>
+            <span id="chat-room-status-text">在线</span>
+        </div>
+    </div>
+    <div class="action-btn-group">
+        <button class="action-btn" id="ai-trajectory-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:24px; height:24px; color:var(--primary-color);">
+                <path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"></path>
+            </svg>
+        </button>
+        <button class="action-btn" id="chat-settings-btn"><img src="https://i.postimg.cc/nhwP4pQy/chan-73.png" alt="设置"></button>
+    </div>
+</header>
         <header class="app-header" id="chat-room-header-select" style="display: none;">
             <button class="action-btn" id="cancel-multi-select-btn">取消</button>
             <div class="title-container">
@@ -2537,7 +2545,7 @@
     <button id="cancel-quote-reply-btn" style="background: none; border: none; font-size: 20px; color: #888; cursor: pointer; padding: 0 5px;">&times;</button>
 </div>
           
-   <div id="sticker-bar">
+<div id="sticker-bar">
     <button class="sticker-bar-btn" id="rollback-btn" title="撤回并重写">
         <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M12.5,8C9.85,8 7.45,9 5.6,10.6L2,7V16H11L7.38,12.38C8.77,11.22 10.54,10.5 12.5,10.5C16.04,10.5 19.05,12.81 20.1,16L22.47,15.22C21.08,11.03 17.15,8 12.5,8Z"></path>
@@ -2577,6 +2585,11 @@
     </button>
     <button class="sticker-bar-btn" id="location-btn">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12C20,15.08 18.05,17.78 15.42,19.23L12,14.5L8.58,19.23C5.95,17.78 4,15.08 4,12A8,8 0 0,1 12,4M12,6.5A5.5,5.5 0 0,0 6.5,12A5.5,5.5 0 0,0 12,17.5A5.5,5.5 0 0,0 17.5,12A5.5,5.5 0 0,0 12,6.5Z"></path></svg>
+    </button>
+    <button class="sticker-bar-btn" id="ai-memories-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20,2H8A2,2 0 0,0 6,4V16A2,2 0 0,0 8,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2M20,16H8V4H20M4,6H2V20A2,2 0 0,0 4,22H18V20H4M12,6L11.2,6.8L9,9L10.2,10.2L11,9.4V14H13V9.4L13.8,10.2L15,9L12.8,6.8L12,6Z"></path>
+        </svg>
     </button>
 </div>
       
@@ -10778,6 +10791,9 @@ function cancelQuoteReply() {
     cursor: pointer;
     flex-shrink: 0;
   }
+
+
+
   /* --- 在 <style> 标签内添加 --- */
 .message-bubble .quoted-content {
     /* --- 在这里调整引用块的大小和样式 --- */
