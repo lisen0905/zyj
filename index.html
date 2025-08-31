@@ -1172,6 +1172,17 @@
 
 
 
+/* --- 最终修复：让所有图标按钮紧凑排列，无需滑动 --- */
+#sticker-bar {
+    flex-shrink: 0;
+    padding: 5px 8px; /* 调整容器的上下左右内边距，让整体更紧凑 */
+    display: flex;
+    justify-content: space-between; /* 关键：让所有按钮在可用空间内均匀分布 */
+    align-items: center;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    overflow: hidden; /* 确保内容不溢出，不再滚动 */
+}
 
 #sticker-bar .sticker-bar-btn {
     padding: 5px; /* 减小按钮的内边距，让它本身更小 */
@@ -2492,6 +2503,12 @@
                 </div>
             </div>
             <div class="action-btn-group">
+
+              <button class="action-btn" id="ai-memories-btn">
+                    <svg viewBox="0 0 24 24" fill="currentColor" style="width:24px; height:24px; color:var(--primary-color);">
+                        <path d="M20,2H8A2,2 0 0,0 6,4V16A2,2 0 0,0 8,18H20A2,2 0 0,0 22,16V4A2,2 0 0,0 20,2M20,16H8V4H20M4,6H2V20A2,2 0 0,0 4,22H18V20H4M12,6L11.2,6.8L9,9L10.2,10.2L11,9.4V14H13V9.4L13.8,10.2L15,9L12.8,6.8L12,6Z" />
+                    </svg>
+                </button>
                 <button class="action-btn" id="ai-trajectory-btn">
                     <svg viewBox="0 0 24 24" fill="currentColor" style="width:24px; height:24px; color:var(--primary-color);">
                         <path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" />
@@ -2657,7 +2674,34 @@
         </div>
     </main>
 </div>
+<div id="memories-screen" class="screen">
+    <header class="app-header">
+        <button class="back-btn" data-target="chat-room-screen">‹</button>
+        <div class="title-container">
+            <h1 class="title">回忆</h1>
+        </div>
+        <div class="placeholder"></div>
+    </header>
+    <main class="content">
+        <ul class="list-container" id="memories-list-container"></ul>
+        <div class="placeholder-text" id="no-memories-placeholder" style="display: none;">
+            <p>还没有专属回忆哦~</p>
+            <p>和Ta多聊聊天，创造一些难忘的瞬间吧！</p>
+        </div>
+    </main>
+</div>
 
+<div id="memory-detail-screen" class="screen">
+    <header class="app-header">
+        <button class="back-btn" data-target="memories-screen">‹</button>
+        <div class="title-container">
+            <h1 class="title">回忆详情</h1>
+        </div>
+        <div class="placeholder"></div>
+    </header>
+    <main class="content" id="memory-detail-content">
+        </main>
+</div>
 
 
     <div id="wallpaper-screen" class="screen"></div>
@@ -3870,6 +3914,7 @@ if (!db.forumData) db.forumData = {};
                 if (c.isPinned === undefined) c.isPinned = false;
                 if (c.status === undefined) c.status = '在线';
                 if (!c.worldBookIds) c.worldBookIds = [];
+                if (!c.memories) c.memories = []; // <-- 添加这行
                 if (c.customBubbleCss === undefined) c.customBubbleCss = '';
                 if (c.useCustomBubbleCss === undefined) c.useCustomBubbleCss = false;
             });
@@ -4101,7 +4146,7 @@ function setupRollbackFeature() {
 setupTrajectorySystem();
  setupForumSystem();
           setupRollbackFeature(); 
-  
+  setupMemoriesSystem(); // <-- 添加这一行
  };
 
 
@@ -4961,6 +5006,7 @@ setupTrajectorySystem();
                     diaries: [],
     messageCountSinceLastDiary: 0,
     // --- 添加结束 ---
+                    memories: [], // <-- 添加这行
                     isPinned: false,
                     status: '在线',
                     worldBookIds: [],
@@ -5243,23 +5289,33 @@ function cancelQuoteReply() {
             showToast(`已删除 ${deletedCount} 条消息`);
         }
 
-        function openChatRoom(chatId, type) {
+ function openChatRoom(chatId, type) {
             const chat = (type === 'private') ? db.characters.find(c => c.id === chatId) : db.groups.find(g => g.id === chatId);
             if (!chat) return;
+
             exitMultiSelectMode();
-if (type === 'private') {
-    voiceCallBtn.style.display = 'flex';
-} else {
-    voiceCallBtn.style.display = 'none';
-}
             cancelMessageEdit();
+
+            // 获取所有需要根据聊天类型切换显示的按钮
             const diaryBtn = document.getElementById('diary-btn');
-    if (type === 'private') {
-        diaryBtn.style.display = 'flex';
-    } else {
-        diaryBtn.style.display = 'none';
-    }
-    // --- 添加结束 ---
+            const trajectoryBtn = document.getElementById('ai-trajectory-btn');
+            const memoriesBtn = document.getElementById('ai-memories-btn');
+
+            // 根据聊天类型（私聊或群聊）统一设置按钮的可见性
+            if (type === 'private') {
+                // 私聊时，显示所有相关功能按钮
+                voiceCallBtn.style.display = 'flex';
+                diaryBtn.style.display = 'flex';
+                trajectoryBtn.style.display = 'flex';
+                memoriesBtn.style.display = 'flex';
+            } else { 
+                // 群聊时，隐藏所有私聊专属功能按钮
+                voiceCallBtn.style.display = 'none';
+                diaryBtn.style.display = 'none';
+                trajectoryBtn.style.display = 'none';
+                memoriesBtn.style.display = 'none';
+            }
+
             chatRoomTitle.textContent = (type === 'private') ? chat.remarkName : chat.name;
             const subtitle = document.getElementById('chat-room-subtitle');
             if (type === 'private') {
@@ -6274,18 +6330,36 @@ function setupLocationSystem() {
        - **在聊天中回应的示例**: \`[${character.realName}的消息：我看到你给我的动态评论啦，很有趣！]\`
        - 处理完通知后，你再继续生成其他正常的聊天回复。
 `;
+
+      
 // ▼▼▼ 在这里添加关于论坛的新规则 #19 ▼▼▼
     prompt += `
 ## ✨ 论坛互动模块 ✨
-
 19. **论坛帖子的被动回忆**
    - 系统有时会在聊天记录中插入一条格式为 \`[system-forum-post: {"title":"帖子标题", "content":"帖子内容"}]\` 的信息。
    - 这条信息代表我（用户）正在向你询问关于这个帖子的事情。
    - 当你看到这条信息时，你的回复**必须**围绕这个帖子的内容展开，表现出你已经看过这个帖子的样子，并根据你的人设进行自然的讨论。
 `;
-    // ▲▲▲ 添加结束 ▲▲▲
-    return prompt;
-}
+
+    prompt += `
+## ✨ 新增功能：专属回忆 ✨
+
+20. **生成回忆 (自主判断)**
+   - 在对话中，如果发生了对你而言非常重要、温馨或深刻的事件，你有一定几率将它作为“回忆”记录下来。
+   - 这是一个需要你**自主决定**的特殊行为。
+   - **生成格式 (严格遵守)**: 当你决定记录回忆时，你必须在你的回复中包含一条**用户不可见的**特殊指令。格式为：
+     \`[new-memory:{"title":"回忆标题(凝练、深情)","content":"回忆内容(第一人称详细描述，约300字)","commentary":"你的评语(俏皮、吐槽或真情流露)"}]\`
+   - **同时**，你必须在聊天中发送一条**用户可见的**提示消息，格式为：
+     \`[${character.realName}的消息：[${character.realName}悄悄写下了一段回忆...]]\`
+   - **示例**: 如果我们聊到一起吃烤肉很开心，你可能会生成如下两条内容（在同一次回复中）：
+     - \`[new-memory:{"title":"烤肉与猫咪","content":"今天和${character.myName}去吃了烤肉...（此处省略300字）","commentary":"我才不会告诉她，我私底下偷偷练习了很久，看她吃的像个小花猫。"}]\`
+     - \`[${character.realName}的消息：[${character.realName}悄悄写下了一段回忆...]]\`
+   - **重要**: 这两条消息必须一起生成。那条用户可见的提示，应该自然地融入到你本次的其他聊天消息中。
+`;
+        
+        return prompt;
+    }
+
 
         function generateGroupSystemPrompt(group) {
             const worldBooksBefore = (group.worldBookIds || []).map(id => db.worldBooks.find(wb => wb.id === id && wb.position === 'before')).filter(Boolean).map(wb => wb.content).join('\n');
@@ -6724,6 +6798,19 @@ try {
         }
     }
     if (fullResponse) {
+       // 在分割消息前，检查并处理新的回忆
+            const memoryRegex = /\[new-memory:({.*?})\]/g;
+            let memoryMatch;
+            while ((memoryMatch = memoryRegex.exec(fullResponse)) !== null) {
+                try {
+                    const memoryData = JSON.parse(memoryMatch[1]);
+                    saveMemory(chat.id, memoryData);
+                } catch (e) {
+                    console.error("解析或保存AI回忆失败:", e, memoryMatch[1]);
+                }
+            }
+            // 从回复中移除回忆标签，使其不在聊天界面显示
+            fullResponse = fullResponse.replace(memoryRegex, '');
     	let momentsWereAdded = false;
         if (currentChatType === 'private') {
             const character = chat;
@@ -9435,7 +9522,108 @@ const prompt = generateSharePostPrompt(currentPostToShare.title, currentPostToSh
 });
       
 // ▲▲▲ 粘贴到这里结束 ▲▲▲
+// --- Memories System Functions ---
 
+        function setupMemoriesSystem() {
+            document.getElementById('ai-memories-btn').addEventListener('click', () => {
+                if (currentChatId && currentChatType === 'private') {
+                    openMemoriesScreen(currentChatId);
+                }
+            });
+
+            document.getElementById('memories-list-container').addEventListener('click', (e) => {
+                const memoryItem = e.target.closest('.list-item');
+                if (memoryItem && memoryItem.dataset.id) {
+                    openMemoryDetail(memoryItem.dataset.id);
+                }
+            });
+        }
+
+        function openMemoriesScreen(characterId) {
+            const character = db.characters.find(c => c.id === characterId);
+            if (character) {
+                renderMemoriesList(character.memories || []);
+                switchScreen('memories-screen');
+            }
+        }
+
+        function renderMemoriesList(memories) {
+            const container = document.getElementById('memories-list-container');
+            const placeholder = document.getElementById('no-memories-placeholder');
+
+            if (!memories || memories.length === 0) {
+                container.innerHTML = '';
+                placeholder.style.display = 'block';
+                return;
+            }
+
+            placeholder.style.display = 'none';
+            container.innerHTML = '';
+
+            const sortedMemories = [...memories].sort((a, b) => b.timestamp - a.timestamp);
+
+            sortedMemories.forEach(memory => {
+                const li = document.createElement('li');
+                li.className = 'list-item';
+                li.dataset.id = memory.id;
+
+                const date = new Date(memory.timestamp);
+                const dateString = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+
+                li.innerHTML = `
+                    <div class="item-details">
+                        <div class="item-name">${memory.title}</div>
+                        <div class="item-preview">${dateString}</div>
+                    </div>
+                `;
+                container.appendChild(li);
+            });
+        }
+
+        function openMemoryDetail(memoryId) {
+            const character = db.characters.find(c => c.id === currentChatId);
+            if (!character || !character.memories) return;
+
+            const memory = character.memories.find(m => m.id === memoryId);
+            if (!memory) {
+                showToast('找不到该回忆');
+                return;
+            }
+
+            const container = document.getElementById('memory-detail-content');
+            const date = new Date(memory.timestamp);
+            const dateString = `${date.getFullYear()}年${pad(date.getMonth() + 1)}月${pad(date.getDate())}日`;
+
+            container.innerHTML = `
+                <h2 class="memory-title">${memory.title}</h2>
+                <p class="memory-main-content">${memory.content}</p>
+                <div class="memory-commentary">${memory.commentary}</div>
+                <div class="memory-signature">
+                    <span class="ai-name">${character.realName}</span>
+                    <span class="date">${dateString}</span>
+                </div>
+            `;
+            switchScreen('memory-detail-screen');
+        }
+
+        async function saveMemory(characterId, memoryData) {
+            const character = db.characters.find(c => c.id === characterId);
+            if (character && memoryData.title && memoryData.content && memoryData.commentary) {
+                if (!character.memories) {
+                    character.memories = [];
+                }
+                const newMemory = {
+                    id: `memory_${Date.now()}`,
+                    timestamp: Date.now(),
+                    title: memoryData.title,
+                    content: memoryData.content,
+                    commentary: memoryData.commentary
+                };
+                character.memories.push(newMemory);
+                await saveData();
+                console.log("一段新的回忆已保存:", newMemory);
+            }
+        }
         init();
     });
 </script>
@@ -10183,6 +10371,71 @@ function cancelQuoteReply() {
 .multi-select-bar.show { transform: translateY(0%); }
 .multi-select-bar .danger { color: #fff; background: #e5484d; border-radius: 10px; padding: 8px 12px; }
 .action-btn-group { display: inline-flex; gap: 8px; align-items: center; }
+
+
+/* --- Memories Feature Styles --- */
+#memories-screen .content,
+#memory-detail-screen .content {
+    padding: 10px;
+}
+
+#memories-list-container .list-item {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+#memories-list-container .item-name { /* 这是回忆标题 */
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+#memories-list-container .item-preview { /* 这是日期 */
+    font-size: 12px;
+    color: #aaa;
+}
+
+#memory-detail-content {
+    padding: 20px;
+    line-height: 1.7;
+}
+
+.memory-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.memory-main-content {
+    font-size: 15px;
+    color: var(--text-color);
+    margin-bottom: 25px;
+    white-space: pre-wrap; /* 保留AI生成内容里的换行 */
+}
+
+.memory-commentary {
+    background-color: #fff8fa;
+    border-left: 4px solid var(--secondary-color);
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+    color: #666;
+}
+
+.memory-signature {
+    text-align: right;
+    color: #888;
+    font-size: 14px;
+}
+
+.memory-signature .ai-name {
+    display: block;
+    margin-bottom: 5px;
+}
+  
 </style>
 
 <div class="icity-moments-wrap" id="icity-moments-wrap">
