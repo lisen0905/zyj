@@ -1172,17 +1172,6 @@
 
 
 
-/* --- 最终修复：让所有图标按钮紧凑排列，无需滑动 --- */
-#sticker-bar {
-    flex-shrink: 0;
-    padding: 5px 8px; /* 调整容器的上下左右内边距，让整体更紧凑 */
-    display: flex;
-    justify-content: space-between; /* 关键：让所有按钮在可用空间内均匀分布 */
-    align-items: center;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    overflow: hidden; /* 确保内容不溢出，不再滚动 */
-}
 
 #sticker-bar .sticker-bar-btn {
     padding: 5px; /* 减小按钮的内边距，让它本身更小 */
@@ -9080,7 +9069,6 @@ function setupTrajectorySystem() {
 
 
 // --- 论坛AI功能：为用户的帖子生成评论 ---
-// --- 论坛AI功能：为指定版块生成帖子列表 ---
 function generateForumBoardPrompt(boardId, boardName, characterList) {
     // 从角色列表中随机挑选2到3名角色
     let shuffled = [...characterList].sort(() => 0.5 - Math.random());
@@ -9092,13 +9080,14 @@ function generateForumBoardPrompt(boardId, boardName, characterList) {
     });
 
     let prompt = `你是一个论坛内容生成AI。${charactersPromptPart}\n`;
-    prompt += `你正在为虚拟手机应用的“论坛”里的【${boardName}】版块，***必须***生成**10条**帖子摘要。\n\n`;
+    prompt += `你正在为虚拟手机应用的“论坛”里的【${boardName}】版块，***必须***生成一个包含**不多不少正好10条**帖子摘要的列表。\n\n`;
     prompt += `规则：\n`;
     prompt += `1. **严格围绕【${boardName}】的主题**来创作帖子内容。\n`;
-    prompt += `2. **这10条帖子中，上方名单里的每一个AI角色都必须至少发布1条**。他们的帖子要符合他们各自的人设，AI角色可以匿名，但要括号标出是谁。\n`;
-    prompt += `3. 其余的帖子由你虚构的“路人甲”或其他符合角色世界观的NPC发表。\n`;
-    prompt += `4. 每条帖子都需要包含：标题(title), 作者(author), 3条评论预览(comments), 点赞数(likes), 以及是否热门(isHot)。\n`;
-    prompt += `5. 你的输出必须严格遵循以下JSON数组格式，不要包含任何额外的解释或文字：\n`;
+    prompt += `2. **帖子构成**: 你的目标是凑齐10条帖子。构成如下：\n`;
+    prompt += `   a. 上方名单中的**每一个AI角色都必须至少发布1条帖子**。他们的帖子要符合他们各自的人设，AI角色可以匿名，但要括号标出是谁。\n`;
+    prompt += `   b. **用你虚构的“路人甲”或其他NPC的帖子，补足剩余的数量，直到总数达到10条**。这是为了确保无论AI角色发了多少条，最终结果永远是10条。\n`;
+    prompt += `3. 每条帖子都需要包含：标题(title), 作者(author), 3条评论预览(comments), 点赞数(likes), 以及是否热门(isHot)。\n`;
+    prompt += `4. 你的输出必须严格遵循以下JSON数组格式，不要包含任何额外的解释或文字：\n`;
     prompt += `[{"title": "帖子标题", "author": "作者名", "likes": 35, "isHot": true, "comments": [{"author":"评论者A", "text":"这是第一条评论"}, ...]}, ...]`;
 
     return prompt;
@@ -9106,12 +9095,7 @@ function generateForumBoardPrompt(boardId, boardName, characterList) {
 
 // --- 论坛AI功能：为指定帖子生成正文和详细评论 ---
 function generateForumThreadPrompt(threadTitle, threadAuthor, character) {
-    const boards = {
-        life: '生活闲聊',
-        secrets: '秘密树洞',
-        gossip: '八卦吃瓜',
-        travel: '旅游美食'
-    };
+ 
     let prompt = `你正在扮演角色“${character.realName}”，人设是：${character.persona}。\n`;
     prompt += `我正在论坛里查看一个帖子，请你为这个帖子生成详细的“正文(content)”和“评论区(comments)”。\n\n`;
     prompt += `帖子的标题是：“${threadTitle}”\n`;
@@ -9132,25 +9116,22 @@ function generateForumThreadPrompt(threadTitle, threadAuthor, character) {
 
   
 // --- 论坛AI功能：为指定版块生成帖子列表 ---
-// ▼▼▼ 请将下面这个新函数，粘贴到 generateForumThreadPrompt 函数的正上方 ▼▼▼
-function generateSharePostPrompt(postTitle, postContent, character) {
+
+function generateSharePostPrompt(postTitle, postContent, postAuthor, character) {
     let prompt = `你正在扮演角色“${character.realName}”，人设是：${character.persona}。\n`;
-    prompt += `你刚刚在我们的应用论坛里，看到了我（${character.myName}）新发布的帖子，你觉得很有趣/很有感触，决定立刻把它转发到我们的私人聊天里，并对此发表一些你的看法。\n\n`;
-    prompt += `我的帖子标题： "${postTitle}"\n`;
-    prompt += `我的帖子正文： "${postContent}"\n\n`;
+    prompt += `我（${character.myName}）刚刚在论坛里看到了一个由“${postAuthor}”发布的帖子，觉得很有趣，现在把它转发给你。请注意，这个帖子**不是我写的**。\n\n`;
+    prompt += `--- 转发的帖子信息 ---\n`;
+    prompt += `帖子作者： "${postAuthor}"\n`;
+    prompt += `帖子标题： "${postTitle}"\n`;
+    prompt += `帖子正文： "${postContent}"\n`;
+    prompt += `--- 帖子信息结束 ---\n\n`;
     prompt += `你的任务：\n`;
-    prompt += `1. **你的第一条消息必须是引用我的帖子**，格式为：\`[${character.realName}转发了帖子“${postTitle}”]\`\n`;
-    prompt += `2. **然后，请根据你的角色人设和帖子内容，生成5-12条对此的聊天消息**。你的回复要自然、连贯，就像真的看到了这个帖子一样。\n`;
-    prompt += `3. 你的输出必须严格遵循多条消息的格式，例如：\n`;
-    prompt += `[${character.realName}转发了帖子“帖子标题”]\n`;
-    prompt += `[${character.realName}的消息：天哪！你也太有爱心了吧！]\n`;
-    prompt += `[${character.realName}的消息：它长什么样子？快给我看看照片！]\n`;
-    prompt += `[${character.realName}的消息：我觉得你应该先带它去检查一下身体。]`;
-    
+    prompt += `1. **你的第一条消息必须是表明你收到了转发**，格式为：\`[${character.realName}转发了帖子“${postTitle}”]\`\n`;
+    prompt += `2. **然后，请根据你的角色人设和帖子的内容，发表你对此的看法**。你的回复要自然、连贯，就像真的看到了这个帖子一样。\n`;
+    prompt += `3. 你的回复可以包含多条消息，但必须严格遵循格式，例如：\`[${character.realName}的消息：你的评论...]\`\n`;
+
     return prompt;
 }
-// ▲▲▲ 添加结束 ▲▲▲
-
       
 // --- 论坛AI功能：为指定帖子生成正文和详细评论 ---
 function generateForumThreadPrompt(threadTitle, threadAuthor, character) {
@@ -9352,17 +9333,19 @@ let currentPostToShare = { title: '', content: '' };
 // 1. 给帖子详情页的“分享”按钮添加点击事件
 shareThreadBtn.addEventListener('click', () => {
     // 获取当前正在查看的帖子的标题和内容
-    const titleEl = document.getElementById('thread-detail-title');
-    const contentEl = document.querySelector('.main-post-body');
+const titleEl = document.querySelector('#thread-content-container .thread-full-content h2');
+const contentEl = document.querySelector('#thread-content-container .main-post-body');
+const authorLineEl = document.querySelector('#thread-content-container .author-line');
 
-    if (!titleEl || !contentEl) {
-        showToast('无法获取帖子内容');
-        return;
-    }
+if (!titleEl || !contentEl || !authorLineEl) {
+    showToast('无法获取完整的帖子内容');
+    return;
+}
 
-    currentPostToShare.title = titleEl.textContent;
-    currentPostToShare.content = contentEl.textContent;
-
+currentPostToShare.title = titleEl.textContent;
+currentPostToShare.content = contentEl.textContent;
+// 新增：从 "由 作者 发布" 中提取作者名
+currentPostToShare.author = authorLineEl.textContent.replace('由', '').replace('发布', '').trim();
     // 渲染角色选择列表
     sharePostSelectionList.innerHTML = '';
     if (db.characters.length === 0) {
@@ -9412,7 +9395,7 @@ confirmPostShareBtn.addEventListener('click', async () => {
 
     try {
         // 使用我们新创建的函数来生成AI指令
-        const prompt = generateSharePostPrompt(currentPostToShare.title, currentPostToShare.content, character);
+const prompt = generateSharePostPrompt(currentPostToShare.title, currentPostToShare.content, currentPostToShare.author, character);
 
         let messagesForApi;
         if (db.apiSettings.provider === 'gemini') {
