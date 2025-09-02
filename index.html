@@ -6272,9 +6272,13 @@ function setupLocationSystem() {
         prompt += `10. 发送表情包的规则...\n`;
 
         if (forceTheater) {
-            prompt += `11. ✨HTML小剧场 (强制生成)✨：你的本次回复中，**必须包含一个且仅一个**HTML小剧场。
-            - 格式必须为: <orange char="${character.realName}">...</orange>。
-            - 在 <orange> 标签内，你可以自由使用HTML和行内CSS (style="") 来创造丰富的视觉内容。
+            prompt += `11. ✨HTML小剧场 (强制生成)✨：你的本次回复中，**必须包含一个**HTML小剧场。
+  🚨 **输出格式（必须严格遵守，否则功能会失效）：**
+            - 你的小剧场内容**必须**被一个带有'char'属性的 <orange> 标签完整包裹。
+            - 格式为: <orange char="${character.realName}"> {你的HTML代码...} </orange>
+            - 'char'属性的值**必须**是你的角色真名: ${character.realName}。
+            - {你的HTML代码...} 部分可以自由使用HTML标签和行内CSS (style="")来创造丰富的视觉内容。
+-不允许全部的英文
             - **小剧场创意示例**: 模拟你的手机聊天界面、一张外卖订单截图、你的浏览器搜索记录、一份和我的虚拟合同或契约书、一张电影票根等等。请发挥创意，不要重复。
             - 这个小剧场消息应该随机穿插在你回复的多条普通消息之间，位置不固定。\n`;
         } else {
@@ -6810,6 +6814,41 @@ try {
             return;
         }
     }
+           // ================== 核心安全网：AI回复清洗与重试 ==================
+
+            // 1. 定义一个“黑名单”列表，用来识别所有不该显示给用户的指令
+            const invisiblePatterns = [
+                /\[new-memory:\{.*?\}(\s*)]/g,
+                /\[call:.*?\]/g,
+                /\[.*?更新状态为：.*?\]/g,
+                /\[.*?已接收礼物\]/g,
+                /\[(?:.*?)发布动态：\{.*?\}(\s*)]/g,
+                /\[(?:.*?)评论动态：\{.*?\}(\s*)]/g,
+                /\[(?:.*?)点赞动态：\{.*?\}(\s*)]/g,
+                /\[(?:.*?)回复评论：\{.*?\}(\s*)]/g,
+                /\[system:.*?\]/g,
+                /^\[done\]$/gm // <--- 专门用来干掉 [done]
+            ];
+            
+            // 2. 清洗AI返回的原始文本
+            let cleanedResponse = fullResponse;
+            invisiblePatterns.forEach(pattern => {
+                cleanedResponse = cleanedResponse.replace(pattern, '');
+            });
+            cleanedResponse = cleanedResponse.trim(); // 移除首尾的空行和空格
+
+            // 3. 检查清洗后的结果，如果变空了就自动重试
+            if (!cleanedResponse) {
+                console.warn("AI回复被完全过滤，内容为空。原始回复:", fullResponse);
+                showToast("AI好像在开小差，我再问问Ta...");
+                setTimeout(() => getAiReply(), 1000); // 悄悄地再问一次
+                return; // 终止当前函数的执行
+            }
+            
+            // 4. 如果内容没问题，就用清洗后的回复继续执行
+            fullResponse = cleanedResponse; 
+
+            // ================== 清洗与重试逻辑结束 ==================
     if (fullResponse) {
        // 在分割消息前，检查并处理新的回忆
             const memoryRegex = /\[new-memory:({.*?})\]/g;
