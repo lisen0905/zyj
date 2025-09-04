@@ -6404,20 +6404,18 @@ function setupLocationSystem() {
    - 当你看到这条信息时，你的回复**必须**围绕这个帖子的内容展开，表现出你已经看过这个帖子的样子，并根据你的人设进行自然的讨论。
 `;
 
-    prompt += `
+prompt += `
 ## ✨ 新增功能：专属回忆 ✨
 
-20. **生成回忆 (自主判断)**
-   - 在对话中，如果发生了对你而言非常重要、温馨或深刻的事件，你有一定几率将它作为“回忆”记录下来。
-   - 这是一个需要你**自主决定**的特殊行为。
-   - **生成格式 (严格遵守)**: 当你决定记录回忆时，你必须在你的回复中包含一条**用户不可见的**特殊指令。格式为：
-     \`[new-memory:{"title":"回忆标题(凝练、深情)","content":"回忆内容(第一人称详细描述，约300字)","commentary":"你的评语(俏皮、吐槽或真情流露)"}]\`
-   - **同时**，你必须在聊天中发送一条**用户可见的**提示消息，格式为：
-     \`[${character.realName}的消息：[${character.realName}悄悄写下了一段回忆...]]\`
-   - **示例**: 如果我们聊到一起吃烤肉很开心，你可能会生成如下两条内容（在同一次回复中）：
-     - \`[new-memory:{"title":"烤肉与猫咪","content":"今天和${character.myName}去吃了烤肉...（此处省略300字）","commentary":"我才不会告诉她，我私底下偷偷练习了很久，看她吃的像个小花猫。"}]\`
-     - \`[${character.realName}的消息：[${character.realName}悄悄写下了一段回忆...]]\`
-   - **重要**: 这两条消息必须一起生成。那条用户可见的提示，应该自然地融入到你本次的其他聊天消息中。
+20. **生成回忆并继续对话 (自主判断)**
+   - 在对话中，如果发生了对你而言非常重要、温馨或深刻的事件，你可以将它作为“回忆”记录下来。
+   - **这是一个特殊行为，ai根据人设与上下文自主触发。**
+   - **生成格式 (必须严格遵守)**: 当你决定记录回忆时，你的回复中必须包含一条用户不可见的**数据指令**，格式为: \`[new-memory:{"title":"...","content":"...","commentary":"..."}]\`，正文不得小于300字。
+   - **重要**: 在生成这条数据指令的**同时**，你必须像平常一样，保持人设，读取上下文，继续我们的对话，回复**一至多条正常的消息** (\`[${character.realName}的消息：...]\`)。数据指令会被程序自动处理，你只需要正常聊天即可。
+   - **示例 (AI的完整回复可能像这样):**
+     \`[new-memory:{"title":"傍晚的约定","content":"今天和他说好了晚上一起看电影...此处省略300字"}]\`
+     \`[${character.realName}的消息：好呀，那一言为定。]\`
+     \`[${character.realName}的消息：我有点期待了...]\`
 `;
         
         return prompt;
@@ -6867,7 +6865,14 @@ try {
             while ((memoryMatch = memoryRegex.exec(fullResponse)) !== null) {
                 try {
                     const memoryData = JSON.parse(memoryMatch[1]);
-                    saveMemory(chat.id, memoryData);
+                   await saveMemory(chat.id, memoryData); // 建议在saveMemory前加上 await
+                    
+                    // ▼▼▼ 在这里添加下面这几行代码 ▼▼▼
+                    const character = db.characters.find(c => c.id === chat.id);
+                    if (character && typeof showToast === 'function') {
+                        showToast(`[ ${character.remarkName} 悄悄写下了一段回忆... ]`);
+                    }
+                    // ▲▲▲ 添加结束 ▲▲▲
                 } catch (e) {
                     console.error("解析或保存AI回忆失败:", e, memoryMatch[1]);
                 }
@@ -10724,6 +10729,7 @@ function cancelQuoteReply() {
 
 <!-- 在聊天界面底部插入导航（你指定的位置：聊天界面底部） -->
 <style>
+  #moments-multi-select-bar { display: none !important; }
   /* 微调底部导航样式（不会影响你原有 .dock） */
   .bottom-nav {
     position: absolute;
