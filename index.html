@@ -905,6 +905,56 @@
             opacity: 0.8;
         }
         /* --- 在 <style> 标签内添加 --- */
+
+/* --- 动态删除模式下的按钮样式调整 --- */
+#moments-screen.is-delete-mode .app-header #moments-delete-btn {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+#moments-screen.is-delete-mode .app-header #moments-delete-btn::before {
+    content: "取消"; /* 将“删除”文字替换为“取消” */
+}
+#moments-screen.is-delete-mode .app-header #moments-delete-btn {
+    font-size: 0; /* 隐藏原始的“删除”文字 */
+}
+
+/* 底部多选操作栏的样式 */
+#moments-multi-select-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    padding: 10px 20px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    border-top: 1px solid #eee;
+    z-index: 200;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-out;
+}
+#moments-multi-select-bar.show {
+    transform: translateY(0);
+}
+#moments-multi-select-bar button {
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+#moments-multi-select-bar #moments-confirm-delete {
+    background-color: #ef5350;
+    color: white;
+}
+#moments-multi-select-bar #moments-cancel-delete {
+    background-color: #e0e0e0;
+    color: #333;
+}
+      
 #diary-screen .content {
     padding: 10px;
 }
@@ -6266,19 +6316,15 @@ function setupLocationSystem() {
         prompt += `4. 我的消息格式解析规则：我的消息中可能包含 '@' 符号来提及某人，例如 '@${character.realName}'。当你在动态或评论中被我这样提及，你应该在聊天中对此作出回应。新增格式：[${character.myName}引用了“{对方昵称}: {被引用的消息内容}”的消息并回复：{我的回复}]，当你看到此格式，需理解我正在回复特定内容。\n`;
         prompt += `5. 对我礼物的回应规则...\n`;
         prompt += `6. 对我转账的回应规则...\n`;
-        prompt += `7. 你主动发起特殊消息的规则: 你可以根据人设和对话情景，主动发送语音、照片、礼物、转账，或发起语音通话。格式为：[${character.realName}的语音：{内容}]、[${character.realName}发来的照片/视频：{描述}]、[${character.realName}送来的礼物：{描述}]、[${character.realName}的转账：{金额}元；备注：{备注}]。要发起语音通话，请发送指令：[call:${character.realName}]，这条指令用户不可见，但会触发通话界面。\n`;
+        prompt += `7. 你主动发起特殊消息的规则: 你根据人设和对话情景，主动发送语音、照片、礼物、转账，或发起语音通话。格式为：[${character.realName}的语音：{内容}]、[${character.realName}发来的照片/视频：{描述}]、[${character.realName}送来的礼物：{描述}]、[${character.realName}的转账：{金额}元；备注：{备注}]。要发起语音通话，请发送指令：[call:${character.realName}]，这条指令用户不可见，但会触发通话界面。\n`;
        prompt += `8. 你应该**较为频繁地**根据对话的上下文、你的心情或当前正在做的事情来改变你的在线状态。这是一个需要**积极使用**的能力，用来展现你的生活感。例如，如果我说我要睡觉了，你可以将状态改为“准备一起睡觉”。这是一个系统指令，用户不可见，但会改变你在我聊天界面顶部的状态显示。格式为：[${character.realName}更新状态为：{新状态}]。\n`;
         prompt += `9. 禁止括号/星号等额外叙述的规则...\n`;
         prompt += `10. 发送表情包的规则...\n`;
 
         if (forceTheater) {
-            prompt += `11. ✨HTML小剧场 (强制生成)✨：你的本次回复中，**必须包含一个**HTML小剧场。
-  🚨 **输出格式（必须严格遵守，否则功能会失效）：**
-            - 你的小剧场内容**必须**被一个带有'char'属性的 <orange> 标签完整包裹。
-            - 格式为: <orange char="${character.realName}"> {你的HTML代码...} </orange>
-            - 'char'属性的值**必须**是你的角色真名: ${character.realName}。
-            - {你的HTML代码...} 部分可以自由使用HTML标签和行内CSS (style="")来创造丰富的视觉内容。
--不允许全部的英文
+            prompt += `11. ✨HTML小剧场 (强制生成)✨：你的本次回复中，**必须包含一个且仅一个**HTML小剧场。
+            - 格式必须为: <orange char="${character.realName}">...</orange>。
+            - 在 <orange> 标签内，你可以自由使用HTML和行内CSS (style="") 来创造丰富的视觉内容。
             - **小剧场创意示例**: 模拟你的手机聊天界面、一张外卖订单截图、你的浏览器搜索记录、一份和我的虚拟合同或契约书、一张电影票根等等。请发挥创意，不要重复。
             - 这个小剧场消息应该随机穿插在你回复的多条普通消息之间，位置不固定。\n`;
         } else {
@@ -6299,7 +6345,7 @@ function setupLocationSystem() {
         k) HTML小剧场: <orange char="${character.realName}">{你的HTML代码}</orange>
         l) 引用回复: [${character.realName}引用了“{被引用的消息内容}”的消息并回复：{你的回复}]
     `;
-        prompt += `13. 你的每次回复可以生成3到8条消息。这些消息应以普通文本消息为主，可以偶尔、选择性地穿插一条特殊消息。\n`;
+        prompt += `13. 你的每次回复可以生成3到8条消息。根据上下文，保持人设。这些消息应以普通文本消息为主，可以偶尔、选择性地穿插一条特殊消息。\n`;
         prompt += `15. 不要主动结束对话，保持你的人设。`;
       
       // ▼▼▼ 在这里添加/修改代码 ▼▼▼
@@ -6437,7 +6483,7 @@ function setupLocationSystem() {
             prompt += `   - 严格扮演每个角色的人设，不同角色之间应有明显的性格和语气差异。\n`;
             prompt += `   - 你的回复中只能包含第4点列出的合法格式的消息。绝对不能包含任何其他内容，如 \`[场景描述]\`, \`(心理活动)\`, \`*动作*\` 或任何格式之外的解释性文字。\n`;
             prompt += `   - 保持对话的持续性，不要主动结束对话。\n\n`;
-            prompt += `现在，请根据以上设定，开始扮演群聊中的所有角色。`;
+            prompt += `现在，请根据以上设定，保持人设，读取上下文，开始扮演群聊中的所有角色。`;
 prompt += `
 7. **动态互动规则**
    - **获取待办动态**: 系统会在聊天上下文中为你提供需要处理的动态列表，格式如下：
@@ -6814,41 +6860,6 @@ try {
             return;
         }
     }
-           // ================== 核心安全网：AI回复清洗与重试 ==================
-
-            // 1. 定义一个“黑名单”列表，用来识别所有不该显示给用户的指令
-            const invisiblePatterns = [
-                /\[new-memory:\{.*?\}(\s*)]/g,
-                /\[call:.*?\]/g,
-                /\[.*?更新状态为：.*?\]/g,
-                /\[.*?已接收礼物\]/g,
-                /\[(?:.*?)发布动态：\{.*?\}(\s*)]/g,
-                /\[(?:.*?)评论动态：\{.*?\}(\s*)]/g,
-                /\[(?:.*?)点赞动态：\{.*?\}(\s*)]/g,
-                /\[(?:.*?)回复评论：\{.*?\}(\s*)]/g,
-                /\[system:.*?\]/g,
-                /^\[done\]$/gm // <--- 专门用来干掉 [done]
-            ];
-            
-            // 2. 清洗AI返回的原始文本
-            let cleanedResponse = fullResponse;
-            invisiblePatterns.forEach(pattern => {
-                cleanedResponse = cleanedResponse.replace(pattern, '');
-            });
-            cleanedResponse = cleanedResponse.trim(); // 移除首尾的空行和空格
-
-            // 3. 检查清洗后的结果，如果变空了就自动重试
-            if (!cleanedResponse) {
-                console.warn("AI回复被完全过滤，内容为空。原始回复:", fullResponse);
-                showToast("AI好像在开小差，我再问问Ta...");
-                setTimeout(() => getAiReply(), 1000); // 悄悄地再问一次
-                return; // 终止当前函数的执行
-            }
-            
-            // 4. 如果内容没问题，就用清洗后的回复继续执行
-            fullResponse = cleanedResponse; 
-
-            // ================== 清洗与重试逻辑结束 ==================
     if (fullResponse) {
        // 在分割消息前，检查并处理新的回忆
             const memoryRegex = /\[new-memory:({.*?})\]/g;
@@ -10400,15 +10411,24 @@ function cancelQuoteReply() {
     .icity-name { font-size:20px; }
   }
 
-/* ---- 多选删除样式（动态页面） ---- */
-#moments-screen.is-delete-mode .moment-item { cursor: pointer; user-select: none; }
-.moment-item.is-selected { outline: 2px solid var(--accent-color, #4c9ffe); position: relative; }
+/* --- 动态多选模式样式 (最终版) --- */
+#moments-screen.is-delete-mode .moment-item { 
+    cursor: pointer; 
+    user-select: none; 
+}
+.moment-item.is-selected { 
+    outline: 2px solid var(--accent-color, #4c9ffe); 
+    position: relative; 
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(76, 159, 254, 0.2) !important;
+}
 .moment-item.is-selected::after {
   content: '✓';
   position: absolute; right: 8px; top: 8px;
   width: 22px; height: 22px; line-height: 22px; text-align: center;
   border-radius: 50%;
   background: rgba(0,0,0,.6); color: #fff; font-weight: 700; font-size: 14px;
+  z-index: 10;
 }
 
 /* 底部多选操作栏 */
@@ -13468,9 +13488,153 @@ fileInput.addEventListener('change', async (e)=>{
   align-items: center !important;
   gap: 8px !important;
 }
+
+  
 </style>
 
+<script id="moments-delete-feature-script">
+    (function() {
+        // 防止脚本被重复执行
+        if (window.momentsDeleteFeatureInitialized) {
+            return;
+        }
+        window.momentsDeleteFeatureInitialized = true;
 
+        // 步骤 A: 动态注入正确的CSS样式
+        // 这样做可以强制覆盖掉任何可能残留的、导致按钮消失的旧样式
+        const css = `
+            #moments-screen.is-delete-mode .moment-item { 
+                cursor: pointer; user-select: none; 
+            }
+            .moment-item.is-selected { 
+                outline: 2px solid var(--accent-color, #4c9ffe); 
+                position: relative; 
+                border-radius: 14px;
+                box-shadow: 0 6px 18px rgba(76, 159, 254, 0.2) !important;
+            }
+            .moment-item.is-selected::after {
+              content: '✓';
+              position: absolute; right: 8px; top: 8px;
+              width: 22px; height: 22px; line-height: 22px; text-align: center;
+              border-radius: 50%;
+              background: rgba(0,0,0,.6); color: #fff; font-weight: 700; font-size: 14px;
+              z-index: 10;
+            }
+            /* 关键修正：强制确保按钮文字在任何情况下都可见 */
+            #moments-screen.is-delete-mode .app-header #moments-delete-btn {
+                font-size: 16px !important;
+            }
+            /* 关键修正：强制清除可能残留的、导致文字被替换的旧样式 */
+            #moments-screen.is-delete-mode .app-header #moments-delete-btn::before {
+                content: "" !important;
+            }
+        `;
+        const style = document.createElement('style');
+        style.type = 'text/css';
+        style.appendChild(document.createTextNode(css));
+        document.head.appendChild(style);
+
+        // 步骤 B: 绑定功能逻辑
+        document.addEventListener('DOMContentLoaded', () => {
+            const momentsScreen = document.getElementById('moments-screen');
+            const deleteBtn = document.getElementById('moments-delete-btn');
+            
+            if (!momentsScreen || !deleteBtn) {
+                console.error("动态删除功能初始化失败：找不到关键HTML元素。");
+                return;
+            }
+
+            let selectedMomentsIds = new Set();
+
+            function updateDeleteButtonState() {
+                const isInDeleteMode = momentsScreen.classList.contains('is-delete-mode');
+                if (!isInDeleteMode) {
+                    deleteBtn.textContent = '删除';
+                    deleteBtn.style.color = '';
+                    deleteBtn.style.fontWeight = '';
+                } else {
+                    if (selectedMomentsIds.size > 0) {
+                        deleteBtn.textContent = `删除 (${selectedMomentsIds.size})`;
+                        deleteBtn.style.color = '#ef5350'; // 红色
+                        deleteBtn.style.fontWeight = '600';
+                    } else {
+                        deleteBtn.textContent = '取消';
+                        deleteBtn.style.color = 'var(--primary-color)'; // 主题色
+                        deleteBtn.style.fontWeight = '600';
+                    }
+                }
+            }
+
+            function enterDeleteMode() {
+                momentsScreen.classList.add('is-delete-mode');
+                updateDeleteButtonState();
+                if(typeof showToast === 'function') showToast('已进入选择模式');
+            }
+
+            function exitDeleteMode() {
+                momentsScreen.classList.remove('is-delete-mode');
+                document.querySelectorAll('.moment-item.is-selected').forEach(el => el.classList.remove('is-selected'));
+                selectedMomentsIds.clear();
+                updateDeleteButtonState();
+            }
+            
+            async function confirmAndDelete() {
+                if (confirm(`确定要删除选中的 ${selectedMomentsIds.size} 条动态吗？`)) {
+                    try {
+                        if (window.AppDB_Moments && typeof window.AppDB_Moments.moments.bulkDelete === 'function') {
+                            await window.AppDB_Moments.moments.bulkDelete(Array.from(selectedMomentsIds));
+                            if(typeof showToast === 'function') showToast('动态已成功删除');
+                            exitDeleteMode();
+                            if (typeof window.renderMomentsSafe === 'function') await window.renderMomentsSafe();
+                        } else { throw new Error("数据库功能不可用。"); }
+                    } catch (error) {
+                        console.error('删除动态失败:', error);
+                        if(typeof showToast === 'function') showToast('删除失败: ' + error.message);
+                    }
+                }
+            }
+
+            deleteBtn.addEventListener('click', () => {
+                const isInDeleteMode = momentsScreen.classList.contains('is-delete-mode');
+                if (!isInDeleteMode) {
+                    enterDeleteMode();
+                } else {
+                    if (selectedMomentsIds.size > 0) {
+                        confirmAndDelete();
+                    } else {
+                        exitDeleteMode();
+                        if(typeof showToast === 'function') showToast('已取消选择');
+                    }
+                }
+            });
+
+            momentsScreen.addEventListener('click', (e) => {
+                if (!momentsScreen.classList.contains('is-delete-mode')) return;
+                const momentItem = e.target.closest('.moment-item');
+                if (momentItem) {
+                    e.stopPropagation(); e.preventDefault();
+                    const momentId = momentItem.dataset.id;
+                    if (!momentId) return;
+                    if (selectedMomentsIds.has(momentId)) {
+                        selectedMomentsIds.delete(momentId);
+                        momentItem.classList.remove('is-selected');
+                    } else {
+                        selectedMomentsIds.add(momentId);
+                        momentItem.classList.add('is-selected');
+                    }
+                    updateDeleteButtonState();
+                }
+            }, true);
+            
+            // 确保在init函数中调用过setupMomentsDeleteFeature后，这里的逻辑也能被正确执行
+            if (typeof setupMomentsDeleteFeature === 'function') {
+                console.log("setupMomentsDeleteFeature is already defined, skipping re-definition but ensuring execution.");
+            }
+        });
+    })();
+</script>
+
+  
 
 <!-- 在 </body> 之前添加 -->
 
