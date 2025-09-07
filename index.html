@@ -2109,49 +2109,6 @@
     font-size: 18px;
     flex-shrink: 0;
 }
-/* --- 音乐播放器小部件样式 --- */
-.music-widget {
-    margin: 20px 20px 15px 20px;
-    padding: 15px;
-    background-color: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    border-radius: var(--border-radius);
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.music-widget:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-}
-.music-widget-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 12px;
-    margin-right: 15px;
-    flex-shrink: 0;
-    object-fit: cover; /* 让图标图片完全覆盖容器 */
-}
-.music-widget-info {
-    overflow: hidden;
-    flex-grow: 1;
-}
-.music-widget-info .title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-color);
-    margin: 0 0 4px 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.music-widget-info .artist {
-    font-size: 13px;
-    color: #666;
-    margin: 0;
-}
 
 /* --- 音乐播放器弹窗样式 --- */
 #music-player-modal .modal-window {
@@ -2486,27 +2443,74 @@
 .app-header .action-btn-group #ai-memories-btn {
     order: 99;
 }
-/* === 主屏幕音乐小部件尺寸控制器 (粘贴到 <style> 标签末尾) === */
-.music-widget {
-    /* --- 在这里修改大小 --- */
-    --music-widget-scale: 1.3; /* 1 = 默认, 1.2 = 放大20%, 0.9 = 缩小10% */
+/* --- 新的音乐播放器小部件样式（唱片机） --- */
+.record-player-widget {
+    /*
+     * ===============================================
+     * == 在这里自定义您的图片 URL ==
+     * ===============================================
+     * --record-sleeve-image: 替换为您想要的方形“唱片封套”图片。
+     * --record-label-image:  替换为您想要的圆形“唱片标签”图片。
+    */
+    --record-sleeve-image: url('https://i.postimg.cc/KzC3q4w3/image.png'); /* 示例：带猫爪的半透明封面 */
+    --record-label-image: url('https://i.postimg.cc/nzP9sgxr/chan-125.png');  /* 示例：动漫头像 */
 
-    /* 应用缩放 */
-    padding: calc(10px * var(--music-widget-scale));
-    margin: calc(20px * var(--music-widget-scale)) calc(20px * var(--music-widget-scale)) calc(15px * var(--music-widget-scale));
-    gap: calc(10px * var(--music-widget-scale));
+    /* 使用变量控制整体大小 */
+    --music-widget-scale: 1.3;
+    
+    position: relative;
+    width: calc(130px * var(--music-widget-scale));
+    height: calc(130px * var(--music-widget-scale));
+    margin: 20px auto 15px auto;
+    cursor: pointer;
 }
-.music-widget-icon {
-    width: calc(60px * var(--music-widget-scale));
-    height: calc(60px * var(--music-widget-scale));
-    border-radius: calc(12px * var(--music-widget-scale));
+
+.record-player-widget .record-sleeve {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 100%;
+    height: 100%;
+    background-image: var(--record-sleeve-image);
+    background-size: cover;
+    background-position: center;
+    background-color: rgba(255, 255, 255, 0.7); /* 图片加载失败时的底色 */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
-.music-widget-info .title {
-    font-size: calc(16px * var(--music-widget-scale));
-    margin-bottom: calc(4px * var(--music-widget-scale));
+
+.record-player-widget .vinyl-record {
+    position: absolute;
+    top: 50%;
+    right: -20%; /* 让唱片从右侧伸出 */
+    transform: translateY(-50%);
+    width: 100%;
+    height: 100%;
+    background-color: #1a1a1a; /* 黑胶唱片的颜色 */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: transform 0.4s ease;
 }
-.music-widget-info .artist {
-    font-size: calc(13px * var(--music-widget-scale));
+
+.record-player-widget:hover .vinyl-record {
+    transform: translateY(-50%) translateX(8px); /* 鼠标悬浮时唱片向右移动 */
+}
+
+.record-player-widget .record-label {
+    width: 70%;
+    height: 70%;
+    background-image: var(--record-label-image);
+    background-size: cover;
+    background-position: center;
+    background-color: #fff; /* 图片加载失败时的底色 */
+    border-radius: 50%;
+    border: 2px solid #333; /* 标签周围的深色环 */
 }
 </style>
 
@@ -2525,6 +2529,72 @@
 #forum-thread-screen .content {
     padding-top: 60px; /* 为固定的导航栏留出空间，您可以根据实际高度微调这个数值 */
 }
+/* === 新版：主页一体化个人信息卡片样式 === */
+#home-screen {
+    justify-content: flex-start;
+    padding-top: 30px;
+}
+
+.home-profile-header {
+    width: calc(100% - 40px); /* 左右留20px边距 */
+    margin: 0 auto; /* 居中 */
+    position: relative;
+    background-color: var(--white-color);
+    border-radius: 18px; /* 统一的圆角 */
+    box-shadow: 0 6px 20px rgba(0,0,0,0.07); /* 统一的阴影 */
+    overflow: visible; /* 允许头像溢出 */
+}
+
+.home-hero {
+    height: 160px;
+    background-color: #f0f0f0;
+    background-size: cover;
+    background-position: center;
+    border-radius: 18px 18px 0 0; /* 只给顶部设置圆角 */
+}
+
+.home-avatar-wrap {
+    position: absolute;
+    top: 160px; /* 定位在背景图的下边缘 */
+    left: 50%;
+    transform: translate(-50%, -50%); /* 精确居中 */
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 4px solid var(--white-color);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    z-index: 5;
+}
+
+#home-profile-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.home-info-card {
+    padding: 50px 20px 20px; /* 顶部留出头像空间，底部缩小间距 */
+    text-align: center;
+}
+
+.home-profile-name {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 5px 0;
+}
+
+.home-profile-signature {
+    font-size: 14px;
+    color: #888;
+    margin: 0;
+}
+
+#home-screen .main-content-area {
+    margin-top: -5px; /* 确保与卡片底部有10px间距 */
+}
+/* === 样式结束 === */
 </style>
 <!-- === /zindex-patch === -->
 </head>
@@ -2803,7 +2873,27 @@
     <main class="content" id="thread-content-container">
         </main>
 </div>
-
+<!-- 自定义组件编辑器弹窗 -->
+<div id="customize-widget-modal" class="modal-overlay">
+    <div class="modal-window">
+        <h3>自定义组件</h3>
+        <form id="customize-widget-form">
+            <input type="hidden" id="editing-widget-id">
+            <div class="form-group">
+                <label for="widget-text-input">显示文字</label>
+                <input type="text" id="widget-text-input" placeholder="输入要显示的文字" required>
+            </div>
+            <div class="form-group">
+                <label for="widget-image-url-input">图片 URL</label>
+                <input type="url" id="widget-image-url-input" placeholder="粘贴图片URL">
+            </div>
+            <p style="text-align:center; color:#888; margin: -10px 0 15px;">或</p>
+            <input type="file" id="widget-image-upload" accept="image/*" style="display:none;">
+            <label for="widget-image-upload" class="btn btn-secondary" style="width:100%; margin-bottom: 20px;">从本地上传</label>
+            <button type="submit" class="btn btn-primary">保存</button>
+        </form>
+    </div>
+</div>
 <div id="new-post-modal" class="modal-overlay">
     <div class="modal-window">
         <h3>发布新帖</h3>
@@ -2959,6 +3049,16 @@
             </div>
             <button type="submit" class="btn btn-primary">发送</button>
         </form>
+    </div>
+</div>
+<!-- NEW: Display File Modal -->
+<div id="display-file-modal" class="modal-overlay">
+    <div class="modal-window">
+        <h3 id="display-file-name" style="word-wrap: break-word;">文件名</h3>
+        <div class="form-group" style="max-height: 60vh; overflow-y: auto; background-color: #f5f5f5; padding: 10px; border-radius: 8px;">
+            <pre id="display-file-content" style="white-space: pre-wrap; word-wrap: break-word; font-size: 14px; color: #333;"></pre>
+        </div>
+        <button id="close-file-display-btn" class="btn btn-primary" style="margin-top: 20px;">关闭</button>
     </div>
 </div>
 <!-- NEW: Send Location Modal -->
@@ -3159,6 +3259,11 @@
                                                                                                    id="setting-max-memory"
                                                                                                    value="10" min="1">
                 </div>
+               <!-- === 修改为回忆记录按钮 开始 === -->
+<div class="form-group">
+    <button type="button" class="btn btn-secondary" id="show-memory-summary-btn">查看回忆记录</button>
+</div>
+<!-- === 修改为回忆记录按钮 结束 === --> 
                 <div class="form-group"><label for="setting-chat-bg-upload" class="btn btn-primary">更换聊天背景</label><input
                         type="file" id="setting-chat-bg-upload" accept="image/*" style="display:none;"></div>
                 <button type="submit" class="btn btn-primary">保存设置</button>
@@ -3255,6 +3360,11 @@
                                                                                                          value="10"
                                                                                                          min="1"></div>
                
+<!-- === 修改为回忆记录按钮 开始 === -->
+<div class="form-group">
+    <button type="button" class="btn btn-secondary" id="show-group-memory-summary-btn">查看回忆记录</button>
+</div>
+<!-- === 修改为回忆记录按钮 结束 === -->
  <div class="form-group"><label for="setting-group-chat-bg-upload"
                                                class="btn btn-primary">更换聊天背景</label><input type="file"
                                                                                                   id="setting-group-chat-bg-upload"
@@ -3470,6 +3580,7 @@
                     img.onload = () => {
                         let width = img.width;
                         let height = img.height;
+                      let sharedWithChatIds = new Set();
 
                         if (width > height) {
                             if (width > maxWidth) {
@@ -3643,7 +3754,10 @@ document.getElementById('api-settings-screen').innerHTML = `<header class="app-h
             'font-settings-screen': {name: '字体', url: 'https://i.postimg.cc/FzVtC0x4/chan-21.png'},
             'tutorial-screen': {name: '教程', url: 'https://i.postimg.cc/6QgNzCFf/chan-118.png'},
             'day-mode-btn': {name: '', url: 'https://i.postimg.cc/Jz0tYqnT/chan-145.png'},
-            'night-mode-btn': {name: '', url: 'https://i.postimg.cc/htYvkdQK/chan-146.png'}
+            'night-mode-btn': {name: '', url: 'https://i.postimg.cc/htYvkdQK/chan-146.png'},
+            'record-label': { name: '唱片标签 (圆形)', url: 'https://i.postimg.cc/nzP9sgxr/chan-125.png' },
+    'record-sleeve': { name: '唱片封套 (方形)', url: 'https://i.postimg.cc/KzC3q4w3/image.png' },
+    'decorative-component': { name: '装饰组件 (方形)', url: '' }
         };
 
         let db = {
@@ -3656,6 +3770,7 @@ document.getElementById('api-settings-screen').innerHTML = `<header class="app-h
             worldBooks: [],
             fontUrl: '',
             customIcons: {},
+            customWidgets: [], // <-- 添加这一行
             playlist: [], // <-- 新增
             musicPlayerSettings: { // <-- 新增
                 volume: 0.8,
@@ -3949,6 +4064,15 @@ const locationBtn = document.getElementById('location-btn'),
                 localStorage.removeItem('gemini-chat-app-db');
             }
             if (data) db = data;
+if (!db.homeProfile) {
+    db.homeProfile = {
+        name: '点击设置昵称',
+        signature: '点击设置个性签名',
+        avatar: 'https://i.postimg.cc/GtbTnxhP/o-o-1.jpg',
+        heroBg: 'https://i.postimg.cc/W4Z9R9x4/ins-1.jpg'
+    };
+}
+            if (!db.globalCustomCss) db.globalCustomCss = '';
             
             // --- 核心修复：在这里添加对新属性的检查和初始化 ---
             if (!db.playlist) {
@@ -3981,14 +4105,22 @@ if (!db.forumData) db.forumData = {};
                 if (!c.memories) c.memories = []; // <-- 添加这行
                 if (c.customBubbleCss === undefined) c.customBubbleCss = '';
                 if (c.useCustomBubbleCss === undefined) c.useCustomBubbleCss = false;
+                c.memorySummary = c.memorySummary || ''; 
             });
             db.groups.forEach(g => {
                 if (g.isPinned === undefined) g.isPinned = false;
                 if (!g.worldBookIds) g.worldBookIds = [];
                 if (g.customBubbleCss === undefined) g.customBubbleCss = '';
                 if (g.useCustomBubbleCss === undefined) g.useCustomBubbleCss = false;
+                g.memorySummary = g.memorySummary || ''; 
             });
-
+// 初始化或验证自定义小组件的数据
+if (!db.customWidgets || !Array.isArray(db.customWidgets) || db.customWidgets.length !== 2) {
+    db.customWidgets = [
+        { id: 'widget1', text: '自定义', imageUrl: 'https://i.ibb.co/6r11fGg/avatar1.png' },
+        { id: 'widget2', text: '自定义', imageUrl: 'https://i.ibb.co/d28n82t/avatar2.png' }
+    ];
+}
             return Promise.resolve()
         };
         // ▲▲▲ 替换结束 ▲▲▲     
@@ -4038,7 +4170,16 @@ function formatFileSize(bytes) {
             const menu = document.querySelector('.context-menu');
             if (menu) menu.remove();
         }
-
+        function applyGlobalCss(css) {
+            const styleId = 'global-custom-css-style';
+            let styleElement = document.getElementById(styleId);
+            if (!styleElement) {
+                styleElement = document.createElement('style');
+                styleElement.id = styleId;
+                document.head.appendChild(styleElement);
+            }
+            styleElement.textContent = css || '';
+        }
         function updateCustomBubbleStyle(chatId, css, enabled) {
             const styleId = `custom-bubble-style-for-${chatId}`;
             let styleElement = document.getElementById(styleId);
@@ -4147,6 +4288,7 @@ function setupRollbackFeature() {
 // ▲▲▲ 新函数到此结束 ▲▲▲
         const init = async () => {
             await loadData();
+           applyGlobalCss(db.globalCustomCss);
             window.db = db;
             document.body.addEventListener('click', (e) => {
                 if (e.target.closest('.context-menu')) {
@@ -4179,6 +4321,7 @@ function setupRollbackFeature() {
 
             
             applyGlobalFont(db.fontUrl);
+            setupCustomWidgetSystem();
             setupHomeScreen();
             updateClock();
             setInterval(updateClock, 30000);
@@ -4202,6 +4345,7 @@ function setupRollbackFeature() {
             setupTutorialApp();
             setupFileSystem(); // --- NEW ---
             setupLocationSystem(); // --- NEW ---
+            setupFileDisplaySystem(); 
             setupVoiceCallSystem();
             setupDiarySystem(); // --- 在这里添加这一行 ---
             setupMusicPlayer();
@@ -4211,6 +4355,7 @@ setupTrajectorySystem();
  setupForumSystem();
           setupRollbackFeature(); 
   setupMemoriesSystem(); // <-- 添加这一行
+  setupMemorySummaryModal(); 
  };
 
 
@@ -4290,35 +4435,30 @@ setupTrajectorySystem();
             const confirmShareBtn = document.getElementById('confirm-music-share-btn');
 
             // --- 核心功能函数 ---
-        const updatePlayerUI = () => {
-                const song = db.playlist[currentSongIndex];
-                const albumArt = musicModal.querySelector('.music-album-art');
-                const songTitle = musicModal.querySelector('.song-title');
-                const widgetIcon = musicWidget.querySelector('.music-widget-icon');
-                const widgetTitle = musicWidget.querySelector('.music-widget-info .title');
-                const widgetArtist = musicWidget.querySelector('.music-widget-info .artist');
-                // ▼▼▼ 在这里修改 ▼▼▼
-                const lyricsPanel = musicModal.querySelector('#lyrics-panel'); // 把 '.lyrics-panel-placeholder' 改为 '#lyrics-panel'
-                // ▲▲▲ 修改结束 ▲▲▲
+        // ▼▼▼ 请用这个【新的、完整的】函数替换掉您文件中旧的 updatePlayerUI 函数 ▼▼▼
+const updatePlayerUI = () => {
+    const song = db.playlist[currentSongIndex];
+    const albumArt = musicModal.querySelector('.music-album-art');
+    const songTitle = musicModal.querySelector('.song-title');
+    const lyricsPanel = musicModal.querySelector('#lyrics-panel');
+    const playBtn = musicModal.querySelector('.play-btn');
 
-                if (song) {
-                    const defaultArt = 'https://i.postimg.cc/nzP9sgxr/chan-125.png';
-                    albumArt.src = song.albumArt || defaultArt;
-                    songTitle.textContent = song.name;
-                    widgetIcon.src = song.albumArt || defaultArt;
-                    widgetTitle.textContent = isPlaying ? `正在播放: ${song.name}` : song.name;
-                    widgetArtist.textContent = song.artist;
-                    playBtn.innerHTML = isPlaying ? '<svg viewBox="0 0 24 24"><path d="M14,19H18V5H14M6,19H10V5H6V19Z"/></svg>' : '<svg viewBox="0 0 24 24"><path d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>';
-                } else {
-                    widgetTitle.textContent = '暂未播放';
-                    widgetArtist.textContent = '点击打开播放器';
-                    songTitle.textContent = '歌曲名';
-                    // 同样检查一下lyricsPanel是否存在，避免后续再出错
-                    if (lyricsPanel) {
-                        lyricsPanel.innerHTML = '<p class="lyric-line">歌词面板</p>';
-                    }
-                }
-            };
+    // --- 核心修复：已经删除了所有对主屏幕小部件（widget）的无效操作 ---
+
+    if (song) {
+        const defaultArt = 'https://i.postimg.cc/nzP9sgxr/chan-125.png';
+        albumArt.src = song.albumArt || defaultArt;
+        songTitle.textContent = song.name;
+        playBtn.innerHTML = isPlaying ? '<svg viewBox="0 0 24 24"><path d="M14,19H18V5H14M6,19H10V5H6V19Z"/></svg>' : '<svg viewBox="0 0 24 24"><path d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>';
+    } else {
+        // 当没有歌曲时，只更新播放器弹窗内的标题
+        songTitle.textContent = '歌曲名';
+        if (lyricsPanel) {
+            lyricsPanel.innerHTML = '<p class="lyric-line">歌词面板</p>';
+        }
+    }
+};
+// ▲▲▲ 替换到此结束 ▲▲▲
 
                                     const playSong = async (index) => {
                 if (index < 0 || index >= db.playlist.length) {
@@ -4326,6 +4466,7 @@ setupTrajectorySystem();
                     audioPlayer.pause();
                     currentSongIndex = -1;
                     updatePlayerUI();
+                  notifyAiOfSongChange();
                     return;
                 }
                 currentSongIndex = index;
@@ -4546,46 +4687,59 @@ setupTrajectorySystem();
                 });
             };
                     // ▼▼▼ 请用下面这【一整块】代码，完整替换掉你文件中旧的 sendMusicCard 函数 ▼▼▼
-        const sendMusicCard = async (chatId, song) => {
-            const chat = db.characters.find(c => c.id === chatId) || db.groups.find(g => g.id === chatId);
-            if (!chat) return;
+  const sendMusicCard = async (chatId, song) => {
+                const chat = db.characters.find(c => c.id === chatId) || db.groups.find(g => g.id === chatId);
+                if (!chat) return;
 
-            // --- 核心修复：使用更可靠的方式来判断聊天类型 ---
-            // 如果 chat 对象有 .me 属性, 说明是群聊；否则就是单聊。
-            const myName = chat.me ? chat.me.nickname : chat.myName;
-            const content = `[${myName}分享了音乐：${song.name} - ${song.artist}]`;
+                const myName = chat.me ? chat.me.nickname : chat.myName;
+                const content = `[${myName}分享了音乐：${song.name} - ${song.artist}]`;
 
-            const message = { 
-                id: `msg_music_${Date.now()}`, 
-                role: 'user', 
-                content, 
-                parts: [{ type: 'text', text: content }], 
-                timestamp: Date.now(), 
-                senderId: 'user_me' 
-            };
-            
-            chat.history.push(message);
-            // 只有当分享的目标就是当前打开的聊天时，才立即在界面上添加气泡
-            if (currentChatId === chatId) {
-                addMessageBubble(message);
-            }
-        };
-        // ▲▲▲ 替换结束 ▲▲▲
-            const notifyAiOfSongChange = async () => {
-                if (currentSongIndex === -1 || sharedWithChatIds.size === 0) return;
+                const message = { 
+                    id: `msg_music_share_${Date.now()}`, 
+                    role: 'user', 
+                    content, 
+                    parts: [{ type: 'text', text: content }], 
+                    timestamp: Date.now(), 
+                    senderId: 'user_me' 
+                };
                 
-                const song = db.playlist[currentSongIndex];
-                const notificationContent = `[system: 我正在听的歌曲已切换为: ${song.name} - ${song.artist}。歌词: ${song.lyrics || '无'}]`;
+                chat.history.push(message);
                 
-                for (const chatId of sharedWithChatIds) {
-                    const chat = db.characters.find(c => c.id === chatId) || db.groups.find(g => g.id === chatId);
-                    if (chat) {
-                        const message = { id: `msg_music_update_${Date.now()}`, role: 'user', content: notificationContent, parts: [{ type: 'text', text: notificationContent }], timestamp: Date.now(), senderId: 'user_me' };
-                        chat.history.push(message);
-                    }
+                // 如果分享的目标就是当前打开的聊天，立即在界面上添加气泡
+                if (currentChatId === chatId) {
+                    addMessageBubble(message);
                 }
-                await saveData();
             };
+        // ▲▲▲ 替换结束 ▲▲▲
+const notifyAiOfSongChange = async () => {
+    if (currentSongIndex === -1 || sharedWithChatIds.size === 0) return;
+
+    const song = db.playlist[currentSongIndex];
+
+    // 遍历所有共享音乐的聊天
+    for (const chatId of sharedWithChatIds) {
+        const chat = db.characters.find(c => c.id === chatId) || db.groups.find(g => g.id === chatId);
+        if (chat) {
+            // 1. 创建一条对AI可见但用户不可见的消息，包含歌曲详情
+            // 这部分被保留，以确保AI知道歌曲已切换
+            const contextMessageContent = `[system: 我正在听的歌曲已切换为: ${song.name} - ${song.artist}。歌词: ${song.lyrics || '无'}]`;
+            const contextMessage = {
+                id: `msg_music_update_ctx_${Date.now()}`,
+                role: 'user',
+                content: contextMessageContent,
+                parts: [{ type: 'text', text: contextMessageContent }],
+                timestamp: Date.now(),
+                senderId: 'user_me'
+            };
+            chat.history.push(contextMessage);
+
+            // 2. [已移除] 创建和显示用户可见的系统提示部分
+            // 这部分代码已被删除，所以你不会再看到“切换了歌曲”的提示
+        }
+    }
+    await saveData();
+    renderChatList(); // 刷新列表以显示最新的简洁消息
+};
 
             // --- 事件监听器 ---
             musicWidget.addEventListener('click', () => musicModal.classList.add('visible'));
@@ -4621,22 +4775,31 @@ setupTrajectorySystem();
                 shareMusicModal.classList.add('visible');
             });
             
-            confirmShareBtn.addEventListener('click', async () => {
+          confirmShareBtn.addEventListener('click', async () => {
                 const checkboxes = shareMusicModal.querySelectorAll('input[type="checkbox"]');
                 const song = db.playlist[currentSongIndex];
-                let newShares = new Set();
+                let newlySelectedChatIds = new Set();
                 
+                // 1. 找出所有新勾选的聊天
                 for (const cb of checkboxes) {
                     if (cb.checked) {
-                        newShares.add(cb.value);
-                        if (!sharedWithChatIds.has(cb.value)) await sendMusicCard(cb.value, song);
+                        const chatId = cb.value;
+                        newlySelectedChatIds.add(chatId);
+                        // 如果这是一个本次才新勾选的分享，就发送可见的音乐卡片
+                        if (!sharedWithChatIds.has(chatId)) {
+                           await sendMusicCard(chatId, song);
+                        }
                     }
                 }
-                sharedWithChatIds = newShares;
+                
+                // 2. 更新全局的分享列表
+                sharedWithChatIds = newlySelectedChatIds;
+                
+                // 3. 关键：通知AI歌曲信息，并触发回复
                 await notifyAiOfSongChange();
                 
                 shareMusicModal.classList.remove('visible');
-                showToast("分享设置已更新");
+                showToast("分享成功！");
             });
 
             audioPlayer.addEventListener('ended', () => { if (!audioPlayer.loop) playNext(); });
@@ -4663,48 +4826,104 @@ setupTrajectorySystem();
         }
 
         // --- App Setup Functions ---
-        function setupHomeScreen() {
+                function setupHomeScreen() {
             const getIcon = (id) => db.customIcons[id] || defaultIcons[id].url;
             const homeScreenHTML = `
-            <div class="time-widget"><div class="time" id="time-display"></div><div class="date" id="date-display"></div></div>
-            <!-- 在这里插入音乐小部件 -->
-<div id="music-app-widget" class="music-widget">
-    <img src="https://i.postimg.cc/BQMG9TCB/retouch-2025080716560739.png" alt="音乐图标" class="music-widget-icon">
-    <div class="music-widget-info">
-        <p class="title">暂未播放</p>
-        <p class="artist">点击打开播放器</p>
+                <div class="time-widget">
+                    <div class="date" id="date-display"></div>
+                    <div class="time" id="time-display"></div>
+                </div>
+                <!-- === 新增：主页个人信息头图 开始 === -->
+<div class="home-profile-header">
+    <div class="home-hero"></div>
+    <div class="home-avatar-wrap">
+        <img id="home-profile-avatar" alt="头像" src="https://i.postimg.cc/GtbTnxhP/o-o-1.jpg">
+    </div>
+    <div class="home-info-card">
+        <h2 class="home-profile-name">点击设置昵称</h2>
+        <p class="home-profile-signature">点击设置个性签名</p>
     </div>
 </div>
-<!-- 音乐小部件结束 -->
-            <div class="app-grid">
-                <a href="#" class="app-icon" data-target="chat-list-screen"><img src="${getIcon('chat-list-screen')}" alt="404" class="icon-img"><span class="app-name">${defaultIcons['chat-list-screen'].name}</span></a>
-                <a href="#" class="app-icon" data-target="api-settings-screen"><img src="${getIcon('api-settings-screen')}" alt="API" class="icon-img"><span class="app-name">${defaultIcons['api-settings-screen'].name}</span></a>
-                <a href="#" class="app-icon" data-target="wallpaper-screen"><img src="${getIcon('wallpaper-screen')}" alt="Wallpaper" class="icon-img"><span class="app-name">${defaultIcons['wallpaper-screen'].name}</span></a>
-                <a href="#" class="app-icon" data-target="world-book-screen"><img src="${getIcon('world-book-screen')}" alt="World Book" class="icon-img"><span class="app-name">${defaultIcons['world-book-screen'].name}</span></a>
-                <a href="#" class="app-icon" data-target="customize-screen"><img src="${getIcon('customize-screen')}" alt="Customize" class="icon-img"><span class="app-name">${defaultIcons['customize-screen'].name}</span></a>
-                <a href="#" class="app-icon" data-target="tutorial-screen"><img src="${getIcon('tutorial-screen')}" alt="Tutorial" class="icon-img"><span class="app-name">${defaultIcons['tutorial-screen'].name}</span></a>
-            </div>
-            <div class="dock">
-                <a href="#" class="app-icon" id="day-mode-btn"><img src="${getIcon('day-mode-btn')}" alt="日间" class="icon-img"></a>
-                <a href="#" class="app-icon" id="night-mode-btn"><img src="${getIcon('night-mode-btn')}" alt="夜间" class="icon-img"></a>
-                <a href="#" class="app-icon" data-target="font-settings-screen"><img src="${getIcon('font-settings-screen')}" alt="字体" class="icon-img"></a>
-            </div>`;
+<!-- === 新增：主页个人信息头图 结束 === -->
+                <div class="main-content-area">
+                    <div class="left-column">
+                        <div class="contact-widgets-column">
+                         <div class="contact-widget" id="custom-widget-1" data-widget-id="widget1">
+    <img src="https://i.ibb.co/6r11fGg/avatar1.png" alt="自定义组件1">
+    <span>自定义</span>
+</div>
+<div class="contact-widget avatar-right" id="custom-widget-2" data-widget-id="widget2">
+    <img src="https://i.ibb.co/d28n82t/avatar2.png" alt="自定义组件2">
+    <span>自定义</span>
+</div>
+                        </div>
+                        <div class="secondary-apps-dock">
+                             <a href="#" class="app-icon" data-target="customize-screen"><img src="${getIcon('customize-screen')}" alt="自定义" class="icon-img"><span class="app-name">${defaultIcons['customize-screen'].name}</span></a>
+                             <a href="#" class="app-icon" data-target="wallpaper-screen"><img src="${getIcon('wallpaper-screen')}" alt="壁纸" class="icon-img"><span class="app-name">${defaultIcons['wallpaper-screen'].name}</span></a>
+                        </div>
+                    </div>
+
+                    <div class="right-column">
+                        <div class="small-app-grid">
+                            <a href="#" class="app-icon" data-target="chat-list-screen"><img src="${getIcon('chat-list-screen')}" alt="404" class="icon-img"><span class="app-name">${defaultIcons['chat-list-screen'].name}</span></a>
+                            <a href="#" class="app-icon" data-target="api-settings-screen"><img src="${getIcon('api-settings-screen')}" alt="API" class="icon-img"><span class="app-name">${defaultIcons['api-settings-screen'].name}</span></a>
+                            <a href="#" class="app-icon" data-target="world-book-screen"><img src="${getIcon('world-book-screen')}" alt="世界书" class="icon-img"><span class="app-name">${defaultIcons['world-book-screen'].name}</span></a>
+                            <a href="#" class="app-icon" data-target="tutorial-screen"><img src="${getIcon('tutorial-screen')}" alt="教程" class="icon-img"><span class="app-name">${defaultIcons['tutorial-screen'].name}</span></a>
+                        </div>
+                        <div id="music-app-widget" class="record-player-widget">
+                            <div class="record-sleeve" id="custom-record-sleeve"></div>
+                            <div class="vinyl-record">
+                                <div class="record-label" id="custom-record-label"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dock">
+                    <a href="#" class="app-icon" id="day-mode-btn"><img src="${getIcon('day-mode-btn')}" alt="日间" class="icon-img"></a>
+                    <a href="#" class="app-icon" id="night-mode-btn"><img src="${getIcon('night-mode-btn')}" alt="夜间" class="icon-img"></a>
+                    <a href="#" class="app-icon" data-target="font-settings-screen"><img src="${getIcon('font-settings-screen')}" alt="字体" class="icon-img"></a>
+                </div>`;
             homeScreen.innerHTML = homeScreenHTML;
+
+            // --- 这里是修正的部分 ---
+            document.getElementById('custom-record-label').style.backgroundImage = `url('${getIcon('record-label')}')`;
+            document.getElementById('custom-record-sleeve').style.backgroundImage = `url('${getIcon('record-sleeve')}')`;
+            // --- 修正结束 ---
+            
+            const decorativeComponent = document.getElementById('custom-decorative-component');
+            const decoURL = getIcon('decorative-component');
+            if (decorativeComponent && decoURL) {
+                decorativeComponent.style.backgroundImage = `url('${decoURL}')`;
+                decorativeComponent.style.backgroundSize = 'cover';
+                decorativeComponent.style.backgroundPosition = 'center';
+            }
+
             updateClock();
             applyWallpaper(db.wallpaper);
             applyHomeScreenMode(db.homeScreenMode);
-            document.getElementById('day-mode-btn')?.addEventListener('click', (e) => {
-                e.preventDefault();
-                applyHomeScreenMode('day');
-            });
-            document.getElementById('night-mode-btn')?.addEventListener('click', (e) => {
-                e.preventDefault();
-                applyHomeScreenMode('night');
-            });
+            // 从已保存的数据更新自定义组件的显示
+const widget1Data = db.customWidgets.find(w => w.id === 'widget1');
+const widget2Data = db.customWidgets.find(w => w.id === 'widget2');
+const widget1El = document.getElementById('custom-widget-1');
+const widget2El = document.getElementById('custom-widget-2');
+
+if (widget1Data && widget1El) {
+    widget1El.querySelector('img').src = widget1Data.imageUrl;
+    widget1El.querySelector('span').textContent = widget1Data.text;
+}
+if (widget2Data && widget2El) {
+    widget2El.querySelector('img').src = widget2Data.imageUrl;
+    widget2El.querySelector('span').textContent = widget2Data.text;
+}
+            document.getElementById('day-mode-btn')?.addEventListener('click', (e) => { e.preventDefault(); applyHomeScreenMode('day'); });
+            document.getElementById('night-mode-btn')?.addEventListener('click', (e) => { e.preventDefault(); applyHomeScreenMode('night'); });
             document.querySelector('[data-target="world-book-screen"]').addEventListener('click', renderWorldBookList);
             document.querySelector('[data-target="customize-screen"]').addEventListener('click', renderCustomizeForm);
             document.querySelector('[data-target="tutorial-screen"]').addEventListener('click', renderTutorialContent);
+            setupHomeScreenProfileEditor(); 
         }
+        
 
         function applyWallpaper(url) {
             homeScreen.style.backgroundImage = `url(${url})`;
@@ -4746,9 +4965,13 @@ setupTrajectorySystem();
             });
         }
 
-        function renderCustomizeForm() {
+                function renderCustomizeForm() {
             customizeForm.innerHTML = '';
-            Object.entries(defaultIcons).forEach(([id, {name, url}]) => {
+            // --- Part 1: 原有的图标自定义功能 ---
+            Object.entries(defaultIcons).forEach(([id, {
+                name,
+                url
+            }]) => {
                 const currentIcon = db.customIcons[id] || url;
                 const itemHTML = `
                 <div class="icon-custom-item">
@@ -4760,6 +4983,72 @@ setupTrajectorySystem();
                     <button type="button" class="reset-icon-btn" data-id="${id}">重置</button>
                 </div>`;
                 customizeForm.insertAdjacentHTML('beforeend', itemHTML);
+            });
+
+            // --- Part 2: 新增的全局CSS自定义功能 ---
+            const globalCssHtml = `
+                <hr style="border:none; border-top:1px solid #f0f0f0; margin: 25px 0;">
+                <div class="global-css-section">
+                    <p style="font-weight: 600; font-size: 16px; color: var(--secondary-color); margin-bottom: 5px;">全局样式 (CSS) 自定义</p>
+                    <p style="font-size: 13px; color: #888; margin-top: 0; margin-bottom: 15px;">这里的代码会覆盖整个应用的默认样式，请谨慎使用。</p>
+                    <textarea id="global-custom-css" rows="12" placeholder="/* 示例：修改聊天气泡和对方名字颜色 */\n\n.message-bubble.sent {\n  background: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);\n}\n\n.item-name {\n  color: #6a11cb !important;\n}" style="width: 100%; border-radius: 10px; padding: 10px; border: 2px solid #fce4ec; font-family: monospace; font-size: 13px;"></textarea>
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button type="button" class="btn btn-primary" id="apply-global-css-btn" style="flex: 1;">应用样式</button>
+                        <button type="button" class="btn btn-secondary" id="export-global-css-btn" style="flex: 1; margin-bottom: 0;">导出</button>
+                        <label for="import-css-input" class="btn btn-neutral" style="flex: 1; margin-bottom: 0;">导入</label>
+                    </div>
+                </div>
+                <input type="file" id="import-css-input" accept=".yu, .css, .txt" style="display: none;">
+            `;
+            customizeForm.insertAdjacentHTML('beforeend', globalCssHtml);
+
+            // --- Part 3: 为新功能绑定事件 ---
+            const cssTextarea = document.getElementById('global-custom-css');
+            if (cssTextarea && db.globalCustomCss) {
+                cssTextarea.value = db.globalCustomCss;
+            }
+
+            document.getElementById('apply-global-css-btn').addEventListener('click', async () => {
+                const cssCode = cssTextarea.value;
+                db.globalCustomCss = cssCode;
+                applyGlobalCss(cssCode);
+                await saveData();
+                showToast('全局样式已应用并保存！');
+            });
+
+            document.getElementById('export-global-css-btn').addEventListener('click', () => {
+                const cssCode = cssTextarea.value;
+                if (!cssCode.trim()) {
+                    showToast('没有内容可导出。');
+                    return;
+                }
+                const blob = new Blob([cssCode], {
+                    type: 'text/plain'
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `饭版小手机_美化样式.yu`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+
+            document.getElementById('import-css-input').addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    cssTextarea.value = e.target.result;
+                    showToast('样式已导入，请点击“应用样式”来保存并查看效果。');
+                };
+                reader.onerror = () => {
+                    showToast('读取文件失败。');
+                };
+                reader.readAsText(file);
+                event.target.value = null; 
             });
         }
 
@@ -5567,18 +5856,49 @@ function cancelQuoteReply() {
             </div>
             <div class="reply-text">${replyText}</div>
         `;
-    } else if (musicMatch) {
+        } else if (musicMatch) {
         bubbleElement = document.createElement('div');
         bubbleElement.className = 'music-card';
         const songTitle = musicMatch[1].trim();
         const artist = musicMatch[2].trim();
         bubbleElement.innerHTML = `<img src="https://i.postimg.cc/d10J4VzR/image.png" alt="music icon" class="music-card-icon"><div class="music-card-info"><p class="music-card-title">${songTitle}</p><p class="music-card-artist">${artist}</p></div>`;
-    } else if (message.fileData && message.fileData.name) {
+    
+    // ================== 从这里开始是修正后的代码 ==================
+
+    } else if (message.fileData && message.fileData.name) { // 1. 处理用户发送的文件
         bubbleElement = document.createElement('div');
         bubbleElement.className = 'file-card';
         const fileSize = formatFileSize(new Blob([message.fileData.content]).size);
         bubbleElement.innerHTML = `<img src="https://i.postimg.cc/vms1Vd9X/1040g2sg31hh9ub1v3oeg5pbsckvn39vt3mbflao.png" alt="file icon" class="file-card-icon"><div class="file-card-info"><p class="file-card-name">${message.fileData.name}</p><p class="file-card-size">${fileSize}</p></div>`;
-    } else if (message.locationData || locationMatch) {
+        
+        // 为点击事件添加数据属性
+        bubbleElement.dataset.fileName = message.fileData.name;
+        bubbleElement.dataset.fileContent = message.fileData.content;
+
+    } else if (content.match(/\[(?:.+?)发送了文件：({.*?})\]/)) { // 2. 新增：处理AI发送的文件
+        const fileMatchAI = content.match(/\[(?:.+?)发送了文件：({.*?})\]/);
+        try {
+            const fileData = JSON.parse(fileMatchAI[1]);
+            const fileName = fileData.name || '未命名文件.txt';
+            const fileContent = fileData.content || '[文件内容为空]';
+
+            bubbleElement = document.createElement('div');
+            bubbleElement.className = 'file-card';
+            const fileSize = formatFileSize(new Blob([fileContent]).size);
+            bubbleElement.innerHTML = `<img src="https://i.postimg.cc/vms1Vd9X/1040g2sg31hh9ub1v3oeg5pbsckvn39vt3mbflao.png" alt="file icon" class="file-card-icon"><div class="file-card-info"><p class="file-card-name">${fileName}</p><p class="file-card-size">${fileSize}</p></div>`;
+            
+            // 同样为点击事件添加数据属性
+            bubbleElement.dataset.fileName = fileName;
+            bubbleElement.dataset.fileContent = fileContent;
+
+        } catch (e) {
+            console.error("解析AI文件数据失败:", e);
+            bubbleElement = document.createElement('div');
+            bubbleElement.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
+            bubbleElement.textContent = '[AI尝试发送文件，但格式错误]';
+        }
+
+    } else if (message.locationData || locationMatch) { // 3. 处理位置信息
         bubbleElement = document.createElement('div');
         bubbleElement.className = 'location-card';
         let mainLoc, detailLoc;
@@ -5592,6 +5912,9 @@ function cancelQuoteReply() {
         bubbleElement.dataset.locationMain = mainLoc;
         bubbleElement.dataset.locationDetail = detailLoc;
         bubbleElement.innerHTML = `<div><div class="location-card-info"><p class="location-main">${mainLoc}</p><p class="location-detail">${detailLoc}</p></div><div class="location-map"></div></div>`;
+    
+    // ================== 修正代码到此结束 ==================
+    
     } else if ((isSent && sentStickerMatch && stickerData) || (!isSent && receivedStickerMatch)) {
         bubbleElement = document.createElement('div');
         bubbleElement.className = 'image-bubble';
@@ -6166,6 +6489,40 @@ function setupLocationSystem() {
         displayLocationModal.classList.remove('visible');
     });
 }
+// --- NEW: File Display System Setup ---
+function setupFileDisplaySystem() {
+    const displayModal = document.getElementById('display-file-modal');
+    const fileNameEl = document.getElementById('display-file-name');
+    const fileContentEl = document.getElementById('display-file-content');
+    const closeBtn = document.getElementById('close-file-display-btn');
+
+    // 使用事件委托，在消息区域监听对文件卡片的点击
+    document.getElementById('message-area').addEventListener('click', (e) => {
+        const fileCard = e.target.closest('.file-card');
+        if (fileCard) {
+            const fileName = fileCard.dataset.fileName;
+            const fileContent = fileCard.dataset.fileContent;
+
+            if (fileName && typeof fileContent !== 'undefined') {
+                fileNameEl.textContent = fileName;
+                fileContentEl.textContent = fileContent;
+                displayModal.classList.add('visible');
+            }
+        }
+    });
+
+    // 关闭按钮逻辑
+    closeBtn.addEventListener('click', () => {
+        displayModal.classList.remove('visible');
+    });
+    
+    // 点击弹窗的灰色背景区域也可以关闭
+    displayModal.addEventListener('click', (e) => {
+        if (e.target === displayModal) {
+            displayModal.classList.remove('visible');
+        }
+    });
+}
         async function sendTimeSkipMessage(text) {
             if (!text) return;
             const chat = (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
@@ -6316,6 +6673,9 @@ function setupLocationSystem() {
         if (worldBooksAfter) {
             prompt += `${worldBooksAfter}\n`;
         }
+if (character.memorySummary && character.memorySummary.trim()) {
+    prompt += `\n## 核心回忆摘要\n这是你必须始终牢记的、关于我们过去互动的核心总结。在任何回复之前，请务必参考以下内容：\n${character.memorySummary}\n---\n`;
+}
         if (character.myPersona) {
             prompt += `3. 关于我的人设：${character.myPersona}\n`;
         }
@@ -6345,7 +6705,8 @@ function setupLocationSystem() {
         '    g) 对我礼物的回应(此条不显示): [' + character.realName + '已接收礼物]\n' +
         '    h) 对我转账的回应(此条不显示): [' + character.realName + '接收' + character.myName + '的转账] 或 [' + character.realName + '退回' + character.myName + '的转账]\n' +
         '    i) ✨【新增】更新状态(此条不显示)✨: [' + character.realName + '更新状态为：{新状态}]\n' +
-        '    j) 位置分享：[' + character.realName + '分享了位置：主位置 \'主要地点\', 详细位置 \'详细地址\']';
+        '    j) 位置分享：[' + character.realName + '分享了位置：主位置 \'主要地点\', 详细位置 \'详细地址\']'
+        '    k) ✨【新增】发送文件✨: [' + character.realName + '发送了文件：{"name":"文件名.txt", "content":"文件正文内容"}]'; // <--- 添加这一行
 
     if (forceTheater) {
         outputFormats += '\n' +
@@ -6446,9 +6807,12 @@ prompt += `
                 prompt += `   - **角色: ${member.realName} (AI)**\n`;
                 prompt += `     - 群内昵称: ${member.groupNickname}\n`;
                 prompt += `     - 人设: ${member.persona || '无特定人设'}\n`;
-            });
+            })
 
-            if (worldBooksAfter) {
+if (group.memorySummary && group.memorySummary.trim()) {
+    prompt += `\n## 核心回忆摘要\n这是你必须始终牢记的、关于这个群聊过去互动的核心总结。在任何回复之前，请务必参考以下内容：\n${group.memorySummary}\n---\n`;
+}
+          if (worldBooksAfter) {
                 prompt += `\n${worldBooksAfter}\n\n`;
             } else {
                 prompt += `\n`;
@@ -6472,6 +6836,7 @@ prompt += `
             prompt += `   - ✨新✨ **发布动态**: \`[{成员真名}发布动态：{"text": "动态文字", "imageDesc": "图片描述，可选"}]\`。注意：你只能用文字描述图片，绝不能生成图片链接。\n`;
     prompt += `   - ✨新✨ **评论动态**: \`[{成员真名}评论动态：{"momentId": "要评论的动态ID", "comment": "你的评论内容"}]\`\n`;
     prompt += `   - ✨新✨ **点赞动态**: \`[{成员真名}点赞动态：{"momentId": "要点赞的动态ID"}]\`\n`;
+    prompt += `   - **发送文件**: \`[{成员真名}发送了文件：{"name":"文件名.txt", "content":"文件正文内容"}]\`\n`;
             prompt += `   - **重要**: 群聊不支持AI成员接收/退回转账或接收礼物的特殊指令，也不支持更新状态。你只需要通过普通消息来回应我发送的转账或礼物即可。\n\n`;
 
             prompt += `5. **模拟群聊氛围**: 为了让群聊看起来真实、活跃且混乱，你的每一次回复都必须遵循以下随机性要求：\n`;
@@ -7632,18 +7997,14 @@ worldBookListContainer.appendChild(li);
                     }
                 }
             });
-            clearChatHistoryBtn.addEventListener('click', async () => {
-                const character = db.characters.find(c => c.id === currentChatId);
-                if (!character) return;
-                if (confirm(`你确定要清空与“${character.remarkName}”的所有聊天记录吗？这个操作是不可恢复的！`)) {
-                    character.history = [];
-                    await saveData();
-                    renderMessages(false, true);
-                    renderChatList();
-                    settingsSidebar.classList.remove('open');
-                    showToast('聊天记录已清空');
-                }
-            });
+            // 这是私聊的修改
+clearChatHistoryBtn.addEventListener('click', async () => {
+    const character = db.characters.find(c => c.id === currentChatId);
+    if (!character) return;
+    if (confirm(`你确定要清空与“${character.remarkName}”的所有聊天记录吗？\n\nAI将首先对你们的对话进行总结并存入回忆面板，这个过程需要消耗API额度。`)) {
+        await summarizeAndClearHistory();
+    }
+});
             linkWorldBookBtn.addEventListener('click', () => {
                 const character = db.characters.find(c => c.id === currentChatId);
                 if (!character) return;
@@ -7708,6 +8069,7 @@ worldBookListContainer.appendChild(li);
                 e.maxMemory = document.getElementById('setting-max-memory').value;
                 e.useCustomBubbleCss = document.getElementById('setting-use-custom-css').checked;
                 e.customBubbleCss = document.getElementById('setting-custom-bubble-css').value;
+               
                 await saveData();
                 showToast('设置已保存！');
                 chatRoomTitle.textContent = e.remarkName;
@@ -8198,6 +8560,7 @@ function setupDiarySystem() {
                     isPinned: false,
                     useCustomBubbleCss: false,
                     customBubbleCss: '',
+                    memorySummary: '' ,
                     worldBookIds: []
                 };
                 db.groups.push(newGroup);
@@ -8277,18 +8640,14 @@ function setupDiarySystem() {
                     }
                 }
             });
-            document.getElementById('clear-group-chat-history-btn').addEventListener('click', async () => {
-                const group = db.groups.find(g => g.id === currentChatId);
-                if (!group) return;
-                if (confirm(`你确定要清空群聊“${group.name}”的所有聊天记录吗？这个操作是不可恢复的！`)) {
-                    group.history = [];
-                    await saveData();
-                    renderMessages(false, true);
-                    renderChatList();
-                    groupSettingsSidebar.classList.remove('open');
-                    showToast('聊天记录已清空');
-                }
-            });
+            // 这是群聊的修改
+document.getElementById('clear-group-chat-history-btn').addEventListener('click', async () => {
+    const group = db.groups.find(g => g.id === currentChatId);
+    if (!group) return;
+    if (confirm(`你确定要清空群聊“${group.name}”的所有聊天记录吗？\n\nAI将首先对群聊内容进行总结并存入回忆面板，这个过程需要消耗API额度。`)) {
+        await summarizeAndClearHistory();
+    }
+});
             groupMembersListContainer.addEventListener('click', e => {
                 const memberDiv = e.target.closest('.group-member');
                 const addBtn = e.target.closest('.add-member-btn');
@@ -9699,6 +10058,243 @@ const prompt = generateSharePostPrompt(currentPostToShare.title, currentPostToSh
                 console.log("一段新的回忆已保存:", newMemory);
             }
         }
+        // --- 自定义主屏幕小组件功能 ---
+function setupCustomWidgetSystem() {
+    // 缓存弹窗相关的DOM元素
+    const modal = document.getElementById('customize-widget-modal');
+    const form = document.getElementById('customize-widget-form');
+    const fileUpload = document.getElementById('widget-image-upload');
+    const imageUrlInput = document.getElementById('widget-image-url-input');
+    const editingWidgetIdInput = document.getElementById('editing-widget-id');
+    const widgetTextInput = document.getElementById('widget-text-input');
+    const homeScreenEl = document.getElementById('home-screen');
+
+    // 打开编辑器弹窗的函数
+    const openWidgetEditor = (widgetId) => {
+        const widgetData = db.customWidgets.find(w => w.id === widgetId);
+        if (!widgetData) return;
+
+        form.reset(); // 清除旧数据
+        editingWidgetIdInput.value = widgetId;
+        widgetTextInput.value = widgetData.text;
+        imageUrlInput.value = widgetData.imageUrl;
+
+        modal.classList.add('visible');
+    };
+
+    // 在主屏幕上使用事件委托来监听点击
+    if(homeScreenEl) {
+        homeScreenEl.addEventListener('click', (e) => {
+            const widget = e.target.closest('.contact-widget[data-widget-id]');
+            if (widget) {
+                openWidgetEditor(widget.dataset.widgetId);
+            }
+        });
+    }
+
+    // 处理表单提交
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const widgetId = editingWidgetIdInput.value;
+        const newText = widgetTextInput.value.trim();
+        const newImageUrl = imageUrlInput.value.trim();
+
+        const widgetIndex = db.customWidgets.findIndex(w => w.id === widgetId);
+        if (widgetIndex > -1) {
+            db.customWidgets[widgetIndex].text = newText;
+            db.customWidgets[widgetIndex].imageUrl = newImageUrl;
+        }
+
+        await saveData();
+        modal.classList.remove('visible');
+        showToast('组件已更新！');
+        
+        // 直接更新主屏幕上的组件，无需重绘整个屏幕
+        const widgetEl = document.getElementById(`custom-widget-${widgetId === 'widget1' ? '1' : '2'}`);
+        if(widgetEl){
+            widgetEl.querySelector('img').src = newImageUrl;
+            widgetEl.querySelector('span').textContent = newText;
+        }
+    });
+
+    // 处理文件上传
+    fileUpload.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            try {
+                const compressedUrl = await compressImage(file, { quality: 0.8, maxWidth: 200, maxHeight: 200 });
+                imageUrlInput.value = compressedUrl;
+            } catch (error) {
+                showToast('图片处理失败，请重试');
+            } finally {
+                e.target.value = null; // 清空文件输入
+            }
+        }
+    });
+
+    // 点击弹窗外部区域关闭
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.remove('visible');
+        }
+    });
+}
+// === 新增的AI总结并清空历史记录的函数 ===
+async function summarizeAndClearHistory() {
+    if (isGenerating) {
+        showToast('AI正在思考中，请稍后重试...');
+        return;
+    }
+
+    const chat = (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
+    if (!chat || chat.history.length === 0) {
+        showToast('没有聊天记录可供总结。');
+        chat.history = []; // 仍然清空
+        await saveData();
+        renderMessages(false, true);
+        return;
+    }
+
+    isGenerating = true;
+    const sidebar = (currentChatType === 'private') ? settingsSidebar : groupSettingsSidebar;
+    sidebar.classList.remove('open');
+    showToast('正在请求AI总结回忆，请稍候...');
+
+    try {
+        const historyText = chat.history
+            .map(msg => msg.content)
+            .join('\n');
+
+        const prompt = `你是一个记忆总结助手。请根据以下完整的聊天记录，用第一人称（即角色的口吻）生成一段非常简洁、精炼的核心回忆摘要，不超过200字。这份摘要将作为角色的永久记忆。请直接输出摘要内容，不要包含任何额外的话。聊天记录如下：\n\n${historyText}`;
+
+        let messagesForApi;
+        if (db.apiSettings.provider === 'gemini') {
+            messagesForApi = [{ role: 'user', parts: [{ type: 'text', text: prompt }] }];
+        } else {
+            messagesForApi = [{ role: 'user', content: prompt }];
+        }
+
+        const summary = await callAiApi(messagesForApi);
+
+        // 将新旧总结合并
+        const oldSummary = chat.memorySummary || '';
+        chat.memorySummary = (oldSummary ? oldSummary + '\n\n' : '') + `[${new Date().toLocaleString()}]\n` + summary.trim();
+        
+        // 清空历史记录
+        chat.history = [];
+
+        await saveData();
+        renderMessages(false, true); // 刷新聊天界面
+        renderChatList(); // 刷新聊天列表
+        showToast('回忆总结已完成并保存，聊天记录已清空！');
+
+    } catch (error) {
+        console.error('总结回忆失败:', error);
+        showToast(`总结失败: ${error.message}。记录未被清空。`);
+    } finally {
+        isGenerating = false;
+    }
+}
+// === 新增：处理回忆记录面板的显示功能 ===
+function setupMemorySummaryModal() {
+    const modal = document.getElementById('memory-summary-modal');
+    const contentEl = document.getElementById('memory-summary-content');
+    const closeBtn = document.getElementById('close-memory-summary-btn');
+
+    // 关闭按钮和背景点击事件
+    const closeModal = () => modal.classList.remove('visible');
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    // 为私聊设置中的“查看回忆”按钮绑定事件
+    document.getElementById('show-memory-summary-btn').addEventListener('click', () => {
+        const character = db.characters.find(c => c.id === currentChatId);
+        if (character) {
+            contentEl.textContent = character.memorySummary || '还没有任何回忆记录。';
+            modal.classList.add('visible');
+        }
+    });
+
+    // 为群聊设置中的“查看回忆”按钮绑定事件
+    document.getElementById('show-group-memory-summary-btn').addEventListener('click', () => {
+        const group = db.groups.find(g => g.id === currentChatId);
+        if (group) {
+            contentEl.textContent = group.memorySummary || '还没有任何群聊回忆记录。';
+            modal.classList.add('visible');
+        }
+    });
+}
+// === 新增：主页头图编辑器功能 ===
+function setupHomeScreenProfileEditor() {
+    const header = document.querySelector('.home-profile-header');
+    if (!header) return;
+
+    // 元素缓存
+    const heroEl = header.querySelector('.home-hero');
+    const avatarImg = header.querySelector('#home-profile-avatar');
+    const nameEl = header.querySelector('.home-profile-name');
+    const signatureEl = header.querySelector('.home-profile-signature');
+    
+    // 1. 渲染函数：从数据库读取数据并更新UI
+    function renderProfile() {
+        const profile = db.homeProfile;
+        heroEl.style.backgroundImage = `url('${profile.heroBg}')`;
+        avatarImg.src = profile.avatar;
+        nameEl.textContent = profile.name;
+        signatureEl.textContent = profile.signature;
+    }
+
+    // 2. 保存函数
+    async function saveProfile() {
+        await saveData();
+        showToast('主页信息已更新');
+    }
+    
+    // 3. 图片编辑逻辑
+    heroEl.addEventListener('click', async () => {
+        const newBg = prompt('请输入新的背景图URL：', db.homeProfile.heroBg);
+        if (newBg && newBg.trim()) {
+            db.homeProfile.heroBg = newBg.trim();
+            renderProfile();
+            await saveProfile();
+        }
+    });
+
+    avatarImg.parentElement.addEventListener('click', async () => {
+        const newAvatar = prompt('请输入新的头像URL：', db.homeProfile.avatar);
+        if (newAvatar && newAvatar.trim()) {
+            db.homeProfile.avatar = newAvatar.trim();
+            renderProfile();
+            await saveProfile();
+        }
+    });
+
+    // 4. 文字内联编辑逻辑
+    nameEl.addEventListener('click', async () => {
+        const newName = prompt('请输入新的昵称：', db.homeProfile.name);
+        if (newName && newName.trim()) {
+            db.homeProfile.name = newName.trim();
+            renderProfile();
+            await saveProfile();
+        }
+    });
+
+    signatureEl.addEventListener('click', async () => {
+        const newSignature = prompt('请输入新的个性签名：', db.homeProfile.signature);
+        if (newSignature && newSignature.trim()) {
+            db.homeProfile.signature = newSignature.trim();
+            renderProfile();
+            await saveProfile();
+        }
+    });
+
+    // 首次加载时渲染一次
+    renderProfile();
+}
         init();
     });
 </script>
@@ -11322,6 +11918,149 @@ function cancelQuoteReply() {
     font-size: 14px;
     color: var(--text-color);
     line-height: 1.5;
+}
+/* --- 时间日期小部件样式修改 --- */
+
+/* 1. 将小部件容器改为绝对定位，放置在屏幕顶部，并使用flex布局 */
+.time-widget {
+    position: absolute;
+    top: 0px;  /* 距离屏幕顶部的间距 */
+    left: 0;
+    width: 100%;
+    padding: 0 20px; /* 左右两边的间距 */
+    
+    /* 核心改动：使用flex布局实现左右对齐 */
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    
+    text-align: unset; /* 取消原有的居中对齐 */
+    color: var(--text-color); /* 为日期和时间设置统一的默认颜色 */
+}
+
+/* 2. 统一修改日期和时间的字体样式 */
+.time-widget .date,
+.time-widget .time {
+    font-size: 11px;      /* 缩小字体大小 */
+    font-weight: 500;     /* 统一字体粗细为中等 */
+    color: inherit;       /* 继承来自父容器 .time-widget 的颜色 */
+}
+
+/* 3. 确保日间模式下的颜色依然生效 */
+#home-screen.day-mode .time-widget {
+    color: var(--white-color); /* 日间模式统一使用白色 */
+}
+/* --- 最终版主屏幕布局样式 --- */
+
+/* 1. 整体屏幕和内容区设定 */
+#home-screen {
+    justify-content: flex-start; /* 内容从顶部开始排列 */
+    padding-top: 50px; /* 增加顶部内边距，为时间日期小部件留出空间 */
+}
+
+#home-screen .main-content-area {
+    display: flex;
+    width: 100%; /* 宽度占满，以便左右对齐 */
+    justify-content: space-between; /* 核心：将左右两列推向屏幕边缘 */
+    align-items: flex-start;
+    padding: 0 40px; /* 屏幕左右留出边距 */
+    margin-top: 20px; /* 与上方元素的间距 */
+}
+
+/* 2. 左右两列的容器 */
+.left-column, .right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* 列内元素的垂直间距 */
+}
+
+/* 3. 左侧联系人组件样式（进一步缩小） */
+.contact-widgets-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.contact-widget {
+    background-color: #f5f5f5;
+    border-radius: 50px;
+    padding: 5px 12px 5px 5px; /* 缩小内边距 */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 130px; /* 缩小宽度 */
+    box-shadow: none; /* 移除阴影，更简洁 */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.contact-widget:hover {
+    background-color: #e9e9e9;
+}
+.contact-widget img {
+    width: 34px; /* 缩小头像 */
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.contact-widget span {
+    font-weight: 500;
+    color: #444;
+    font-size: 13px; /* 缩小字体 */
+}
+.contact-widget.avatar-right {
+    flex-direction: row-reverse;
+    padding: 5px 5px 5px 12px;
+}
+
+/* 4. 左侧下方的“自定义”和“壁纸”容器（改为横向排列） */
+.secondary-apps-dock {
+    display: flex;
+    justify-content: center; /* 图标居中排列 */
+    gap: 15px; /* 图标间距 */
+    padding: 8px;
+    border-radius: 18px;
+}
+
+/* 5. 右侧2x2应用网格（缩小尺寸） */
+.small-app-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+.small-app-grid .app-icon .icon-img,
+.secondary-apps-dock .app-icon .icon-img {
+    width: 36px; /* 统一缩小图标尺寸 */
+    height: 36px;
+    border-radius: 11px;
+    margin-bottom: 4px;
+}
+.small-app-grid .app-icon .app-name,
+.secondary-apps-dock .app-icon .app-name {
+    font-size: 10px; /* 统一缩小文字大小 */
+}
+
+/* 6. 音乐播放器新位置和尺寸 */
+.record-player-widget {
+    --music-widget-scale: 0.9; /* 再次缩小组件 */
+    margin: 0 auto; /* 移除上下外边距，由父容器gap控制 */
+    width: 100%; /* 宽度与父容器（右列）对齐 */
+    max-width: calc(130px * var(--music-widget-scale));
+    height: calc(100px * var(--music-widget-scale));
+}
+.record-player-widget .vinyl-record {
+    right: -12%;
+}
+
+/* 7. 底部Dock栏调整 */
+.dock {
+    margin: 42px 20px 20px; /* 上 左右 下 的间距 */
+}
+
+/* 8. 确保旧的布局规则被禁用 */
+#home-screen .top-row, 
+#home-screen .bottom-row,
+#home-screen .app-grid,
+#home-screen .decorative-component {
+    display: none !important;
 }
 
 </style>
@@ -13681,6 +14420,17 @@ fileInput.addEventListener('change', async (e)=>{
 
 <div id="mention-panel" class="mention-panel"></div>
 <!-- ... (El resto de los scripts y styles finales) ... -->
+	<!-- === 新增：回忆记录显示面板 (Modal) === -->
+<div id="memory-summary-modal" class="modal-overlay">
+    <div class="modal-window">
+        <h3>回忆记录</h3>
+        <div class="form-group" style="max-height: 60vh; overflow-y: auto; background-color: #f9f9f9; padding: 10px; border-radius: 8px;">
+            <pre id="memory-summary-content" style="white-space: pre-wrap; word-wrap: break-word; font-size: 14px; color: #333;"></pre>
+        </div>
+        <button id="close-memory-summary-btn" class="btn btn-primary" style="margin-top: 20px;">关闭</button>
+    </div>
+</div>
+<!-- === Modal 结束 === -->
 </body>
 
 </html>
