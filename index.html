@@ -248,7 +248,7 @@
             backdrop-filter: blur(10px);
             border-radius: var(--border-radius);
             margin: 0 20px;
-            min-height: 80px;
+            min-height: 10px;
             gap: 15px;
         }
 
@@ -2393,7 +2393,121 @@
 @media (max-width: 420px) {
   .moment-image-desc-card { padding: 9px; /* min-height: 72px; */ }
   .moment-image-desc-card .desc-content { /* -webkit-line-clamp: 3; */ }
+}/* --- 钱包功能新增样式 --- */
+.wallet-balance-card {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 25px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 25px rgba(255, 128, 171, 0.3);
 }
+.wallet-balance-label {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    opacity: 0.9;
+}
+.wallet-balance-amount {
+    margin: 0;
+    font-size: 42px;
+    font-weight: 600;
+}
+.wallet-actions-list {
+    background-color: #fff;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+.wallet-action-item {
+    padding: 18px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+}
+.wallet-action-item:last-child {
+    border-bottom: none;
+}
+.wallet-action-item:hover {
+    background-color: #fdf6f8;
+}
+
+/* 交易明细样式 */
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 5px;
+    border-bottom: 1px solid #f0f0f0;
+}
+.transaction-details {
+    display: flex;
+    flex-direction: column;
+}
+.transaction-description {
+    font-weight: 500;
+    color: #333;
+}
+.transaction-timestamp {
+    font-size: 12px;
+    color: #999;
+    margin-top: 4px;
+}
+.transaction-amount {
+    font-weight: bold;
+    font-size: 16px;
+}
+.transaction-amount.expense {
+    color: #333;
+}
+.transaction-amount.income {
+    color: #4CAF50; /* 收入用绿色表示 */
+}
+/* --- HTML小剧场样式修复与美化 --- */
+.ai-generated-theater {
+    max-width: 90%; /* 限制最大宽度，防止内容溢出屏幕 */
+    margin: 0 8px;   /* 与头像保持合适的间距 */
+    padding: 5px;    /* 添加一点内边距，让内容不要紧贴边缘 */
+    border-radius: var(--border-radius);
+    overflow: hidden; /* 确保内部元素的圆角效果正确 */
+    box-sizing: border-box;
+}
+
+/* 确保小剧场在发送方和接收方位置正确 */
+.message-wrapper.sent .ai-generated-theater {
+    align-self: flex-end;
+}
+.message-wrapper.received .ai-generated-theater {
+    align-self: flex-start;
+}
+/* --- AI空间对话气泡样式修复与美化 (AI Space Bubble Fix & Styling) --- */
+
+/* 核心：为“对方”的消息（received）定义样式 */
+#ai-message-area .message-wrapper.received .message-bubble {
+    /* 1. 强制为对方消息添加一个默认的灰色气泡背景，解决“没有气泡”的问题 */
+    background-color: #f0f0f0;
+    color: #333;
+
+    /* 2. 将气泡设置为椭圆形，并移除尖角 */
+    border-radius: 20px; /* 您可以调整这个值来改变椭圆的圆润程度 */
+}
+
+/* 确保主视角AI自己发送的消息（sent）也有默认的粉色气泡（以防万一） */
+#ai-message-area .message-wrapper.sent .message-bubble {
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 20px;
+    border-bottom-right-radius: 5px; /* 依然可以保留自己消息的尖角，如果想去掉也改成20px即可 */
+}
+
+/* 对于HTML小剧场等特殊内容，确保它们在AI空间也能正常显示 */
+#ai-message-area .ai-generated-theater {
+    max-width: 90%;
+    margin: 0 8px;
+}
+
     </style>
     <!-- === moments 固定在 phone-screen 内的修复样式 (自动插入补丁) === -->
 <style>
@@ -3007,14 +3121,19 @@
             </form>
         </div>
     </div>
-    <div id="send-gift-modal" class="modal-overlay">
+        <div id="send-gift-modal" class="modal-overlay">
         <div class="modal-window">
             <h3>送出礼物</h3>
             <form id="send-gift-form">
+                <!-- ▼▼▼ 新增的价格输入框 ▼▼▼ -->
+                <div class="form-group">
+                    <label for="gift-amount-input">礼物价格 (元)</label>
+                    <input type="number" id="gift-amount-input" placeholder="0.00" required step="0.01" min="0.01">
+                </div>
+                <!-- ▲▲▲ 新增结束 ▲▲▲ -->
                 <div class="form-group">
                     <label for="gift-description-input">礼物描述</label>
-                    <textarea id="gift-description-input" placeholder="告诉Ta你送了什么特别的东西..." required
-                              rows="4"></textarea>
+                    <textarea id="gift-description-input" placeholder="告诉Ta你送了什么特别的东西..." required rows="4"></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary">发送</button>
             </form>
@@ -3547,6 +3666,183 @@
             </form>
         </div>
     </div>
+<!-- =============================================================== -->
+<!-- START: 新增钱包功能HTML (粘贴到 </body> 标签前) -->
+<!-- =============================================================== -->
+
+<!-- 1. 钱包主界面 Screen -->
+<div id="wallet-screen" class="screen">
+    <header class="app-header">
+        <button class="back-btn" data-target="home-screen">‹</button>
+        <div class="title-container">
+            <h1 class="title">我的钱包</h1>
+        </div>
+       <div class="action-btn-group">
+    <button class="action-btn" id="wallet-settings-btn">设置</button>
+</div>
+    </header>
+    <main class="content" style="padding: 20px; background-color: #f9f9f9;">
+        <div class="wallet-balance-card">
+            <p class="wallet-balance-label">零花钱余额 (元)</p>
+            <p class="wallet-balance-amount" id="wallet-balance-display">0.00</p>
+        </div>
+        <div class="wallet-actions-list">
+            <div class="wallet-action-item" id="show-transactions-btn">
+                <span>零花钱明细</span>
+                <span>›</span>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- 2. 钱包设置界面 Screen -->
+<div id="wallet-settings-screen" class="screen">
+    <header class="app-header">
+        <button class="back-btn" data-target="wallet-screen">‹</button>
+        <div class="title-container">
+            <h1 class="title">支付设置</h1>
+        </div>
+        <div class="placeholder"></div>
+    </header>
+    <main class="content">
+        <form id="wallet-settings-form">
+    <div class="form-group">
+    <label for="wallet-balance-input">设置零花钱余额</label>
+    <input type="number" id="wallet-balance-input" placeholder="0.00" step="0.01" min="0">
+</div>
+
+<div class="form-group toggle-group">
+    <label for="wallet-password-enabled-toggle" style="margin-bottom:0;">启用支付密码</label>
+    <label class="toggle-switch">
+        <input type="checkbox" id="wallet-password-enabled-toggle">
+        <span class="slider"></span>
+    </label>
+</div>
+<div class="form-group">
+    <label for="wallet-password-input">设置/修改支付密码 (6位数字)</label>
+    <input type="password" id="wallet-password-input" pattern="\d{6}" maxlength="6" inputmode="numeric">
+</div>
+            <button type="submit" class="btn btn-primary">保存设置</button>
+        </form>
+    </main>
+</div>
+
+<!-- 3. 零花钱明细弹窗 Modal -->
+<div id="transaction-details-modal" class="modal-overlay">
+    <div class="modal-window">
+        <h3>零花钱明细</h3>
+        <ul id="transaction-list-container" class="list-container" style="max-height: 60vh; overflow-y: auto;">
+            <!-- 明细将由JS动态生成 -->
+        </ul>
+        <button class="btn btn-primary" id="close-transactions-btn" style="margin-top: 20px;">关闭</button>
+    </div>
+</div>
+
+<!-- 4. 支付密码输入弹窗 Modal -->
+<div id="payment-password-modal" class="modal-overlay">
+    <div class="modal-window">
+        <h3 id="payment-prompt-title">请输入支付密码</h3>
+        <p id="payment-prompt-description" style="text-align:center; color:#666;"></p>
+        <div class="form-group">
+            <input type="password" id="payment-password-input" pattern="\d{6}" maxlength="6" inputmode="numeric" style="text-align:center; font-size: 20px; letter-spacing: 1em;">
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn btn-neutral" id="cancel-payment-btn" style="flex: 1;">取消</button>
+            <button class="btn btn-primary" id="confirm-payment-btn" style="flex: 1;">确认</button>
+        </div>
+    </div>
+</div>
+
+<!-- =============================================================== -->
+<!-- END: 新增钱包功能HTML -->
+<!-- =============================================================== -->
+<!-- ▼▼▼ 在这里粘贴下面的新代码 ▼▼▼ -->
+<!-- AI POV: Character Selection Screen -->
+<div id="ai-character-select-screen" class="screen">
+    <header class="app-header">
+        <button class="back-btn" data-target="home-screen">‹</button>
+        <div class="title-container">
+            <h1 class="title">选择AI视角</h1>
+        </div>
+        <div class="placeholder"></div>
+    </header>
+    <main class="content">
+        <ul class="list-container" id="ai-character-select-list"></ul>
+        <div class="placeholder-text" id="no-ai-chars-placeholder" style="display: none;">
+            <p>还没有创建任何AI角色哦~</p>
+        </div>
+    </main>
+</div>
+
+<!-- AI POV: AI's Chat List Screen -->
+<div id="ai-chat-list-screen" class="screen">
+    <header class="app-header">
+        <button class="back-btn" data-target="ai-character-select-screen">‹</button>
+        <div class="title-container">
+            <h1 class="title" id="ai-chat-list-title">的聊天列表</h1>
+        </div>
+        <div class="placeholder"></div>
+    </header>
+    <main class="content">
+        <ul class="list-container" id="ai-chat-list-container"></ul>
+         <div class="placeholder-text" id="no-ai-chats-placeholder" style="display: none;">
+            <p>Ta还没有和别人聊过天哦~</p>
+        </div>
+    </main>
+</div>
+
+<!-- AI POV: AI's Conversation View Screen -->
+<div id="ai-chat-view-screen" class="screen">
+   <header class="app-header">
+    <button class="back-btn" data-target="ai-chat-list-screen">‹</button>
+    <div class="title-container">
+        <h1 class="title" id="ai-chat-view-title">与...的对话</h1>
+    </div>
+    <div class="placeholder"></div>
+   </header>
+    <main class="content">
+        <div class="message-area" id="ai-message-area"></div>
+    </main>
+    <!-- 这个屏幕是只读的，所以没有输入框 -->
+</div>
+<!-- ▲▲▲ 新代码粘贴到这里结束 ▲▲▲ -->
+<!-- === Modal 结束 === -->
+<div id="voice-call-overlay">
+    <img src="" alt="Avatar" class="call-avatar-large" id="call-avatar">
+    <h2 class="call-name" id="call-name">...</h2>
+    <p class="call-status" id="call-status">正在呼叫...</p>
+
+    <div id="ringing-view">
+        <div class="call-button-group" id="incoming-buttons" style="display: none;">
+            <button class="call-button decline" id="decline-call-btn">
+                <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M12,9C10.4,9 9,10.4 9,12S10.4,15 12,15 15,13.6 15,12 13.6,9 12,9M12,17.25C9.24,17.25 6.75,15.17 6.75,12.5C6.75,11.05 7.42,9.73 8.5,8.81L15.19,15.5C14.27,16.58 12.95,17.25 12,17.25M17.25,12C17.25,14.76 15.17,17.25 12.5,17.25C11.05,17.25 9.73,16.58 8.81,15.5L15.5,8.81C16.58,9.73 17.25,11.05 17.25,12M4.44,3L3,4.44L8.06,9.5C7.36,10.23 6.84,11.08 6.5,12H4.13C4.5,14.75 6.13,17.13 8.5,18.5V22H15.5V18.5C16.92,17.81 18.1,16.81 18.91,15.56L20.56,17.22L21.94,15.84L4.44,3Z" /></svg></div>
+                <span>拒接</span>
+            </button>
+            <button class="call-button accept" id="accept-call-btn">
+                <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M6.62,10.79C8.06,13.62 10.38,15.94 13.21,17.38L15.41,15.18C15.69,14.9 16.08,14.82 16.43,14.93C17.55,15.3 18.75,15.5 20,15.5A1,1 0 0,1 21,16.5V20A1,1 0 0,1 20,21A17,17 0 0,1 3,4A1,1 0 0,1 4,3H7.5A1,1 0 0,1 8.5,4C8.5,5.25 8.7,6.45 9.07,7.57C9.18,7.92 9.1,8.31 8.82,8.59L6.62,10.79Z" /></svg></div>
+                <span>接听</span>
+            </button>
+        </div>
+        <div class="call-button-group" id="outgoing-buttons" style="display: none;">
+            <button class="call-button decline" id="cancel-call-btn">
+                 <div class="icon-wrapper"><svg viewBox="0 0 24 24"><path d="M12,9C10.4,9 9,10.4 9,12S10.4,15 12,15 15,13.6 15,12 13.6,9 12,9M12,17.25C9.24,17.25 6.75,15.17 6.75,12.5C6.75,11.05 7.42,9.73 8.5,8.81L15.19,15.5C14.27,16.58 12.95,17.25 12,17.25M17.25,12C17.25,14.76 15.17,17.25 12.5,17.25C11.05,17.25 9.73,16.58 8.81,15.5L15.5,8.81C16.58,9.73 17.25,11.05 17.25,12M4.44,3L3,4.44L8.06,9.5C7.36,10.23 6.84,11.08 6.5,12H4.13C4.5,14.75 6.13,17.13 8.5,18.5V22H15.5V18.5C16.92,17.81 18.1,16.81 18.91,15.56L20.56,17.22L21.94,15.84L4.44,3Z" /></svg></div>
+                <span>取消</span>
+            </button>
+        </div>
+    </div>
+
+ <div id="call-transcript-area"></div>
+    <div class="call-button-group" id="hangup-button-container">
+        <button class="call-button decline" id="hangup-call-btn">
+            </button>
+    </div>
+    <div id="call-input-area">
+        <input type="text" id="call-input" placeholder="输入文字...">
+        <button id="send-call-message-btn">➤</button>
+    </div>
+</div>
+</div>
+  
 </div>
 <input type="file" id="import-data-input" accept=".ee" style="display: none;">	
 <script>
@@ -3580,7 +3876,6 @@
                     img.onload = () => {
                         let width = img.width;
                         let height = img.height;
-                      let sharedWithChatIds = new Set();
 
                         if (width > height) {
                             if (width > maxWidth) {
@@ -3753,6 +4048,7 @@ document.getElementById('api-settings-screen').innerHTML = `<header class="app-h
             'customize-screen': {name: '自定义', url: 'https://i.postimg.cc/vZVdC7gt/chan-133.png'},
             'font-settings-screen': {name: '字体', url: 'https://i.postimg.cc/FzVtC0x4/chan-21.png'},
             'tutorial-screen': {name: '教程', url: 'https://i.postimg.cc/6QgNzCFf/chan-118.png'},
+          'ai-character-select-screen': {name: 'AI手机', url: 'https://i.postimg.cc/9Q8B2X3D/chan-101.png'},
             'day-mode-btn': {name: '', url: 'https://i.postimg.cc/Jz0tYqnT/chan-145.png'},
             'night-mode-btn': {name: '', url: 'https://i.postimg.cc/htYvkdQK/chan-146.png'},
             'record-label': { name: '唱片标签 (圆形)', url: 'https://i.postimg.cc/nzP9sgxr/chan-125.png' },
@@ -4106,6 +4402,7 @@ if (!db.forumData) db.forumData = {};
                 if (c.customBubbleCss === undefined) c.customBubbleCss = '';
                 if (c.useCustomBubbleCss === undefined) c.useCustomBubbleCss = false;
                 c.memorySummary = c.memorySummary || ''; 
+                if (!c.povCache) c.povCache = null; 
             });
             db.groups.forEach(g => {
                 if (g.isPinned === undefined) g.isPinned = false;
@@ -4120,7 +4417,21 @@ if (!db.customWidgets || !Array.isArray(db.customWidgets) || db.customWidgets.le
         { id: 'widget1', text: '自定义', imageUrl: 'https://i.ibb.co/6r11fGg/avatar1.png' },
         { id: 'widget2', text: '自定义', imageUrl: 'https://i.ibb.co/d28n82t/avatar2.png' }
     ];
+}          
+     // --- 新增：初始化钱包数据 ---
+if (!db.wallet) {
+    db.wallet = {
+        balance: 0,
+        password: null,
+        transactions: [],
+        passwordEnabled: true // 默认启用密码
+    };
 }
+// 兼容旧数据，如果旧数据没有这个属性，也默认为启用
+if (db.wallet.passwordEnabled === undefined) {
+    db.wallet.passwordEnabled = true;
+}
+            // --- 初始化结束 ---
             return Promise.resolve()
         };
         // ▲▲▲ 替换结束 ▲▲▲     
@@ -4237,6 +4548,233 @@ function formatFileSize(bytes) {
             previewContainer.appendChild(receivedBubble);
             previewContainer.appendChild(sentBubble);
         }
+        // ===============================================================
+// START: 钱包功能核心代码
+// ===============================================================
+
+// --- 交易记录 ---
+function addTransaction(type, amount, description) {
+    if (!db.wallet) return;
+    
+    // 1. 更新余额
+    const numericAmount = parseFloat(amount);
+    if (type === 'income') {
+        db.wallet.balance += numericAmount;
+    } else if (type === 'expense') {
+        db.wallet.balance -= numericAmount;
+    }
+    db.wallet.balance = parseFloat(db.wallet.balance.toFixed(2)); // 避免精度问题
+
+    // 2. 添加交易记录
+    const transaction = {
+        id: `tx_${Date.now()}`,
+        type, // 'income' or 'expense'
+        amount: numericAmount,
+        description,
+        timestamp: Date.now()
+    };
+    db.wallet.transactions.unshift(transaction); // unshift使最新记录在最前
+
+    // 3. 限制交易记录数量，防止无限增长
+    if (db.wallet.transactions.length > 200) {
+        db.wallet.transactions.pop();
+    }
+    
+    // 4. 更新UI显示
+    const balanceDisplay = document.getElementById('wallet-balance-display');
+    if (balanceDisplay) {
+        balanceDisplay.textContent = db.wallet.balance.toFixed(2);
+    }
+}
+
+// --- 支付流程处理 ---
+function handlePayment(amount, description) {
+    return new Promise((resolve, reject) => {
+        // ▼▼▼ 新增的逻辑：检查密码是否启用 ▼▼▼
+        if (db.wallet.passwordEnabled === false) {
+            if (db.wallet.balance < amount) {
+                reject(new Error('零花钱余额不足'));
+                return;
+            }
+            // 直接扣款并成功返回，跳过密码环节
+            addTransaction('expense', amount, description);
+            resolve(); 
+            return;
+        }
+        // ▲▲▲ 新增逻辑结束 ▲▲▲
+
+        // 当密码启用时，执行原有的逻辑
+        if (!db.wallet.password) {
+            reject(new Error('请先前往“我”-“支付设置”设置支付密码！'));
+            return;
+        }
+        if (db.wallet.balance < amount) {
+            reject(new Error('零花钱余额不足'));
+            return;
+        }
+
+        const modal = document.getElementById('payment-password-modal');
+        const title = document.getElementById('payment-prompt-title');
+        const desc = document.getElementById('payment-prompt-description');
+        const passwordInput = document.getElementById('payment-password-input');
+        const confirmBtn = document.getElementById('confirm-payment-btn');
+        const cancelBtn = document.getElementById('cancel-payment-btn');
+
+        title.textContent = description;
+        desc.innerHTML = `<p style="font-size: 24px; font-weight: bold; margin: 10px 0;">¥ ${amount.toFixed(2)}</p>`;
+        passwordInput.value = '';
+        
+        const confirmHandler = () => {
+            if (passwordInput.value === db.wallet.password) {
+                addTransaction('expense', amount, description);
+                cleanup();
+                resolve(); // 支付成功
+            } else {
+                showToast('支付密码错误');
+                passwordInput.value = '';
+            }
+        };
+
+        const cancelHandler = () => {
+            cleanup();
+            reject(new Error('支付已取消'));
+        };
+        
+        const cleanup = () => {
+            modal.classList.remove('visible');
+            confirmBtn.removeEventListener('click', confirmHandler);
+            cancelBtn.removeEventListener('click', cancelHandler);
+            passwordInput.removeEventListener('keypress', keypressHandler);
+        };
+        
+        const keypressHandler = (e) => {
+            if(e.key === 'Enter') {
+                confirmHandler();
+            }
+        };
+
+        confirmBtn.addEventListener('click', confirmHandler);
+        cancelBtn.addEventListener('click', cancelHandler);
+        passwordInput.addEventListener('keypress', keypressHandler);
+
+        modal.classList.add('visible');
+        setTimeout(() => passwordInput.focus(), 100);
+    });
+}
+
+// --- 渲染交易明细 ---
+function renderTransactionDetails() {
+    const container = document.getElementById('transaction-list-container');
+    container.innerHTML = '';
+
+    if (!db.wallet.transactions || db.wallet.transactions.length === 0) {
+        container.innerHTML = '<li class="placeholder-text" style="padding: 20px 0;">暂无明细</li>';
+        return;
+    }
+
+    db.wallet.transactions.forEach(tx => {
+        const li = document.createElement('li');
+        li.className = 'transaction-item';
+
+        const date = new Date(tx.timestamp);
+        const dateString = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+        
+        const amountSign = tx.type === 'income' ? '+' : '-';
+        
+        li.innerHTML = `
+            <div class="transaction-details">
+                <span class="transaction-description">${tx.description}</span>
+                <span class="transaction-timestamp">${dateString}</span>
+            </div>
+            <span class="transaction-amount ${tx.type}">
+                ${amountSign}${tx.amount.toFixed(2)}
+            </span>
+        `;
+        container.appendChild(li);
+    });
+}
+
+// --- 设置钱包所有功能的事件监听 ---
+function setupWalletApp() {
+    // 缓存DOM元素
+    const walletScreen = document.getElementById('wallet-screen');
+    const balanceDisplay = document.getElementById('wallet-balance-display');
+    const settingsBtn = document.getElementById('wallet-settings-btn');
+    const settingsScreen = document.getElementById('wallet-settings-screen');
+    const settingsForm = document.getElementById('wallet-settings-form');
+    const balanceInput = document.getElementById('wallet-balance-input');
+    const passwordInput = document.getElementById('wallet-password-input');
+    const transactionsBtn = document.getElementById('show-transactions-btn');
+    const transactionsModal = document.getElementById('transaction-details-modal');
+    const closeTransactionsBtn = document.getElementById('close-transactions-btn');
+
+    // 监听导航到底部“我”按钮的点击事件
+    document.querySelector('.nav-btn[data-target="wallet-screen"]').addEventListener('click', () => {
+        balanceDisplay.textContent = db.wallet.balance.toFixed(2);
+    });
+    
+// 从钱包主页跳转到设置页
+settingsBtn.addEventListener('click', () => {
+    const passwordEnabledToggle = document.getElementById('wallet-password-enabled-toggle');
+    
+    balanceInput.value = db.wallet.balance;
+    passwordInput.value = db.wallet.password || '';
+    passwordEnabledToggle.checked = db.wallet.passwordEnabled;
+    passwordInput.disabled = !db.wallet.passwordEnabled; // 根据开关状态禁用/启用输入框
+    
+    // 监听开关的实时变化
+    passwordEnabledToggle.onchange = (event) => {
+        passwordInput.disabled = !event.target.checked;
+        if (!event.target.checked) {
+            passwordInput.value = ''; // 如果禁用，清空密码框
+        }
+    };
+    
+    switchScreen('wallet-settings-screen');
+});
+
+// 保存设置
+settingsForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const newBalance = parseFloat(balanceInput.value);
+    const newPassword = passwordInput.value;
+    const passwordEnabled = document.getElementById('wallet-password-enabled-toggle').checked;
+
+    if (passwordEnabled && newPassword && (newPassword.length !== 6 || !/^\d+$/.test(newPassword))) {
+        showToast('支付密码必须为6位数字！');
+        return;
+    }
+
+    db.wallet.balance = isNaN(newBalance) ? 0 : parseFloat(newBalance.toFixed(2));
+    db.wallet.passwordEnabled = passwordEnabled;
+
+    if (passwordEnabled) {
+        db.wallet.password = newPassword || null;
+    } else {
+        db.wallet.password = null; // 禁用密码时，自动清除已保存的密码
+    }
+
+    await saveData();
+    showToast('支付设置已保存！');
+    switchScreen('wallet-screen');
+    balanceDisplay.textContent = db.wallet.balance.toFixed(2);
+});
+    
+    // 打开交易明细
+    transactionsBtn.addEventListener('click', () => {
+        renderTransactionDetails();
+        transactionsModal.classList.add('visible');
+    });
+
+    // 关闭交易明细
+    closeTransactionsBtn.addEventListener('click', () => {
+        transactionsModal.classList.remove('visible');
+    });
+}
+
+// ===============================================================
+// END: 钱包功能核心代码
+// ===============================================================
 // ▼▼▼ 在 init() 函数的正上方，粘贴下面这个完整的新函数 ▼▼▼
 
 function setupRollbackFeature() {
@@ -4346,8 +4884,10 @@ function setupRollbackFeature() {
             setupFileSystem(); // --- NEW ---
             setupLocationSystem(); // --- NEW ---
             setupFileDisplaySystem(); 
+          
             setupVoiceCallSystem();
             setupDiarySystem(); // --- 在这里添加这一行 ---
+          setupDiarySystem();
             setupMusicPlayer();
             setupNotificationSystem();
             setupMomentsEventListeners();
@@ -4356,7 +4896,9 @@ setupTrajectorySystem();
           setupRollbackFeature(); 
   setupMemoriesSystem(); // <-- 添加这一行
   setupMemorySummaryModal(); 
+  setupAiPovApp();
  };
+             setupWalletApp(); // <-- 添加这一行
 
 
         // v-- 在这里（init 函数外部）添加下面的新函数 --v
@@ -4466,7 +5008,6 @@ const updatePlayerUI = () => {
                     audioPlayer.pause();
                     currentSongIndex = -1;
                     updatePlayerUI();
-                  notifyAiOfSongChange();
                     return;
                 }
                 currentSongIndex = index;
@@ -4687,59 +5228,46 @@ const updatePlayerUI = () => {
                 });
             };
                     // ▼▼▼ 请用下面这【一整块】代码，完整替换掉你文件中旧的 sendMusicCard 函数 ▼▼▼
-  const sendMusicCard = async (chatId, song) => {
-                const chat = db.characters.find(c => c.id === chatId) || db.groups.find(g => g.id === chatId);
-                if (!chat) return;
+        const sendMusicCard = async (chatId, song) => {
+            const chat = db.characters.find(c => c.id === chatId) || db.groups.find(g => g.id === chatId);
+            if (!chat) return;
 
-                const myName = chat.me ? chat.me.nickname : chat.myName;
-                const content = `[${myName}分享了音乐：${song.name} - ${song.artist}]`;
+            // --- 核心修复：使用更可靠的方式来判断聊天类型 ---
+            // 如果 chat 对象有 .me 属性, 说明是群聊；否则就是单聊。
+            const myName = chat.me ? chat.me.nickname : chat.myName;
+            const content = `[${myName}分享了音乐：${song.name} - ${song.artist}]`;
 
-                const message = { 
-                    id: `msg_music_share_${Date.now()}`, 
-                    role: 'user', 
-                    content, 
-                    parts: [{ type: 'text', text: content }], 
-                    timestamp: Date.now(), 
-                    senderId: 'user_me' 
-                };
-                
-                chat.history.push(message);
-                
-                // 如果分享的目标就是当前打开的聊天，立即在界面上添加气泡
-                if (currentChatId === chatId) {
-                    addMessageBubble(message);
-                }
+            const message = { 
+                id: `msg_music_${Date.now()}`, 
+                role: 'user', 
+                content, 
+                parts: [{ type: 'text', text: content }], 
+                timestamp: Date.now(), 
+                senderId: 'user_me' 
             };
+            
+            chat.history.push(message);
+            // 只有当分享的目标就是当前打开的聊天时，才立即在界面上添加气泡
+            if (currentChatId === chatId) {
+                addMessageBubble(message);
+            }
+        };
         // ▲▲▲ 替换结束 ▲▲▲
-const notifyAiOfSongChange = async () => {
-    if (currentSongIndex === -1 || sharedWithChatIds.size === 0) return;
-
-    const song = db.playlist[currentSongIndex];
-
-    // 遍历所有共享音乐的聊天
-    for (const chatId of sharedWithChatIds) {
-        const chat = db.characters.find(c => c.id === chatId) || db.groups.find(g => g.id === chatId);
-        if (chat) {
-            // 1. 创建一条对AI可见但用户不可见的消息，包含歌曲详情
-            // 这部分被保留，以确保AI知道歌曲已切换
-            const contextMessageContent = `[system: 我正在听的歌曲已切换为: ${song.name} - ${song.artist}。歌词: ${song.lyrics || '无'}]`;
-            const contextMessage = {
-                id: `msg_music_update_ctx_${Date.now()}`,
-                role: 'user',
-                content: contextMessageContent,
-                parts: [{ type: 'text', text: contextMessageContent }],
-                timestamp: Date.now(),
-                senderId: 'user_me'
+            const notifyAiOfSongChange = async () => {
+                if (currentSongIndex === -1 || sharedWithChatIds.size === 0) return;
+                
+                const song = db.playlist[currentSongIndex];
+                const notificationContent = `[system-context-only: 我正在听的歌曲已切换为: ${song.name} - ${song.artist}。歌词: ${song.lyrics || '无'}]`;
+                
+                for (const chatId of sharedWithChatIds) {
+                    const chat = db.characters.find(c => c.id === chatId) || db.groups.find(g => g.id === chatId);
+                    if (chat) {
+                        const message = { id: `msg_music_update_${Date.now()}`, role: 'user', content: notificationContent, parts: [{ type: 'text', text: notificationContent }], timestamp: Date.now(), senderId: 'user_me' };
+                        chat.history.push(message);
+                    }
+                }
+                await saveData();
             };
-            chat.history.push(contextMessage);
-
-            // 2. [已移除] 创建和显示用户可见的系统提示部分
-            // 这部分代码已被删除，所以你不会再看到“切换了歌曲”的提示
-        }
-    }
-    await saveData();
-    renderChatList(); // 刷新列表以显示最新的简洁消息
-};
 
             // --- 事件监听器 ---
             musicWidget.addEventListener('click', () => musicModal.classList.add('visible'));
@@ -4775,31 +5303,22 @@ const notifyAiOfSongChange = async () => {
                 shareMusicModal.classList.add('visible');
             });
             
-          confirmShareBtn.addEventListener('click', async () => {
+            confirmShareBtn.addEventListener('click', async () => {
                 const checkboxes = shareMusicModal.querySelectorAll('input[type="checkbox"]');
                 const song = db.playlist[currentSongIndex];
-                let newlySelectedChatIds = new Set();
+                let newShares = new Set();
                 
-                // 1. 找出所有新勾选的聊天
                 for (const cb of checkboxes) {
                     if (cb.checked) {
-                        const chatId = cb.value;
-                        newlySelectedChatIds.add(chatId);
-                        // 如果这是一个本次才新勾选的分享，就发送可见的音乐卡片
-                        if (!sharedWithChatIds.has(chatId)) {
-                           await sendMusicCard(chatId, song);
-                        }
+                        newShares.add(cb.value);
+                        if (!sharedWithChatIds.has(cb.value)) await sendMusicCard(cb.value, song);
                     }
                 }
-                
-                // 2. 更新全局的分享列表
-                sharedWithChatIds = newlySelectedChatIds;
-                
-                // 3. 关键：通知AI歌曲信息，并触发回复
+                sharedWithChatIds = newShares;
                 await notifyAiOfSongChange();
                 
                 shareMusicModal.classList.remove('visible');
-                showToast("分享成功！");
+                showToast("分享设置已更新");
             });
 
             audioPlayer.addEventListener('ended', () => { if (!audioPlayer.loop) playNext(); });
@@ -4883,6 +5402,7 @@ const notifyAiOfSongChange = async () => {
                     <a href="#" class="app-icon" id="day-mode-btn"><img src="${getIcon('day-mode-btn')}" alt="日间" class="icon-img"></a>
                     <a href="#" class="app-icon" id="night-mode-btn"><img src="${getIcon('night-mode-btn')}" alt="夜间" class="icon-img"></a>
                     <a href="#" class="app-icon" data-target="font-settings-screen"><img src="${getIcon('font-settings-screen')}" alt="字体" class="icon-img"></a>
+                 <a href="#" class="app-icon" data-target="ai-character-select-screen"><img src="${getIcon('ai-character-select-screen')}" alt="AI空间" class="icon-img"></a>
                 </div>`;
             homeScreen.innerHTML = homeScreenHTML;
 
@@ -5273,7 +5793,7 @@ if (widget2Data && widget2El) {
             sortedChats.forEach(chat => {
                 let lastMessageText = '开始聊天吧...';
                 if (chat.history && chat.history.length > 0) {
-                    const invisibleRegex = /\[.*?(?:接收|退回).*?的转账\]|\[.*?更新状态为：.*?\]|\[.*?已接收礼物\]|\[system:.*?\]|\[.*?邀请.*?加入了群聊\]|\[.*?修改群名为：.*?\]|\[system-display:.*?\]/;
+                const invisibleRegex = /\[.*?(?:接收|退回).*?的转账\]|\[.*?更新状态为：.*?\]|\[.*?已接收礼物\]|\[system:.*?\]|\[system-context-only:.*?\]|\[.*?邀请.*?加入了群聊\]|\[.*?修改群名为：.*?\]|\[system-display:.*?\]/; // <-- 添加这里: 在 [system:.*?] 后面加上 |\[system-context-only:.*?\]
                     const visibleHistory = chat.history.filter(msg => !invisibleRegex.test(msg.content));
                     if (visibleHistory.length > 0) {
                         const lastMsg = visibleHistory[visibleHistory.length - 1];
@@ -5734,6 +6254,9 @@ function cancelQuoteReply() {
         }
 
          function createMessageBubbleElement(message) {
+      if (message.content.startsWith('[system-context-only:')) {
+        return null; // 如果是仅供AI上下文参考的消息，直接返回null，不创建任何HTML元素
+    }      
     const chat = (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
     const {role, content, timestamp, id, transferStatus, giftStatus, stickerData, senderId} = message;
 
@@ -6223,6 +6746,10 @@ function cancelQuoteReply() {
     addMessageBubble(message);
     await saveData();
     renderChatList();
+    // [新增] 清除AI空间的缓存
+if (chat.povCache) {
+    chat.povCache = null;
+}
     messageInput.value = '';
 }
 
@@ -6313,10 +6840,25 @@ function cancelQuoteReply() {
             sendPvModal.classList.remove('visible');
         }
 
-        async function sendMyTransfer(amount, remark) {
+               async function sendMyTransfer(amount, remark) {
+            const numericAmount = parseFloat(amount);
+            if (isNaN(numericAmount) || numericAmount <= 0) {
+                 showToast('请输入有效的金额');
+                 return;
+            }
+            
+            // --- 新增：支付逻辑 ---
+             try {
+                await handlePayment(numericAmount, `转账`);
+            } catch (error) {
+                showToast(error.message);
+                return; // 中断转账流程
+            }
+            // --- 支付逻辑结束 ---
+
             const chat = (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
             if (currentChatType === 'private') {
-                const content = `[${chat.myName}给你转账：${amount}元；备注：${remark}]`;
+                const content = `[${chat.myName}给你转账：${numericAmount.toFixed(2)}元；备注：${remark}]`;
                 const message = {
                     id: `msg_${Date.now()}`,
                     role: 'user',
@@ -6331,7 +6873,7 @@ function cancelQuoteReply() {
                 currentGroupAction.recipients.forEach(recipientId => {
                     const recipient = chat.members.find(m => m.id === recipientId);
                     if (recipient) {
-                        const content = `[${chat.me.nickname} 向 ${recipient.realName} 转账：${amount}元；备注：${remark}]`;
+                        const content = `[${chat.me.nickname} 向 ${recipient.realName} 转账：${numericAmount.toFixed(2)}元；备注：${remark}]`;
                         const message = {
                             id: `msg_${Date.now()}_${recipientId}`,
                             role: 'user',
@@ -6350,8 +6892,29 @@ function cancelQuoteReply() {
             sendTransferModal.classList.remove('visible');
         }
 
-        async function sendMyGift(description) {
+                      async function sendMyGift(description, amount) {
             if (!description) return;
+            
+            // --- ▼▼▼ 修改：支付逻辑使用动态价格 ▼▼▼ ---
+            const giftPrice = parseFloat(amount); 
+            if (isNaN(giftPrice) || giftPrice <= 0) {
+                showToast("请输入有效的礼物价格");
+                return;
+            }
+
+            const recipientName = (currentChatType === 'private') 
+                ? db.characters.find(c => c.id === currentChatId).remarkName 
+                : '群成员';
+
+            try {
+                // 调用支付处理函数，使用用户输入的价格
+                await handlePayment(giftPrice, `送礼物给 ${recipientName}`);
+            } catch (error) {
+                showToast(error.message); 
+                return; 
+            }
+            // --- ▲▲▲ 修改结束 ▲▲▲ ---
+
             const chat = (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
 
             if (currentChatType === 'private') {
@@ -6388,7 +6951,6 @@ function cancelQuoteReply() {
             renderChatList();
             sendGiftModal.classList.remove('visible');
         }
-
         // --- NEW: Time Skip System ---
         function setupTimeSkipSystem() {
             timeSkipBtn.addEventListener('click', () => {
@@ -6403,6 +6965,265 @@ function cancelQuoteReply() {
                 sendTimeSkipMessage(timeSkipInput.value.trim());
             });
         }
+
+  // ▼▼▼ 在这里粘贴新的视频通话JS代码 ▼▼▼
+
+function setupVoiceCallSystem() {
+    const voiceCallBtn = document.getElementById('voice-call-btn');
+    const voiceCallOverlay = document.getElementById('voice-call-overlay');
+    const callAvatar = document.getElementById('call-avatar');
+    const callName = document.getElementById('call-name');
+    const callStatus = document.getElementById('call-status');
+    const ringingView = document.getElementById('ringing-view');
+    const incomingButtons = document.getElementById('incoming-buttons');
+    const outgoingButtons = document.getElementById('outgoing-buttons');
+    const activeCallView = document.getElementById('active-call-view');
+    const callTranscriptArea = document.getElementById('call-transcript-area');
+    const hangupCallBtn = document.getElementById('hangup-call-btn');
+    const callInput = document.getElementById('call-input');
+    const sendCallMessageBtn = document.getElementById('send-call-message-btn');
+    const declineCallBtn = document.getElementById('decline-call-btn');
+    const acceptCallBtn = document.getElementById('accept-call-btn');
+    const cancelCallBtn = document.getElementById('cancel-call-btn');
+
+    voiceCallBtn.addEventListener('click', startUserInitiatedCall);
+    cancelCallBtn.addEventListener('click', () => endCall('ended'));
+    declineCallBtn.addEventListener('click', () => endCall('declined'));
+    acceptCallBtn.addEventListener('click', () => {
+        const character = db.characters.find(c => c.id === currentCallTargetId);
+        if (!character) return;
+        const contextMessage = {
+            id: `msg_call_${Date.now()}`, role: 'user',
+            content: `[system: ${character.myName} 接听了你的电话。]`,
+            parts: [{type: 'text', text: `[system: ${character.myName} 接听了你的电话。]`}],
+            timestamp: Date.now()
+        };
+        character.history.push(contextMessage);
+        saveData();
+        startActiveCall();
+    });
+    hangupCallBtn.addEventListener('click', () => endCall('ended'));
+    sendCallMessageBtn.addEventListener('click', sendCallMessage);
+    callInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendCallMessage();
+    });
+}
+
+function startUserInitiatedCall() {
+    if (isGenerating || currentChatType !== 'private') return;
+    const character = db.characters.find(c => c.id === currentChatId);
+    if (!character) return;
+
+    currentCallTargetId = character.id;
+    voiceCallOverlay.classList.add('visible');
+    ringingView.style.display = 'block';
+    activeCallView.style.display = 'none';
+    incomingButtons.style.display = 'none';
+    outgoingButtons.style.display = 'flex';
+
+    callAvatar.src = character.avatar;
+    callName.textContent = character.remarkName;
+    callStatus.textContent = '正在呼叫...';
+
+    isCallRinging = true;
+    callInitiationTimeout = setTimeout(() => {
+        if (isCallRinging) {
+            showToast('对方无应答');
+            endCall('timeout');
+        }
+    }, 60000); 
+
+    const callMessage = {
+        id: `msg_call_${Date.now()}`, role: 'user',
+        content: `[system: ${character.myName} 正在呼叫你，请根据你的人设决定是接听 [call-accept] 还是拒接 [call-decline]]`,
+        parts: [{type: 'text', text: `[system: ${character.myName} 正在呼叫你，请根据你的人设决定是接听 [call-accept] 还是拒接 [call-decline]]`}],
+        timestamp: Date.now()
+    };
+    character.history.push(callMessage);
+    saveData();
+    getAiReply();
+}
+
+function startAiInitiatedCall(characterId) {
+    const character = db.characters.find(c => c.id === characterId);
+    if (!character) return;
+    
+    currentCallTargetId = character.id;
+    voiceCallOverlay.classList.add('visible');
+    ringingView.style.display = 'block';
+    activeCallView.style.display = 'none';
+    incomingButtons.style.display = 'flex';
+    outgoingButtons.style.display = 'none';
+
+    callAvatar.src = character.avatar;
+    callName.textContent = character.remarkName;
+    callStatus.textContent = '来电邀请...';
+}
+
+function startActiveCall() {
+    const character = db.characters.find(c => c.id === currentCallTargetId);
+    if (!character) return;
+
+    clearTimeout(callInitiationTimeout);
+    isCallRinging = false;
+    isVoiceCallActive = true;
+    voiceCallTranscript = [];
+    voiceCallStartTime = Date.now();
+    
+    document.getElementById('call-avatar').style.display = 'block';
+    document.getElementById('call-name').style.display = 'block';
+    
+    ringingView.style.display = 'none';
+    activeCallView.style.display = 'flex';
+    
+    callTranscriptArea.innerHTML = '';
+    callInput.value = '';
+
+    appendCallTranscript('system', '通话已连接');
+    
+    callTimerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - voiceCallStartTime) / 1000);
+        const minutes = String(Math.floor(elapsed / 60)).padStart(2, '0');
+        const seconds = String(elapsed % 60).padStart(2, '0');
+        const timeString = `${minutes}:${seconds}`;
+        callStatus.textContent = timeString; 
+    }, 1000);
+
+    getAiCallReply("[system: 通话已接通，请说第一句话。]");
+}
+
+// 这是新的、修复后的代码，请完整复制并替换
+async function endCall(reason = 'ended') {
+    clearTimeout(callInitiationTimeout);
+    isCallRinging = false;
+    const character = db.characters.find(c => c.id === currentCallTargetId);
+
+    // 无论通话是否曾接通，只要UI还在，就先隐藏它
+    voiceCallOverlay.classList.remove('visible');
+
+    if (!character) {
+        // 如果找不到角色信息，重置状态并直接退出
+        isVoiceCallActive = false;
+        currentCallTargetId = null;
+        clearInterval(callTimerInterval);
+        return;
+    }
+
+    // 清理计时器和通话状态
+    clearInterval(callTimerInterval);
+    const duration = callStatus.textContent;
+
+    // --- 核心修复逻辑开始 ---
+    if (isVoiceCallActive) { // 情况一：通话曾被接通过
+        const summaryDisplay = {
+            id: `msg_call_${Date.now()}_disp`, role: 'system',
+            content: `[system-display:与 ${character.remarkName} 的通话已结束，时长 ${duration}]`,
+            parts: [], timestamp: Date.now()
+        };
+        const summaryContext = {
+            id: `msg_call_${Date.now()}_ctx`, role: 'user',
+            content: `[system: 与 ${character.realName} 的通话已结束。通话记录：${JSON.stringify(voiceCallTranscript)}]`,
+            parts: [{type: 'text', text: `[system: 与 ${character.realName} 的通话已结束。通话记录：${JSON.stringify(voiceCallTranscript)}]`}],
+            timestamp: Date.now()
+        };
+        character.history.push(summaryDisplay, summaryContext);
+        if(currentChatId === character.id) {
+             addMessageBubble(summaryDisplay);
+        }
+    } else { // 情况二：通话从未接通（被拒接或无应答）
+        let transitionPrompt = '';
+        if (reason === 'declined') {
+            // 如果是AI主动拒接，强制它发消息解释
+            transitionPrompt = `[system: 你刚刚拒绝了 ${character.myName} 的电话。请用一句话向用户解释你为什么不方便接电话，以自然地过渡回聊天。]`;
+        } else if (reason === 'timeout' || reason === 'no_action_reply') {
+            // 如果是超时未接，强制它发消息表示歉意或询问
+            transitionPrompt = `[system: 你似乎错过了 ${character.myName} 的来电。请发一条消息表示歉意或询问对方有什么事，以自然地过渡回聊天。]`;
+        }
+
+        if (transitionPrompt) {
+            const contextMessage = {
+                id: `msg_call_fail_${Date.now()}`, role: 'user',
+                content: transitionPrompt,
+                parts: [{type: 'text', text: transitionPrompt}],
+                timestamp: Date.now()
+            };
+            character.history.push(contextMessage);
+            // 关键：主动触发一次AI回复，强制它从卡死的状态中恢复
+            if (currentChatId === character.id) {
+                getAiReply();
+            }
+        }
+    }
+    // --- 核心修复逻辑结束 ---
+
+    // 统一重置所有状态
+    isVoiceCallActive = false;
+    voiceCallTranscript = [];
+    voiceCallStartTime = null;
+    currentCallTargetId = null;
+    
+    await saveData();
+}
+
+function sendCallMessage() {
+    const text = callInput.value.trim();
+    if (!text || isGenerating) return;
+    appendCallTranscript('user', text);
+    getAiCallReply(text);
+    callInput.value = '';
+}
+
+async function getAiCallReply(userText) {
+    if (isGenerating) return;
+    const character = db.characters.find(c => c.id === currentCallTargetId);
+    if (!character) return;
+
+    isGenerating = true;
+    sendCallMessageBtn.disabled = true;
+
+    try {
+       const prompt = `[通话中] 你是 ${character.realName} (人设: ${character.persona})，正在和 ${character.myName} 通话。请直接回复对话内容。可以使用括号()描述动作。`;
+        const callHistory = voiceCallTranscript.map(line => ({
+            role: line.sender === 'user' ? 'user' : 'assistant',
+            content: line.text
+        }));
+        const messages = [
+            { role: 'system', content: prompt },
+            ...callHistory.slice(-5),
+            { role: 'user', content: userText }
+        ];
+        const aiResponseText = await callAiApi(messages);
+        const replies = aiResponseText.split('\n').filter(reply => reply.trim() !== '');
+        for (const reply of replies) {
+            appendCallTranscript("ai", reply);
+            await new Promise(resolve => setTimeout(resolve, Math.random() * 500 + 200));
+        }
+    } catch (error) {
+        // --- 核心修改：增加用户提示 ---
+        const errorMessage = `[AI服务器返回错误: ${error.message}]`;
+        appendCallTranscript("system", errorMessage);
+        showToast('AI回复失败，可能是服务器临时问题'); // 弹出顶部的友好提示
+    } finally {
+        isGenerating = false;
+        sendCallMessageBtn.disabled = false;
+    }
+}
+
+function appendCallTranscript(sender, text) {
+    voiceCallTranscript.push({ sender, text });
+    const line = document.createElement('div');
+    line.className = 'call-transcript-line';
+    if (sender === 'system') {
+        line.innerHTML = `<span class="action">${text}</span>`;
+    } else {
+        const name = sender === 'user' ? '我' : callName.textContent;
+        const styledText = text.replace(/\((.*?)\)/g, '<span class="action">($1)</span>');
+        line.innerHTML = `<strong>${name}:</strong> <span class="dialog">${styledText}</span>`;
+    }
+    callTranscriptArea.appendChild(line);
+    callTranscriptArea.scrollTop = callTranscriptArea.scrollHeight;
+}
+// ▲▲▲ 粘贴到这里结束 ▲▲▲
 // --- NEW: File System Setup ---
 function setupFileSystem() {
     fileBtn.addEventListener('click', () => {
@@ -6675,7 +7496,10 @@ function setupFileDisplaySystem() {
         }
 if (character.memorySummary && character.memorySummary.trim()) {
     prompt += `\n## 核心回忆摘要\n这是你必须始终牢记的、关于我们过去互动的核心总结。在任何回复之前，请务必参考以下内容：\n${character.memorySummary}\n---\n`;
-}
+}// --- ▼▼▼ 新增规则 ▼▼▼ ---
+prompt += `\n## 新增规则：处理后台对话记忆\n`;
+prompt += `系统有时会在最新的历史记录中，插入一条格式为 "[system: 这是你最近在后台和“XXX”的一段对话回顾...]" 的信息。这代表了你在和我聊天之前，与其他人的互动。你必须将这段回顾视为你自己的真实记忆，并在接下来与我的对话中，可能会不经意地、自然地提及或被其影响，从而表现出你拥有独立社交生活的真实感。\n`;
+// --- ▲▲▲ 新增规则结束 ▲▲▲ ---
         if (character.myPersona) {
             prompt += `3. 关于我的人设：${character.myPersona}\n`;
         }
@@ -6687,13 +7511,20 @@ if (character.memorySummary && character.memorySummary.trim()) {
         prompt += `9. 禁止括号/星号等额外叙述的规则...\n`;
         prompt += `10. 发送表情包的规则...\n`;
 
-     
-       if (forceTheater) {
-        prompt += '11. ✨HTML小剧场 (强制生成)✨：你的本次回复中，**必须包含一个且仅一个**HTML小剧场。\n' +
-        '- 格式必须为: <div class="ai-theater" data-char="' + character.realName + '">...</div>。\n' +
-        '- 在 <div> 标签内，你可以自由使用HTML和行内CSS (style="") 来创造丰富的视觉内容。\n' +
-        '- 这个小剧场消息应该随机穿插在你回复的多条普通消息之间，位置不固定。\n';
-    }
+     // --- ▼▼▼ 核心修改区域 ▼▼▼ ---
+            if (forceTheater) {
+                prompt += '11. ✨HTML小剧场 (强制生成)✨：你的本次回复中，**必须包含一个且仅一个**HTML小剧场。\n' +
+                '- 格式必须为: <div class="ai-theater" data-char="' + character.realName + '">...</div>。\n' +
+                '- **【创意指导】** 你需要发挥创意，利用HTML和行内CSS (style="") 来制作各种各样精美、有趣的互动卡片，而**不只是一段文字**。卡片内容要与对话情景紧密相关。\n' +
+                '- **【可用创意示例】**:\n' +
+                '  - **电影票根**: 模拟一张电影票，包含电影名、场次、座位信息，可以添加一个检票按钮。例如：`<div style="background-color: #f1c40f; padding: 15px; border-radius: 10px; font-family: sans-serif; text-align: center;"><h3 style="margin:0; border-bottom: 1px dashed #000; padding-bottom: 5px;">深海影院</h3><p>放映影片：《与千寻》</p><p>座位：专属双人座</p><button style="background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px;" onclick="alert(\'检票成功！请在我身边坐好哦~\')">检票入场</button></div>`\n' +
+                '  - **天气预报卡**: 显示今天或明天的心情天气，用图标和文字描述。例如：`<div style="..."><p>今日心情天气：晴转多云，有时有想你的小雨</p></div>`\n' +
+                '  - **点歌单**: 像一个音乐播放器界面，显示歌曲名和歌手，附带一个播放按钮。例如：`<div style="..."><p>为你点播一首《遇见》</p><button onclick="alert(\'♪ 听见冬天的离开...我在某年某月醒过来... ♪\')">播放</button></div>`\n' +
+                '  - **二选一投票**: 提出一个问题，提供两个可以点击的选项按钮。例如：`<div><p>晚餐吃什么？</p><button onclick="alert(\'好呀，就吃火锅！\')">火锅</button> <button onclick="alert(\'听你的，我们去吃烧烤！\')">烧烤</button></div>`\n' +
+                '  - **手写便签**: 模拟一张便利贴，用手写体字体和淡黄色背景。例如：`<div style="background: #fef9e7; padding: 10px; font-family: \'Comic Sans MS\', cursive;"><p>记得要开心呀！</p></div>`\n' +
+                '- **【交互规则】** 你可以在卡片中加入可点击的元素，例如按钮。请使用 `onclick="alert(\'这里是点击后的提示内容\')"` 的格式来创建简单的点击事件。\n' +
+                '- 这个小剧场消息应该随机穿插在你回复的多条普通消息之间，位置不固定。\n';
+            }
     
     let outputFormats = '\n' +
         '    a) 普通消息: [' + character.realName + '的消息：{消息内容}]\n' +
@@ -6719,7 +7550,7 @@ if (character.memorySummary && character.memorySummary.trim()) {
       let momentPostingRule;
       if (autoPostMoment) {
           momentPostingRule = `16. **发布动态 (高概率触发)**
-       - 在你的每次回复中，你有 **70%的概率** 需要根据我们的对话上下文和你的角色人设，额外发布一条动态。
+       - 在你的每次回复中，你有 **50%的概率** 需要根据我们的对话上下文和你的角色人设，额外发布一条动态。
        - 这条动态应该像是你真实生活中的所思所想，是对我们聊天内容的一种延伸或感悟。
        - **发布格式 (严格遵守)**: 当你决定发布时，请仅生成一条特殊指令消息（该指令不会在聊天中显示）。格式为：
          \`[${character.realName}发布动态：{"text":"这是动态文字","imageDesc":"这里是图片的文字描述（可选）"}]\`
@@ -6971,6 +7802,43 @@ async function getAiReply() {
             systemPrompt = generateGroupSystemPrompt(chat);
         }
         const historySlice = chat.history.slice(-chat.maxMemory);
+        // --- ▼▼▼ 新增：注入AI的后台聊天记忆 ▼▼▼ ---
+try {
+    if (currentChatType === 'private' && chat.povCache && chat.povCache.conversations) {
+        const conversations = Object.values(chat.povCache.conversations);
+        if (conversations.length > 0) {
+            // 1. 找到时间戳最新的那段对话
+            conversations.sort((a, b) => b.timestamp - a.timestamp);
+            const mostRecentConversation = conversations[0];
+            const otherChatInfo = chat.povCache.chatList.find(c => c.chatId === Object.keys(chat.povCache.conversations).find(key => chat.povCache.conversations[key] === mostRecentConversation));
+
+            if (mostRecentConversation && otherChatInfo) {
+                // 2. 截取最后几条消息作为记忆片段
+                const memorySnippet = mostRecentConversation.history.slice(-5); // 最多回忆5条
+                let otherPartyName = "某人";
+                if(otherChatInfo.type === 'private') {
+                    otherPartyName = otherChatInfo.otherParty.name;
+                } else {
+                    otherPartyName = otherChatInfo.groupName;
+                }
+
+                // 3. 格式化成易于AI理解的文本
+                const memoryText = memorySnippet.map(msg => `${msg.sender}: ${msg.content}`).join('\n');
+                const contextMessageContent = `[system: 这是你最近在后台和“${otherPartyName}”的一段对话回顾，发生在我与你当前对话之前。你需要参考它来记起最近发生的事，并在与我的对话中自然地体现出来。\n--- 对话回顾开始 ---\n${memoryText}\n--- 对话回顾结束 ---]`;
+
+                // 4. 将这段记忆作为一条系统消息，注入到历史记录的最末尾
+                historySlice.push({
+                    role: 'user', // 作为user消息注入，确保AI会阅读
+                    content: contextMessageContent,
+                    parts: [{ type: 'text', text: contextMessageContent }]
+                });
+            }
+        }
+    }
+} catch (error) {
+    console.error("注入AI后台聊天记忆时出错:", error);
+}
+// --- ▲▲▲ 新增代码结束 ▲▲▲ ---
         
         // --- 核心修改：在这里加入“论坛帖子回忆”逻辑 ---
         if (currentChatType === 'private') {
@@ -7044,10 +7912,53 @@ async function getAiReply() {
             };
         } else {
             const messages = [
-                {role: 'system', content: systemPrompt}, 
-                ...historySlice.map(msg => {
-                    return {role: msg.role, content: msg.content};
-                })
+              {role: 'system', content: systemPrompt}, 
+...historySlice.map(msg => {
+    // 检查消息是否有 parts 数组并且包含图片
+    if (msg.parts && msg.parts.some(p => p.type === 'image')) {
+        const textPart = msg.parts.find(p => p.type === 'text');
+        const imagePart = msg.parts.find(p => p.type === 'image');
+
+        // 根据不同的API服务商，构建不同的图片消息格式
+        if (db.apiSettings.provider === 'claude') {
+            // --- 这是专门为 Claude 准备的格式 ---
+            const base64Match = imagePart.data.match(/^data:(image\/.+);base64,(.*)$/);
+            if (!base64Match) return { role: msg.role, content: textPart ? textPart.text : '' };
+
+            const mediaType = base64Match[1];
+            const base64Data = base64Match[2];
+
+            const contentParts = [
+                { type: 'text', text: textPart ? textPart.text : ' ' },
+                {
+                    type: 'image',
+                    source: {
+                        type: 'base64',
+                        media_type: mediaType,
+                        data: base64Data
+                    }
+                }
+            ];
+            return { role: msg.role, content: contentParts };
+
+        } else {
+            // --- 这是用于 OpenAI, DeepSeek, NewAPI 等兼容服务商的格式 ---
+            const contentParts = [
+                { type: 'text', text: textPart ? textPart.text : ' ' },
+                {
+                    type: 'image_url',
+                    image_url: {
+                        url: imagePart.data // 直接使用完整的 Base64 Data URI
+                    }
+                }
+            ];
+            return { role: msg.role, content: contentParts };
+        }
+    } else {
+        // 如果是普通文本消息，保持原样
+        return { role: msg.role, content: msg.content };
+    }
+})
             ];
             requestBody = {model: model, messages: messages, stream: true};
         }
@@ -7096,7 +8007,7 @@ async function getAiReply() {
     }
     const chat = (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
     if (!chat) return;
-    
+
     isGenerating = true;
     getReplyBtn.disabled = true;
     const typingName = currentChatType === 'private' ? chat.remarkName : chat.name;
@@ -7112,65 +8023,98 @@ async function getAiReply() {
             systemPrompt = generateGroupSystemPrompt(chat);
         }
         const historySlice = chat.history.slice(-chat.maxMemory);
-        // --- moments: attach pending moments for AI to process ---
-try {
-    const character = chat;
-    const pendingMoments = (typeof getPendingMomentsForRole === 'function') ? await getPendingMomentsForRole(character.id, 3) : [];
-    let momentsPromptPart = '';
-    if (pendingMoments && pendingMoments.length > 0) {
-        const momentsData = pendingMoments.map(m => ({
-            id: m.id,
-            author: m.author,
-            text: m.text,
-            imageDesc: m.imageDesc
-        }));
-        momentsPromptPart = `\n[system-moments: ${JSON.stringify(momentsData)}]`;
-    }
-    if (momentsPromptPart) {
-        historySlice.push({
-            role: 'user',
-            content: momentsPromptPart,
-            parts: [{ type: 'text', text: momentsPromptPart }]
-        });
-    }
-} catch(e) {
-    console.warn('attach pending moments failed', e);
-}
-// --- end moments ---
+
+        try {
+            const character = chat;
+            const pendingMoments = (typeof getPendingMomentsForRole === 'function') ? await getPendingMomentsForRole(character.id, 3) : [];
+            let momentsPromptPart = '';
+            if (pendingMoments && pendingMoments.length > 0) {
+                const momentsData = pendingMoments.map(m => ({
+                    id: m.id,
+                    author: m.author,
+                    text: m.text,
+                    imageDesc: m.imageDesc
+                }));
+                momentsPromptPart = `\n[system-moments: ${JSON.stringify(momentsData)}]`;
+            }
+            if (momentsPromptPart) {
+                historySlice.push({
+                    role: 'user',
+                    content: momentsPromptPart,
+                    parts: [{ type: 'text', text: momentsPromptPart }]
+                });
+            }
+        } catch(e) {
+            console.warn('attach pending moments failed', e);
+        }
+
+        // --- 核心修复：这里修正了数组嵌套问题，并增加了对Claude图片格式的兼容 ---
+        const messages = [
+            {role: 'system', content: systemPrompt},
+            ...historySlice.map(msg => {
+                if (msg.parts && msg.parts.some(p => p.type === 'image')) {
+                    const textPart = msg.parts.find(p => p.type === 'text');
+                    const imagePart = msg.parts.find(p => p.type === 'image');
+
+                    if (db.apiSettings.provider === 'claude') {
+                        const base64Match = imagePart.data.match(/^data:(image\/.+);base64,(.*)$/);
+                        if (!base64Match) return { role: msg.role, content: textPart ? textPart.text : '' };
+
+                        const mediaType = base64Match[1];
+                        const base64Data = base64Match[2];
+
+                        const contentParts = [
+                            { type: 'text', text: textPart ? textPart.text : ' ' },
+                            {
+                                type: 'image',
+                                source: {
+                                    type: 'base64',
+                                    media_type: mediaType,
+                                    data: base64Data
+                                }
+                            }
+                        ];
+                        return { role: msg.role, content: contentParts };
+                    } else {
+                        const contentParts = [
+                            { type: 'text', text: textPart ? textPart.text : ' ' },
+                            {
+                                type: 'image_url',
+                                image_url: {
+                                    url: imagePart.data
+                                }
+                            }
+                        ];
+                        return { role: msg.role, content: contentParts };
+                    }
+                } else {
+                    return { role: msg.role, content: msg.content };
+                }
+            })
+        ];
 
         if (db.apiSettings.provider === 'gemini') {
-            // Gemini 的请求体构造保持不变，因为它支持多模态parts
-            const contents = historySlice.map(msg => {
-                const role = msg.role === 'assistant' ? 'model' : 'user';
-                let parts = msg.parts && msg.parts.length > 0 ? msg.parts.map(p => {
-                    if (p.type === 'text' || p.type === 'html') return {text: p.text};
-                    if (p.type === 'image') {
-                        const match = p.data.match(/^data:(image\/(.+));base64,(.*)$/);
-                        if (match) return {inline_data: {mime_type: match[1], data: match[3]}};
+            const geminiMessages = messages.map(msg => {
+                const parts = (Array.isArray(msg.content)) ? msg.content.map(part => {
+                    if (part.type === 'text') return { text: part.text };
+                    if (part.type === 'image_url') {
+                        const match = part.image_url.url.match(/^data:(image\/(.+));base64,(.*)$/);
+                        if (match) return { inline_data: { mime_type: match[1], data: match[3] } };
                     }
                     return null;
-                }).filter(p => p) : [{text: msg.content}];
-                return {role, parts};
+                }).filter(p => p) : [{ text: msg.content }];
+                return { role: msg.role === 'assistant' ? 'model' : 'user', parts };
             });
+
             requestBody = {
-                contents: contents,
-                system_instruction: {parts: [{text: systemPrompt}]},
+                contents: geminiMessages,
+                system_instruction: { parts: [{ text: systemPrompt }] },
                 generationConfig: {}
             };
         } else {
-            // --- 这是关键的修复部分 ---
-            // 对所有非Gemini的API，强制使用简单的{role, content}格式，其中content永远是字符串
-            const messages = [
-                {role: 'system', content: systemPrompt}, 
-                ...historySlice.map(msg => {
-                    // 无论消息内部结构如何，只取其纯文本表示 (msg.content)
-                    return {role: msg.role, content: msg.content};
-                })
-            ];
             requestBody = {model: model, messages: messages, stream: true};
-            // --- 修复结束 ---
         }
-        
+
         const endpoint = (db.apiSettings.provider === 'gemini') ? `${url}/v1beta/models/${model}:streamGenerateContent?key=${getRandomValue(key)}` : `${url}/v1/chat/completions`;
         const headers = (db.apiSettings.provider === 'gemini') ? {'Content-Type': 'application/json'} : {
             'Content-Type': 'application/json',
@@ -7186,9 +8130,7 @@ try {
 
     } catch (error) {
         console.error('AI回复失败:', error);
-        showToast(`AI回复失败: ${error.message}`);            if (isCallRinging) { // <-- 添加这个 if 判断块
-        endCall('error');
-        }
+        showToast(`AI回复失败: ${error.message}`);
     } finally {
         isGenerating = false;
         getReplyBtn.disabled = false;
@@ -7432,7 +8374,7 @@ try {
                await addMessageBubble(simpleMessage);
             }
             character.messageCountSinceLastDiary = (character.messageCountSinceLastDiary || 0) + 1;
-            if (character.messageCountSinceLastDiary >= 10 && Math.random() < 0.3) { generateDiaryEntry(); }    
+            if (character.messageCountSinceLastDiary >= 5&& Math.random() < 0.9) { generateDiaryEntry(); }    
         } else if (currentChatType === 'group') {
             const group = chat;
             const messages = getMixedContent(fullResponse)
@@ -7460,13 +8402,19 @@ try {
                    await addMessageBubble(simpleMessage);
                 }
             }
-        }
+        }if (chat.povCache) {
+    chat.povCache = null;
+}
         await saveData();
         renderChatList();
         if (momentsWereAdded) {
             if (typeof renderMoments === 'function') { try { await renderMoments(); } catch (e) {} } 
             else if (typeof window.renderMomentsSafe === 'function') { try { await window.renderMomentsSafe(); } catch (e) {} }
         }
+        if (currentChatType === 'private' && Math.random() < 0.85) { // 85%的几率触发
+        await generateBackgroundChat(chat);
+        await saveData(); // 背景对话生成后再次保存数据
+    }
     }
     if (isCallRinging && !callActionReceived) {
         showToast('对方无应答');
@@ -7682,7 +8630,7 @@ try {
             receiveTransferActionSheet.classList.add('visible');
         }
 
-        async function respondToTransfer(action) {
+               async function respondToTransfer(action) {
             if (!currentTransferMessageId) return;
             const character = db.characters.find(c => c.id === currentChatId);
             const message = character.history.find(m => m.id === currentTransferMessageId);
@@ -7695,6 +8643,17 @@ try {
                     cardOnScreen.querySelector('.transfer-status').textContent = action === 'received' ? '已收款' : '已退回';
                     cardOnScreen.style.cursor = 'default';
                 }
+
+                // --- 新增：收款逻辑 ---
+                if (action === 'received') {
+                    const amountMatch = message.content.match(/\[.*?的转账：([\d.]+)元；备注：.*?\]/);
+                    if (amountMatch) {
+                        const amount = parseFloat(amountMatch[1]);
+                        addTransaction('income', amount, `收到 ${character.remarkName} 的转账`);
+                    }
+                }
+                // --- 收款逻辑结束 ---
+
                 let contextMessageContent = (action === 'received') ? `[${character.myName}接收${character.realName}的转账]` : `[${character.myName}退回${character.realName}的转账]`;
                 const contextMessage = {
                     id: `msg_${Date.now()}`,
@@ -7711,7 +8670,7 @@ try {
             currentTransferMessageId = null;
         }
 
-        function setupGiftSystem() {
+               function setupGiftSystem() {
             giftBtn.addEventListener('click', () => {
                 if (currentChatType === 'private') {
                     sendGiftForm.reset();
@@ -7724,7 +8683,11 @@ try {
             });
             sendGiftForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                sendMyGift(giftDescriptionInput.value.trim());
+                // --- ▼▼▼ 修改：获取价格和描述 ▼▼▼ ---
+                const description = document.getElementById('gift-description-input').value.trim();
+                const amount = document.getElementById('gift-amount-input').value;
+                sendMyGift(description, amount); // 将价格作为参数传递
+                // --- ▲▲▲ 修改结束 ▲▲▲ ---
             });
         }
 
@@ -10295,6 +11258,622 @@ function setupHomeScreenProfileEditor() {
     // 首次加载时渲染一次
     renderProfile();
 }
+// ▼▼▼ 在这里粘贴下面的新代码 ▼▼▼
+
+// --- AI空间 (AI POV Chat) 功能 [由AI生成对话的修改版] ---
+
+// 用于临时存储AI生成数据的全局变量
+let currentAiPovData = {
+    mainAi: null,
+    chatList: [],
+    conversations: {} // key是povChatId
+};
+/**
+ * [新的辅助函数] 检查两个角色是否可能根据其人设和世界书相互认识。
+ * @param {object} charA - 第一个角色对象。
+ * @param {object} charB - 第二个角色对象。
+ * @returns {boolean} - 如果确认相识则返回 true，否则返回 false。
+ */
+function charactersAreAcquainted(charA, charB) {
+    // 获取两个角色的所有已知名称，用于检查提及。
+    const namesA = [charA.realName, charA.remarkName].filter(Boolean);
+    const namesB = [charB.realName, charB.remarkName].filter(Boolean);
+
+    // 将人设和所有关联的世界书内容合并为每个角色的单个上下文字符串。
+    const getWorldBookContent = (char) => {
+        return (char.worldBookIds || [])
+            .map(id => db.worldBooks.find(wb => wb.id === id))
+            .filter(Boolean)
+            .map(wb => wb.content)
+            .join(' ');
+    };
+
+    const contextA = `${charA.persona || ''} ${getWorldBookContent(charA)}`;
+    const contextB = `${charB.persona || ''} ${getWorldBookContent(charB)}`;
+
+    // 进行双向检查。
+    // 角色A的上下文（人设或世界书）是否提及了角色B的名字？
+    const aKnowsB = namesB.some(name => contextA.includes(name));
+    // 角色B的上下文（人设或世界书）是否提及了角色A的名字？
+    const bKnowsA = namesA.some(name => contextB.includes(name));
+
+    // 只要任意一方的上下文中提到了对方，就认为他们相识。
+    return aKnowsB || bKnowsA;
+}
+/**
+ * 为AI生成“聊天列表”的指令
+ * @param {object} mainAi - 主视角AI的角色对象
+ * @param {Array} allOtherCharacters - 其他所有可互动的AI角色列表
+ * @param {object} userProfile - 用户信息对象
+ * @returns {string} - 发给大语言模型的完整指令
+ */
+function generateAiChatListPrompt(mainAi, allOtherCharacters, userProfile) {
+    if (!Array.isArray(allOtherCharacters)) {
+        allOtherCharacters = [];
+    }
+
+    // [新增逻辑] 根据人设和世界书筛选出真正认识的角色
+    const acquaintedChars = allOtherCharacters.filter(charB => charactersAreAcquainted(mainAi, charB));
+
+    let otherCharsPrompt = acquaintedChars.length > 0
+        ? acquaintedChars.map(c => `- ${c.realName} (人设: ${c.persona})`).join('\n')
+        : '无其他可互动角色。';
+
+    let worldBooksPrompt = (mainAi.worldBookIds || [])
+        .map(id => db.worldBooks.find(wb => wb.id === id))
+        .filter(Boolean)
+        .map(wb => `[${wb.name}]\n${wb.content}`)
+        .join('\n\n');
+
+    let prompt = `你是一个AI角色扮演辅助工具。你的任务是为AI角色“${mainAi.realName}”生成一个虚拟的聊天列表。
+
+# 角色信息
+- 主视角AI: ${mainAi.realName} (人设: ${mainAi.persona})
+- 用户: ${userProfile.name} (用户在我眼中的人设: ${mainAi.myPersona || '未设定'})
+- 其他**认识的、可互动的**AI角色:\n${otherCharsPrompt}
+
+# 世界观设定
+${worldBooksPrompt || '无特定世界观。'}
+
+# 任务要求
+根据“${mainAi.realName}”的人设、与用户的关系、以及世界观，虚构一个包含3到5个聊天的列表。
+1.  **必须包含一个与用户“${userProfile.name}”的聊天**。这是最重要的，这条聊天的“最后一条消息”应该能反映出他们当前的关系和最近的互动。
+2.  **[严格规则]** 剩下的聊天，你**只能**从上方“其他认识的、可互动的AI角色”列表中选择角色进行私聊或群聊。如果该列表是“无”，则你**不能**生成任何与其他AI的聊天，只能生成与用户的聊天。严禁虚构与不认识的角色的对话。
+3.  为每个聊天生成一句能体现对话内容的“最后一条消息预览”。
+4.  你的输出必须是严格的JSON数组格式，不要包含任何其他文字。
+
+# 输出JSON格式示例:
+[
+  {
+    "chatId": "pov_chat_user",
+    "type": "private",
+    "otherParty": { "type": "user", "name": "${userProfile.name}" },
+    "lastMessage": "我正在想你刚才说的话..."
+  },
+  {
+    "chatId": "pov_chat_ai_1",
+    "type": "private",
+    "otherParty": { "type": "ai", "name": "另一个AI的真名" },
+    "lastMessage": "关于那个计划，我觉得..."
+  },
+  {
+    "chatId": "pov_chat_group_1",
+    "type": "group",
+    "groupName": "一个有趣的群名",
+    "members": ["AI角色A真名", "AI角色B真名"],
+    "lastMessage": "AI角色A真名: 哈哈真的吗？"
+  }
+]
+`;
+    return prompt;
+}
+
+/**
+ * 为AI生成具体“对话内容”的指令
+ * @param {object} mainAi - 主视角AI的角色对象
+ * @param {object} chatInfo - 被点击的聊天条目的信息
+ * @returns {string} - 发给大语言模型的完整指令
+ */
+function generateAiConversationPrompt(mainAi, chatInfo) {
+    let participantsPrompt;
+    if (chatInfo.type === 'private') {
+        const otherPartyName = chatInfo.otherParty.name;
+        const otherPartyObj = (chatInfo.otherParty.type === 'user')
+            ? { persona: mainAi.myPersona, realName: otherPartyName }
+            : db.characters.find(c => c.realName === otherPartyName);
+        
+        participantsPrompt = `这是一个你 (${mainAi.realName}) 和 ${otherPartyName} 之间的私聊。
+- 你的角色: ${mainAi.realName} (人设: ${mainAi.persona})
+- 对方的角色: ${otherPartyName} (人设: ${otherPartyObj ? otherPartyObj.persona : '通用人设'})`;
+    } else { // group
+        const memberNames = [mainAi.realName, ...chatInfo.members];
+        const memberInfos = memberNames.map(name => {
+            const char = db.characters.find(c => c.realName === name);
+            return `- ${name} (人设: ${char ? char.persona : '通用人设'})`;
+        }).join('\n');
+        participantsPrompt = `这是一个名为“${chatInfo.groupName}”的群聊。
+群成员信息:
+${memberInfos}`;
+    }
+
+    let prompt = `你是一个AI角色扮演辅助工具。你的任务是根据以下信息，生成一段简短的对话记录。
+
+# 对话背景
+${participantsPrompt}
+对话主题线索 (最后一条消息): "${chatInfo.lastMessage}"
+
+# 任务要求
+1.  生成一段连贯的对话，总消息数**不得超过15条**。
+2.  所有角色的发言都必须严格符合他们各自的人设。
+3.  对话内容应该与主题线索相关并自然发展。
+4.  对话的视角应该是以 **${mainAi.realName}** 为主视角。
+5.  你的输出必须是严格的JSON数组格式，不要包含任何其他文字。
+
+# 输出JSON格式示例:
+[
+  {"sender": "发送者真名", "content": "这是第一条消息。"},
+  {"sender": "另一个发送者真名", "content": "这是第二条消息。"}
+]
+`;
+    return prompt;
+}
+/**
+ * [新增的辅助函数] 更智能地从AI返回的文本中提取并解析JSON。
+ * @param {string} text - 从AI获取的原始文本回复。
+ * @returns {object} - 解析成功后的JavaScript对象或数组。
+ * @throws {Error} - 如果在文本中找不到或无法解析有效的JSON，则抛出错误。
+ */
+function extractAndParseJson(text) {
+    // 优先尝试从Markdown代码块中提取JSON
+    const codeBlockMatch = text.match(/```(json)?\s*([\s\S]+?)\s*```/);
+    if (codeBlockMatch && codeBlockMatch) {
+        try {
+            return JSON.parse(codeBlockMatch);
+        } catch (e) {
+            console.warn("无法从Markdown代码块中解析JSON，将尝试后备方法。", e);
+        }
+    }
+
+    // 后备方法：寻找第一个 '{' 或 '['，并匹配到其对应的 '}' 或 ']'
+    const firstBracket = text.indexOf('[');
+    const firstBrace = text.indexOf('{');
+    let startIndex = -1;
+
+    if (firstBracket === -1 && firstBrace === -1) {
+        throw new Error("AI的回复中没有找到JSON对象或数组的起始符号。");
+    }
+
+    if (firstBracket === -1) {
+        startIndex = firstBrace;
+    } else if (firstBrace === -1) {
+        startIndex = firstBracket;
+    } else {
+        startIndex = Math.min(firstBracket, firstBrace);
+    }
+    
+    const startChar = text[startIndex];
+    const endChar = startChar === '[' ? ']' : '}';
+    
+    let nestingLevel = 0;
+    let endIndex = -1;
+
+    for (let i = startIndex; i < text.length; i++) {
+        if (text[i] === startChar) {
+            nestingLevel++;
+        } else if (text[i] === endChar) {
+            nestingLevel--;
+        }
+
+        if (nestingLevel === 0) {
+            endIndex = i;
+            break;
+        }
+    }
+
+    if (endIndex === -1) {
+        throw new Error("无法在AI回复中找到匹配的JSON结束符号。");
+    }
+
+    const jsonString = text.substring(startIndex, endIndex + 1);
+    
+    try {
+        return JSON.parse(jsonString);
+    } catch (e) {
+        console.error("最终JSON解析失败。提取出的字符串为:", jsonString);
+        throw e; 
+    }
+}
+/**
+ /**
+ * [重写] 设置AI空间应用的所有事件和逻辑
+ */
+function setupAiPovApp() {
+    // 监听“AI角色选择列表”的点击事件
+    document.getElementById('ai-character-select-list').addEventListener('click', async (e) => {
+        const charItem = e.target.closest('.list-item');
+        if (charItem && charItem.dataset.id) {
+            currentAiPovId = charItem.dataset.id;
+            const character = db.characters.find(c => c.id === currentAiPovId);
+            if (!character) return;
+            
+            switchScreen('ai-chat-list-screen');
+
+            // [新增] 检查缓存
+            if (character.povCache && character.povCache.chatList) {
+                console.log("从缓存加载AI聊天列表。");
+                currentAiPovData.mainAi = character;
+                currentAiPovData.chatList = character.povCache.chatList;
+                currentAiPovData.conversations = character.povCache.conversations || {};
+                renderAiChatList(character, character.povCache.chatList);
+                return;
+            }
+
+            // 如果没有缓存，则生成
+            document.getElementById('ai-chat-list-title').textContent = `正在生成 ${character.remarkName} 的聊天...`;
+            document.getElementById('ai-chat-list-container').innerHTML = `<p class="placeholder-text">请稍候...</p>`;
+
+            try {
+                const otherCharacters = db.characters.filter(c => c.id !== currentAiPovId);
+                const userProfile = { name: character.myName };
+                const prompt = generateAiChatListPrompt(character, otherCharacters, userProfile);
+
+                const aiResponseText = await callAiApi([{ role: 'user', content: prompt }]);
+                const chatList = extractAndParseJson(aiResponseText);
+
+                // 存储AI生成的数据到临时变量和长期缓存
+                currentAiPovData.mainAi = character;
+                currentAiPovData.chatList = chatList;
+                currentAiPovData.conversations = {};
+                
+                character.povCache = {
+                    chatList: chatList,
+                    conversations: {}
+                };
+                await saveData();
+
+                renderAiChatList(character, chatList);
+
+            } catch (error) {
+                console.error("生成AI聊天列表失败:", error);
+                showToast(`生成失败: ${error.message}`);
+                document.getElementById('ai-chat-list-container').innerHTML = `<p class="placeholder-text" style="color:red;">生成聊天列表失败。</p>`;
+            }
+        }
+    });
+
+    // 监听主屏幕上“AI空间”图标的点击
+    document.body.addEventListener('click', e => {
+        const icon = e.target.closest('[data-target="ai-character-select-screen"]');
+        if (icon) {
+            renderAiCharacterSelect();
+        }
+    });
+    
+    // 监听“AI的聊天列表”的点击事件
+    document.getElementById('ai-chat-list-container').addEventListener('click', async (e) => {
+        const chatItem = e.target.closest('.list-item');
+        if (chatItem && chatItem.dataset.povChatId) {
+            currentAiPovChatId = chatItem.dataset.povChatId;
+            const chatInfo = currentAiPovData.chatList.find(c => c.chatId === currentAiPovChatId);
+            if (!chatInfo) return;
+
+            // [新增] 特殊处理：如果点击的是与用户的聊天
+            if (chatInfo.otherParty && chatInfo.otherParty.type === 'user') {
+                renderAiPovConversation(currentAiPovData.mainAi, chatInfo, currentAiPovData.mainAi.history);
+                switchScreen('ai-chat-view-screen');
+                return;
+            }
+
+            // [新增] 检查对话缓存
+            if (currentAiPovData.conversations[currentAiPovChatId]) {
+                console.log("从缓存加载AI间对话。");
+                renderAiPovConversation(currentAiPovData.mainAi, chatInfo, currentAiPovData.conversations[currentAiPovChatId]);
+                switchScreen('ai-chat-view-screen');
+                return;
+            }
+            
+            // 如果没有缓存，则生成
+            switchScreen('ai-chat-view-screen');
+            const otherPartyName = chatInfo.type === 'private' ? (db.characters.find(c=>c.realName === chatInfo.otherParty.name)?.remarkName || chatInfo.otherParty.name) : chatInfo.groupName;
+            document.getElementById('ai-chat-view-title').textContent = `正在生成与 ${otherPartyName} 的对话...`;
+            document.getElementById('ai-message-area').innerHTML = `<p class="placeholder-text">请稍候...</p>`;
+
+            try {
+                const prompt = generateAiConversationPrompt(currentAiPovData.mainAi, chatInfo);
+                const aiResponseText = await callAiApi([{ role: 'user', content: prompt }]);
+                const conversation = extractAndParseJson(aiResponseText);
+
+               
+
+                // 存储到临时变量和长期缓存，并添加时间戳
+const conversationData = {
+    history: conversation,
+    timestamp: Date.now() // <-- 核心新增：记录当前时间
+};
+currentAiPovData.conversations[currentAiPovChatId] = conversationData;
+const character = db.characters.find(c => c.id === currentAiPovId);
+if (character && character.povCache) {
+    character.povCache.conversations[currentAiPovChatId] = conversationData;
+    await saveData();
+}
+
+
+renderAiPovConversation(currentAiPovData.mainAi, chatInfo, conversation);
+
+            } catch(error) {
+                console.error("生成AI对话失败:", error);
+                showToast(`生成失败: ${error.message}`);
+                document.getElementById('ai-message-area').innerHTML = `<p class="placeholder-text" style="color:red;">生成对话失败。</p>`;
+            }
+        }
+    });
+}
+
+/**
+ * [重写] 渲染AI角色选择列表
+ */
+function renderAiCharacterSelect() {
+    const container = document.getElementById('ai-character-select-list');
+    const placeholder = document.getElementById('no-ai-chars-placeholder');
+    container.innerHTML = '';
+    
+    if (!db.characters || db.characters.length === 0) {
+        placeholder.style.display = 'block';
+    } else {
+        placeholder.style.display = 'none';
+        db.characters.forEach(char => {
+            const li = document.createElement('li');
+            li.className = 'list-item';
+            li.dataset.id = char.id;
+            li.style.cursor = 'pointer';
+            li.innerHTML = `
+                <img src="${char.avatar}" alt="${char.remarkName}" class="chat-avatar">
+                <div class="item-details">
+                    <div class="item-name">${char.remarkName}</div>
+                    <div class="item-preview">查看 ${char.remarkName} 的聊天...</div>
+                </div>
+            `;
+            container.appendChild(li);
+        });
+    }
+    switchScreen('ai-character-select-screen');
+}
+
+/**
+ * [重写] 渲染由AI生成的聊天列表
+ * @param {object} character - 主视角AI角色对象
+ * @param {Array} chatList - AI生成的聊天列表数据
+ */
+function renderAiChatList(character, chatList) {
+    document.getElementById('ai-chat-list-title').textContent = `${character.remarkName}的聊天列表`;
+    const container = document.getElementById('ai-chat-list-container');
+    const placeholder = document.getElementById('no-ai-chats-placeholder');
+    container.innerHTML = '';
+    
+    if (!chatList || chatList.length === 0) {
+        placeholder.style.display = 'block';
+    } else {
+        placeholder.style.display = 'none';
+        chatList.forEach(chat => {
+            let avatar = 'https://i.postimg.cc/Y96LPskq/o-o-2.jpg';
+            let name = '未知';
+            if (chat.type === 'private') {
+                if (chat.otherParty.type === 'user') {
+                    // 尝试从任何一个角色数据中找到用户的头像信息
+                    const userChar = db.characters.find(c => c.myName === chat.otherParty.name);
+                    avatar = userChar ? userChar.myAvatar : (db.characters[0]?.myAvatar || avatar);
+                    name = chat.otherParty.name;
+                } else {
+                    const otherAi = db.characters.find(c => c.realName === chat.otherParty.name);
+                    avatar = otherAi ? otherAi.avatar : avatar;
+                    name = otherAi ? otherAi.remarkName : chat.otherParty.name;
+                }
+            } else { // group
+                avatar = 'https://i.postimg.cc/fTLCngk1/image.jpg'; // 默认群头像
+                name = chat.groupName;
+            }
+            
+            const li = document.createElement('li');
+            li.className = 'list-item';
+            li.dataset.povChatId = chat.chatId;
+            li.style.cursor = 'pointer';
+            li.innerHTML = `
+                <img src="${avatar}" alt="${name}" class="chat-avatar ${chat.type === 'group' ? 'group-avatar' : ''}">
+                <div class="item-details">
+                    <div class="item-name">${name}</div>
+                    <div class="item-preview">${chat.lastMessage}</div>
+                </div>
+            `;
+            container.appendChild(li);
+        });
+    }
+}
+
+/**
+ * [重写] 渲染由AI生成的对话内容或真实的用户对话
+ * @param {object} mainAi - 主视角AI角色对象
+ * @param {object} chatInfo - 被点击的聊天条目的信息
+ * @param {Array} conversationHistory - AI生成的对话历史或真实的聊天记录
+ */
+           function renderAiPovConversation(mainAi, chatInfo, conversationHistory) {
+            const otherPartyName = chatInfo.type === 'private' ? (db.characters.find(c=>c.realName === chatInfo.otherParty.name)?.remarkName || chatInfo.otherParty.name) : chatInfo.groupName;
+            document.getElementById('ai-chat-view-title').textContent = `与 ${otherPartyName} 的对话`;
+            const messageArea = document.getElementById('ai-message-area');
+            messageArea.innerHTML = '';
+
+            // 区分真实历史记录和AI生成的模拟对话
+            const isRealHistory = conversationHistory.some(msg => msg.role);
+
+            const historyToRender = isRealHistory 
+                ? conversationHistory // 如果是真实历史，直接使用
+                : conversationHistory.map(msg => ({ // 如果是AI模拟的，转换格式
+                    content: msg.content,
+                    senderId: msg.sender // AI生成的sender是真名，需要转换
+                }));
+
+            historyToRender.forEach(msg => {
+                // --- ▼▼▼ 核心修改：复用主聊天界面的渲染逻辑 ---
+                // 创建一个临时的消息对象，使其结构与 createMessageBubbleElement 兼容
+                const tempMessage = {
+                    id: msg.id || `pov_${Date.now()}_${Math.random()}`,
+                    content: msg.content,
+                    timestamp: msg.timestamp || Date.now(),
+                    role: msg.role || (msg.senderId === mainAi.realName ? 'assistant' : 'user'),
+                    senderId: msg.senderId
+                };
+                
+                // 借用主渲染函数来创建气泡元素
+                const bubbleElement = createMessageBubbleElement(tempMessage);
+                
+                if (bubbleElement) {
+                    // AI空间不需要头像和时间，我们只提取气泡本身
+                    const bubble = bubbleElement.querySelector('.message-bubble, .ai-generated-theater, .system-notification-bubble, .image-bubble, .pv-card, .transfer-card, .gift-card, .file-card, .location-card, .music-card');
+                    
+                    if(bubble) {
+                        const wrapper = document.createElement('div');
+                        // 判断消息是主AI发的还是对方发的
+                        const isSentByMainAi = (isRealHistory && msg.role === 'assistant') || (!isRealHistory && msg.senderId === mainAi.realName);
+                        wrapper.className = `message-wrapper ${isSentByMainAi ? 'sent' : 'received'}`;
+                        wrapper.style.alignItems = isSentByMainAi ? 'flex-end' : 'flex-start'; // 强制对齐
+                        wrapper.style.marginBottom = '10px';
+                        
+                        // 直接将解析好的气泡放入wrapper
+                        wrapper.appendChild(bubble.cloneNode(true));
+                        messageArea.appendChild(wrapper);
+                    }
+                }
+                // --- ▲▲▲ 修改结束 ▲▲▲
+            });
+
+            setTimeout(() => { messageArea.scrollTop = messageArea.scrollHeight; }, 50);
+        }
+       
+/**
+ * [重写] 背景对话生成功能，以确保与AI空间功能解耦
+ */
+/**
+ * [新的辅助函数] 检查两个角色是否可能根据其人设和世界书相互认识。
+ * @param {object} charA - 第一个角色对象。
+ * @param {object} charB - 第二个角色对象。
+ * @returns {boolean} - 如果确认相识则返回 true，否则返回 false。
+ */
+function charactersAreAcquainted(charA, charB) {
+    // 获取两个角色的所有已知名称，用于检查提及。
+    const namesA = [charA.realName, charA.remarkName].filter(Boolean);
+    const namesB = [charB.realName, charB.remarkName].filter(Boolean);
+
+    // 将人设和所有关联的世界书内容合并为每个角色的单个上下文字符串。
+    const getWorldBookContent = (char) => {
+        return (char.worldBookIds || [])
+            .map(id => db.worldBooks.find(wb => wb.id === id))
+            .filter(Boolean)
+            .map(wb => wb.content)
+            .join(' ');
+    };
+
+    const contextA = `${charA.persona || ''} ${getWorldBookContent(charA)}`;
+    const contextB = `${charB.persona || ''} ${getWorldBookContent(charB)}`;
+
+    // 进行双向检查。
+    // 角色A的上下文（人设或世界书）是否提及了角色B的名字？
+    const aKnowsB = namesB.some(name => contextA.includes(name));
+    // 角色B的上下文（人设或世界书）是否提及了角色A的名字？
+    const bKnowsA = namesA.some(name => contextB.includes(name));
+
+    // 只要任意一方的上下文中提到了对方，就认为他们相识。
+    return aKnowsB || bKnowsA;
+}
+
+
+/**
+ * [修订版] 触发并生成两个AI角色之间的后台对话。
+ * 该对话只会在两个角色被确认相互认识的情况下发生。
+ * @param {object} characterA - 刚刚与用户互动的那个角色。
+ */
+async function generateBackgroundChat(characterA) {
+    // 如果没有足够的角色进行对话，则中止。
+    if (currentChatType !== 'private' || db.characters.length < 2) return;
+
+    // 找到用户的最后一条消息，作为对话的触发器。
+    const lastUserMessage = characterA.history.findLast(m => m.role === 'user');
+    if (!lastUserMessage) return;
+
+    const otherCharacters = db.characters.filter(c => c.id !== characterA.id);
+
+    // --- 核心逻辑变更 ---
+    // 筛选潜在的聊天伙伴列表，只保留那些认识 characterA 的角色。
+    const potentialPartners = otherCharacters.filter(charB => charactersAreAcquainted(characterA, charB));
+
+    // 如果没有找到认识的角色，则不执行任何操作。
+    if (potentialPartners.length === 0) {
+        console.log(`[后台聊天] ${characterA.remarkName} 没有认识的伙伴可以聊天。`);
+        return;
+    }
+
+    // 从认识的角色列表中随机选择一个伙伴。
+    const characterB = potentialPartners[Math.floor(Math.random() * potentialPartners.length)];
+    // --- 核心逻辑变更结束 ---
+
+    const prompt = `你是一个聊天模拟器。你的任务是根据一个触发事件，在两个AI角色之间生成一段简短、真实的对话。
+    
+    角色A (对话发起者):
+    - 名字: ${characterA.realName}
+    - 人设: ${characterA.persona}
+    
+    角色B (对话接收者):
+    - 名字: ${characterB.realName}
+    - 人设: ${characterB.persona}
+
+    触发事件 (这是用户刚刚对角色A说的话): "${lastUserMessage.content.replace(/\[.*?的消息：|\]/g, '')}"
+
+    任务:
+    1. 角色A主动找角色B，就“触发事件”开始一段对话。
+    2. 生成2到4句对话。
+    3. 严格保持两个角色的人设。
+    4. 你的输出必须是严格的JSON数组格式，像这样: [{"sender": "${characterA.realName}", "content": "第一句话"}, {"sender": "${characterB.realName}", "content": "第二句话"}]
+    
+    请直接开始生成JSON，不要包含任何额外的解释。`;
+
+    try {
+        let messagesForApi;
+        if (db.apiSettings.provider === 'gemini') {
+            messagesForApi = [{ role: 'user', parts: [{ type: 'text', text: prompt }] }];
+        } else {
+            messagesForApi = [{ role: 'user', content: prompt }];
+        }
+        
+        const aiResponseText = await callAiApi(messagesForApi);
+        const jsonMatch = aiResponseText.match(/\[[\s\S]*?\]/);
+        if (!jsonMatch) {
+            console.warn("背景对话生成失败: AI回复中未找到有效的JSON数组。", aiResponseText);
+            return;
+        }
+
+        const newMessages = JSON.parse(jsonMatch[0]);
+
+        if (!characterA.povChats) characterA.povChats = [];
+        
+        let povChat = characterA.povChats.find(pc => pc.otherCharId === characterB.id);
+        if (!povChat) {
+            povChat = {
+                id: `pov_${characterA.id}_${characterB.id}`,
+                otherCharId: characterB.id,
+                history: []
+            };
+            characterA.povChats.push(povChat);
+        }
+
+        povChat.history.push(...newMessages);
+        if (povChat.history.length > 20) {
+            povChat.history = povChat.history.slice(povChat.history.length - 20);
+        }
+        
+        console.log(`已生成 ${characterA.remarkName} 和 ${characterB.remarkName} 之间的背景对话。`);
+
+    } catch (error) {
+        console.error("生成背景对话失败:", error);
+    }
+}
         init();
     });
 </script>
@@ -11116,6 +12695,30 @@ function cancelQuoteReply() {
     margin-bottom: 5px;
 }
   
+  /* --- 最终修复：“我的钱包”等页面内容溢出，让其被包裹在手机内部 --- */
+#wallet-screen .content,
+#forum-screen .content,
+#forum-thread-screen .content,
+#chat-list-screen .content,
+#world-book-screen .content,
+#api-settings-screen .content,
+#diary-screen .content,
+#memories-screen .content,
+#ai-character-select-screen .content,
+#ai-chat-list-screen .content,
+#ai-chat-view-screen .content {
+    flex-grow: 1; /* 关键：让内容区占据所有剩余空间 */
+    overflow-y: auto; /* 关键：当内容超出时，只滚动内容区本身 */
+    height: auto; /* 移除固定的100%高度 */
+    min-height: 0; /* flex布局的一个小技巧，防止内容撑破容器 */
+}
+
+/* 为钱包和论坛等页面的内容区增加底部内边距，防止被底部导航栏遮挡 */
+#wallet-screen .content,
+#forum-screen .content,
+#forum-thread-screen .content {
+    padding-bottom: 80px; 
+}
 </style>
 
 <div class="icity-moments-wrap" id="icity-moments-wrap">
@@ -11515,6 +13118,53 @@ function cancelQuoteReply() {
 .new-post-btn:hover {
     transform: scale(1.1);
 }
+
+/* --- 支付密码开关Toggle Switch样式 --- */
+.form-group.toggle-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.toggle-switch .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 28px;
+}
+.toggle-switch .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+input:checked + .slider {
+    background-color: var(--primary-color);
+}
+input:checked + .slider:before {
+    transform: translateX(22px);
+}
+  
 /* --- 在 <style> 标签末尾添加 --- */
 
 /* --- 论坛功能最终布局和样式 (严格参考已有范例) --- */
@@ -11833,7 +13483,163 @@ function cancelQuoteReply() {
     /* 增加一个足够高的底部内边距，为导航栏留出空间 */
     padding-bottom: 80px; 
 }
-  
+/* --- 视频通话功能样式 (最终修正版) --- */
+.sticker-bar-btn#voice-call-btn {
+    display: none;
+}
+
+#voice-call-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 300;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+    animation: fadeIn 0.3s ease;
+}
+
+#voice-call-overlay.visible {
+    display: flex;
+}
+
+.call-avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 4px solid rgba(255, 255, 255, 0.5);
+    margin-top: 40px; 
+    flex-shrink: 0;
+}
+
+.call-name {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+}
+
+.call-status {
+    font-size: 16px;
+    color: #ccc;
+    min-height: 24px;
+    margin-bottom: 15px;
+    flex-shrink: 0;
+}
+
+/* 聊天记录区域的核心修复 */
+#call-transcript-area {
+    flex: 1; /* 关键：让此区域自动伸展并占据所有剩余空间 */
+    width: 100%;
+    overflow-y: auto; /* 内容多时可以滚动 */
+    min-height: 0; /* flex布局的关键技巧，防止内容溢出 */
+    padding: 10px;
+    font-size: 15px;
+    line-height: 1.7;
+    text-align: left;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.call-transcript-line {
+    margin-bottom: 12px;
+}
+.call-transcript-line .action {
+    color: #aaa;
+    font-style: italic;
+}
+.call-transcript-line .dialog {
+    color: #fff;
+}
+
+/* 底部输入框和按钮 */
+#call-input-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0 0 0; /* 只保留上边距 */
+    width: 100%;
+    flex-shrink: 0;
+}
+#call-input {
+    flex-grow: 1;
+    border: none;
+    padding: 12px;
+    border-radius: 18px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+#call-input::placeholder {
+    color: #ccc;
+}
+#send-call-message-btn {
+    background: var(--primary-color);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    color: white;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+/* 通话按钮组 */
+.call-button-group {
+    position: absolute;
+    bottom: 80px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.call-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: white;
+}
+.call-button .icon-wrapper {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+.call-button svg {
+    width: 36px;
+    height: 36px;
+    fill: white;
+}
+.call-button.decline .icon-wrapper {
+    background-color: #ef5350;
+}
+.call-button.accept .icon-wrapper {
+    background-color: #4CAF50;
+}
+/* 将挂断按钮也放入这个组，但由JS控制显隐 */
+#hangup-button-container {
+    position: static;
+    padding: 10px 0;
+    flex-shrink: 0;
+}
 /* --- 在 <style> 标签末尾添加 --- */
 
 
@@ -11987,7 +13793,7 @@ function cancelQuoteReply() {
     display: flex;
     align-items: center;
     gap: 8px;
-    min-width: 130px; /* 缩小宽度 */
+    min-width: 160px; /* 缩小宽度 */
     box-shadow: none; /* 移除阴影，更简洁 */
     cursor: pointer;
     transition: background-color 0.2s ease;
@@ -11996,8 +13802,8 @@ function cancelQuoteReply() {
     background-color: #e9e9e9;
 }
 .contact-widget img {
-    width: 34px; /* 缩小头像 */
-    height: 34px;
+    width: 40px; /* 缩小头像 */
+    height: 40px;
     border-radius: 50%;
     object-fit: cover;
 }
@@ -12024,12 +13830,12 @@ function cancelQuoteReply() {
 .small-app-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 16px;
 }
 .small-app-grid .app-icon .icon-img,
 .secondary-apps-dock .app-icon .icon-img {
-    width: 36px; /* 统一缩小图标尺寸 */
-    height: 36px;
+    width: 50px; /* 统一缩小图标尺寸 */
+    height: 50px;
     border-radius: 11px;
     margin-bottom: 4px;
 }
@@ -12040,7 +13846,7 @@ function cancelQuoteReply() {
 
 /* 6. 音乐播放器新位置和尺寸 */
 .record-player-widget {
-    --music-widget-scale: 0.9; /* 再次缩小组件 */
+    --music-widget-scale: 1.2; /* 再次缩小组件 */
     margin: 0 auto; /* 移除上下外边距，由父容器gap控制 */
     width: 100%; /* 宽度与父容器（右列）对齐 */
     max-width: calc(130px * var(--music-widget-scale));
@@ -12052,7 +13858,7 @@ function cancelQuoteReply() {
 
 /* 7. 底部Dock栏调整 */
 .dock {
-    margin: 42px 20px 20px; /* 上 左右 下 的间距 */
+    margin: 60px 20px 10px; /* 上 左右 下 的间距 */
 }
 
 /* 8. 确保旧的布局规则被禁用 */
@@ -12065,11 +13871,14 @@ function cancelQuoteReply() {
 
 </style>
 
+
+<!-- 在聊天界面底部插入导航（你指定的位置：聊天界面底部） -->
 <div id="bottom-nav-host" data-managed-by="injection" style="display:none;">
   <div class="bottom-nav" id="bottom-nav">
     <button class="nav-btn active" data-target="chat-list-screen">聊天</button>
     <button class="nav-btn" data-target="moments-screen">动态</button>
     <button class="nav-btn" data-target="forum-screen">论坛</button>
+    <button class="nav-btn" data-target="wallet-screen">我</button>
   </div>
 </div>
 
@@ -12787,12 +14596,14 @@ function updateBottomNavVisibilityByActive() {
     const momentsCls = document.getElementById('moments-screen');
     const forumScreen = document.getElementById('forum-screen');
     const forumThreadScreen = document.getElementById('forum-thread-screen');
+    const walletScreen = document.getElementById('wallet-screen'); // <-- 新增这一行
 
-    // --- 修改：在判断条件里加入对论坛页面的检查 ---
+    // --- 修改：在判断条件里加入对论坛和钱包页面的检查 ---
     if ((chatCls && chatCls.classList.contains('active')) ||
         (momentsCls && momentsCls.classList.contains('active')) ||
         (forumScreen && forumScreen.classList.contains('active')) ||
-        (forumThreadScreen && forumThreadScreen.classList.contains('active'))
+        (forumThreadScreen && forumThreadScreen.classList.contains('active')) ||
+        (walletScreen && walletScreen.classList.contains('active')) // <-- 新增这一行
        ) {
       bottomNavHost.style.display = '';
     } else {
@@ -13420,6 +15231,7 @@ mo.observe(phone, { attributes: true, subtree: false, attributeFilter: ['class']
     --icity-avatar-size: 77px; /* 70% of previous 110px */
   }
 }
+  
 </style>
 <!-- End assistant-inserted CSS -->
 
@@ -14430,7 +16242,10 @@ fileInput.addEventListener('change', async (e)=>{
         <button id="close-memory-summary-btn" class="btn btn-primary" style="margin-top: 20px;">关闭</button>
     </div>
 </div>
-<!-- === Modal 结束 === -->
+<!-- ... 紧跟在 memory-summary-modal 的 div 之后 ... -->
+
+
+
 </body>
 
 </html>
