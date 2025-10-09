@@ -7533,6 +7533,8 @@ const locationBtn = document.getElementById('location-btn'),
             return Promise.resolve();
         };
 
+
+   // ▼▼▼ 请从这里开始，一直复制到最下面的“复制结束”注释 ▼▼▼
         const loadData = async () => {
             // 首先尝试数据迁移
             await dataStorage.migrateFromOldStorage();
@@ -7574,7 +7576,33 @@ const locationBtn = document.getElementById('location-btn'),
                 db = { ...db, ...data };
             }
     // --- 新增：从独立通道加载所有重要数据 ---
-            db.worldBooks = await dataStorage.getData('worldBooks_data') || [];
+
+            // --- 兼容旧版世界书数据的迁移逻辑 ---
+            const loadedWorldBooks = await dataStorage.getData('worldBooks_data');
+            if (loadedWorldBooks && loadedWorldBooks.length > 0) {
+                // 如果新的专用位置有数据，就优先使用它
+                db.worldBooks = loadedWorldBooks;
+            } else if (db.worldBooks && db.worldBooks.length > 0) {
+                // 如果专用位置没数据，但我们从旧的大包里读出了世界书数据
+                // 就把它保存到新的专用位置，完成数据“搬家”
+                await dataStorage.saveData('worldBooks_data', db.worldBooks);
+                console.log('已成功将旧版世界书数据迁移到新存储位置。');
+            } else {
+                // 如果两边都没有，那才是真的没有世界书
+                db.worldBooks = [];
+            }
+            // --- 迁移逻辑结束 ---
+  // ▼▼▼ 在这里添加新的代码 ▼▼▼
+            // --- 新增：为旧版世界书数据添加分类兼容 ---
+            if (db.worldBooks && db.worldBooks.length > 0) {
+                db.worldBooks.forEach(book => {
+                    if (book.categoryId === undefined) {
+                        book.categoryId = 'uncategorized';
+                    }
+                });
+            }
+            // --- 兼容代码结束 ---
+            // ▲▲▲ 添加结束 ▲▲▲
             db.apiSettings = await dataStorage.getData('apiSettings_data') || {};
             db.customIcons = await dataStorage.getData('customIcons_data') || {};
             db.wallpaper = await dataStorage.getData('wallpaper_data') || 'https://i.postimg.cc/W4Z9R9x4/ins-1.jpg';
@@ -7629,9 +7657,7 @@ if (!db.homeProfile) {
                 db.forumData = {};
             }
           if (!db.forumSettings) db.forumSettings = {}; // 新增：为论坛配置初始化
-                // --- 在这里单独加载世界书 ---
-            const loadedWorldBooks = await dataStorage.getData('worldBooks_data');
-            db.worldBooks = loadedWorldBooks || [];
+            
             if (!db.worldBooks) db.worldBooks = []; // 兼容性检查
             // --- 结束 ---
 
@@ -7702,7 +7728,7 @@ if (!db.homeProfile) {
          
             return Promise.resolve();
         };
-        // ▲▲▲ 替换结束 ▲▲▲             
+// ▲▲▲ 复制结束 ▲▲▲          
         const switchScreen = (targetId) => {
             screens.forEach(screen => screen.classList.remove('active'));
             document.getElementById(targetId)?.classList.add('active');
@@ -10735,14 +10761,16 @@ renderWorldBookList = function() {
     const hasContent = db.worldBooks.length > 0 || db.worldBookCategories.length > 0;
     noWorldBooksPlaceholder.style.display = hasContent ? 'none' : 'block';
 
-    const renderBooks = (books) => {
+  const renderBooks = (books) => {
         let html = '';
         books.forEach(book => {
             html += `
                 <li class="list-item world-book-item" data-id="${book.id}">
                     <div class="item-details" style="padding-left: 20px;">
-                        <div class="item-name">${book.name}</div>
-                        <div class="item-preview">${book.content}</div>
+                      
+                        <div class="item-name">${escapeHTML(book.name)}</div>
+                      
+                        <div class="item-preview">${escapeHTML(book.content)}</div>
                     </div>
                 </li>`;
         });
@@ -22551,8 +22579,19 @@ function setupHomeScreenProfileEditor() {
         avatarImg.src = profile.avatar;
         nameEl.textContent = profile.name;
         signatureEl.textContent = profile.signature;
+    
+  // ▼▼▼ 在这里添加新的代码 ▼▼▼
+        // 新增：同时更新商城个人中心的显示
+        const mallAvatarImg = document.getElementById('profile-avatar');
+        const mallUsernameEl = document.getElementById('profile-username');
+        if (mallAvatarImg) {
+            mallAvatarImg.src = profile.avatar;
+        }
+        if (mallUsernameEl) {
+            mallUsernameEl.textContent = profile.name;
+        }
+        // ▲▲▲ 添加结束 ▲▲▲
     }
-
     // 2. 保存函数 (保持不变)
     async function saveProfile() {
         await saveData();
